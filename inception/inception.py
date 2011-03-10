@@ -2,25 +2,23 @@
 # encoding: utf=8
 
 """
-beatcaster.py
+inception.py
 
 Lucas Garron, garron.us
 
-Program lazily hacked onto Tristan Jehan's swinger.py
+Really buggy hack of beatcaster.py to add Inception sounds to a song
 
 TODO:
+- Fix normalization.
 
-- Allow skipping of beats.
-- Use something smarter to go by bars instead of beat cycles
-- Allow the beat to change during the song? (e.g. combat detection errors)
-- Apply pattern to sub-beats (like the swinger)
 """
 
 from optparse import OptionParser
 import os, sys
 import string
+import numpy
 
-from echonest.audio import LocalAudioFile, AudioData
+from echonest.audio import LocalAudioFile, AudioData, AudioData32
 from echonest.action import render, Playback, display_actions
 
 try:
@@ -37,6 +35,7 @@ except Exception, e:
     sys.exit("Unable to load dirac, which is required for Crossmatch. Please install pydirac: %s" % e)
 
 def do_work(track, options):
+
     beat_pattern = string.replace(options.pattern, "-", "")
     beat_pattern_len = len(beat_pattern)
     
@@ -47,31 +46,47 @@ def do_work(track, options):
     
     # build rates
     rates = []
+    bar_starts = []
     n_beat = 0
     last_start = 0
     start = 0
-    print "Running through beats..."
+    if verb == True: print "Running through beats..."
     for beat in beats[:-1]:
         rate = float(options.slowdown)/int(beat_pattern[n_beat % beat_pattern_len])
     	last_start = start
         start = int(beat.start * track.sampleRate)
-        if options.debug and (n_beat % beat_pattern)==(beat_pattern-1) and (n_beat > 0):
+        if options.debug and (n_beat % beat_pattern_len)==(beat_pattern_len-1) and (n_beat > 0):
 	        rates.append(((start*9 + last_start)/10 - offset, 11*rate))	
         rates.append((start-offset, rate))
         n_beat = n_beat + 1
         if verb: print n_beat, start-offset, start, rate
+        if (n_beat % beat_pattern_len)==int(options.downbeat):
+        	bar_starts.append(n_beat)
         #print rate, start
         #if verb == True: print "Beat %d — split [%.3f|%.3f] — stretch [%.3f|%.3f] seconds" % (beats.index(beat), dur, beat.duration-dur, stretch, beat.duration-stretch)
-    print "Done with beats."
-    
+    if verb == True: print "Done with beats."
+
+    track1 = AudioData32(ndarray = track.data, shape=track.data.shape, sampleRate=44100, numChannels=track.data.shape[1])
+    if (options.downbeat >= 0):
+        inc2 = AudioData(options.downbeat_file, sampleRate=44100, numChannels=2)
+        if verb == True: print "Starting downbeats."
+        for bar_start in bar_starts:
+            if verb == True: print beats[bar_start].start , bar_start
+            track1.add_at(float(beats[bar_start].start) + float(options.downbeat_offset), inc2)
+        if verb == True: print "Done with downbeats."
+
+    track1.normalize()
+
     # get audio
-    vecin = track.data[offset:int(beats[-1].start * track.sampleRate),:]
+    vecin = track1[offset:int(beats[-1].start * track.sampleRate),:]
     # time stretch
     if verb == True: print "\nTime stretching..."
     vecout = dirac.timeScale(vecin, rates, track.sampleRate, 0)
     # build timestretch AudioData object
     ts = AudioData(ndarray=vecout, shape=vecout.shape, sampleRate=track.sampleRate, numChannels=vecout.shape[1])
-    # initial and final playback
+
+
+	# initial and final playback
     pb1 = Playback(track, 0, beats[0].start)
     pb2 = Playback(track, beats[-1].start, track.analysis.duration-beats[-1].start)
 
@@ -90,6 +105,9 @@ def main():
     	")
     parser.add_option("-s", "--slowdown", default=1, help="General factor of slowdown")
     parser.add_option("-d", "--debug", action="store_true", help="General factor of slowdown")
+    parser.add_option("--downbeat", default=-1, help="Downbeat index in the pattern.")
+    parser.add_option("--downbeat_file", default=0, help="File to use for downbeat sound.")
+    parser.add_option("--downbeat_offset", default=0, help="Amount of seconds to shift beat back.")
     parser.add_option("-v", "--verbose", action="store_true", help="show results on screen")
     
     (options, args) = parser.parse_args()
@@ -107,10 +125,13 @@ def main():
     
     # this is where the work takes place
     actions = do_work(track, options)
+    if bool(options.verbose): print "\t2..."
+
     
-    if bool(options.verbose) == True:
-        display_actions(actions)
+        #if bool(options.verbose) == True:
+            #display_actions(actions)
     
+    if bool(options.verbose): print "\t2..."
     # Send to renderer
     name = os.path.splitext(os.path.basename(args[0]))
     beat_signature = options.pattern;
@@ -118,7 +139,8 @@ def main():
     	beat_signature = beat_signature + "_" + options.slowdown
     name = name[0]+'_'+beat_signature+'.mp3'
     name = name.replace(' ','')
-    
+    if bool(options.verbose): print "\t2..."
+
     print "Rendering..."
     render(actions, name)
     return 1
