@@ -10,7 +10,6 @@ Program lazily hacked onto Tristan Jehan's swinger.py
 
 TODO:
 
-- Allow skipping of beats.
 - Use something smarter to go by bars instead of beat cycles
 - Allow the beat to change during the song? (e.g. combat detection errors)
 - Apply pattern to sub-beats (like the swinger)
@@ -52,16 +51,20 @@ def do_work(track, options):
     start = 0
     print "Running through beats..."
     for beat in beats[:-1]:
-        rate = float(options.slowdown)/int(beat_pattern[n_beat % beat_pattern_len])
-    	last_start = start
+        last_start = start
         start = int(beat.start * track.sampleRate)
-        if options.debug and (n_beat % beat_pattern)==(beat_pattern-1) and (n_beat > 0):
-	        rates.append(((start*9 + last_start)/10 - offset, 11*rate))	
-        rates.append((start-offset, rate))
+        if (int(beat_pattern[n_beat % beat_pattern_len]) != 0):
+            rate = float(options.slowdown)/int(beat_pattern[n_beat % beat_pattern_len])
+            if options.debug and (n_beat % beat_pattern_len)==(beat_pattern_len-1) and (n_beat > 0):
+                rates.append(((start*9 + last_start)/10 - offset, 11*rate))	
+            rates.append((start-offset, rate))
+            if verb: print n_beat, start-offset, start, rate
+            #print rate, start
+            #if verb == True: print "Beat %d — split [%.3f|%.3f] — stretch [%.3f|%.3f] seconds" % (beats.index(beat), dur, beat.duration-dur, stretch, beat.duration-stretch)
+        else:
+            rates.append((start-offset, 0))
+            if verb: print "Dropped beat."
         n_beat = n_beat + 1
-        if verb: print n_beat, start-offset, start, rate
-        #print rate, start
-        #if verb == True: print "Beat %d — split [%.3f|%.3f] — stretch [%.3f|%.3f] seconds" % (beats.index(beat), dur, beat.duration-dur, stretch, beat.duration-stretch)
     print "Done with beats."
     
     # get audio
@@ -82,9 +85,10 @@ def main():
 
     parser = OptionParser(usage=usage)
     parser.add_option("-p", "--pattern", default="1", help="tempo pattern, default 1 (every beat at same tempo)\
-    	Each beat will be sped up by a factor of the corresponding digit in the pattern.\
+    	Each beat will be sped up by a factor of the corresponding digit in the pattern. 0 will drop a beat\
     	1122 will take each four beats, and squish the last two (making a waltz)\
     	12 will squish every alternating beat (long swing, depending on the song)\
+        1110 will drop every 4th beat\
     	Much crazier is possible. Also note that the beat detection is sometimes off/ not aligned with bars.\
     	Use -d with \"1111\" to find out what four beats will be grouped at a time.\"\
     	")
