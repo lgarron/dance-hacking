@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
-# Usage ./waltz_blender.py beats.json 0 0.3 file.mp3
+# Usage ./waltz_blender.py beats.json 0 100 file.mp3
+# Usage ./waltz_blender.py beats.json [offset in beats, normally 0, 1, 2, or 3] [percent overlap, normally 0 to 100] file.mp3
 
 import wave, binascii, json, sys, struct, math
 
 # Config
 beats_shift = int(sys.argv[2]);
-overlapTime = float(sys.argv[3]);
+overlap_ratio = float(sys.argv[3]) / 100;
 
 # Read in
 beats_in = open(sys.argv[1], 'r')
@@ -18,26 +19,38 @@ print(file_in.getparams())
 
 array_regular = []
 array_blend = []
+array_overlap = []
 
 hz = file_in.getframerate()
-overlapSamples = 20000 #math.trunc(overlapTime * hz)
-
 
 # For offsetting
 for i in range(beats_shift):
 	beats.insert(0, beats[0])
 
 
-for i in range(len(beats)/4):
+for i in range(len(beats)/4 - 1):
+	array_overlap.append(
+		math.trunc(min(
+			math.trunc(beats[i*4+3][0] * hz) - math.trunc(beats[i*4+2][0] * hz),
+			math.trunc(beats[i*4+4][0] * hz) - math.trunc(beats[i*4+3][0] * hz)
+		) * overlap_ratio)
+	)
+
+for i in range(len(beats)/4 - 1):
 	array_regular.append([
-		math.trunc(beats[i*4+0]/1000. * hz) + 1,
-		math.trunc(beats[i*4+3]/1000. * hz) - overlapSamples
+		math.trunc(beats[i*4+0][0] * hz) + 1,
+		math.trunc(beats[i*4+3][0] * hz) - array_overlap[i]
 	])
+
+array_regular.append([
+	math.trunc(beats[(len(beats)/4 - 1)*4+0][0] * hz) + 1,
+	file_in.getnframes() - 1
+])
 
 for i in range(len(beats)/4 - 1):
 	array_blend.append([
-		math.trunc(beats[i*4+3]/1000. * hz) - overlapSamples,
-		math.trunc(beats[i*4+4]/1000. * hz) - overlapSamples
+		math.trunc(beats[i*4+3][0] * hz) - array_overlap[i],
+		math.trunc(beats[i*4+4][0] * hz) - array_overlap[i]
 	])
 
 array_regular[0][0] = 0
@@ -52,7 +65,7 @@ if (file_in.getsampwidth() != 2):
 
 shift_names = ["12[34]", "1[23]4", "[12]34", "1]23[4"]
 
-outName = sys.argv[4]+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(overlapTime) + "s.wav";
+outName = sys.argv[4]+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
 file_out.setnchannels(file_in.getnchannels())
 file_out.setsampwidth(file_in.getsampwidth())
@@ -72,20 +85,22 @@ for i in range(len(array_regular)):
 
 	if i < len(array_blend):
 
+		print array_overlap[i]
+
 		file_in.setpos(array_blend[i][0])
-		frames1 = file_in.readframes(overlapSamples)
+		frames1 = file_in.readframes(array_overlap[i])
 
 		file_in.setpos(array_blend[i][1])
-		frames2 = file_in.readframes(overlapSamples)
+		frames2 = file_in.readframes(array_overlap[i])
 		
 		out_blend = ""
 
-		for j in range(overlapSamples):
+		for j in range(array_overlap[i]):
 
 			v1 = struct.unpack("<hh", frames1[j * 4: j * 4+4])
 			v2 = struct.unpack("<hh", frames2[j * 4: j * 4+4])
 
-			p = float(j)/overlapSamples
+			p = float(j)/array_overlap[i]
 
 			newVLeft  = math.trunc(v1[0] * math.pow(1-p, 0.5) + v2[0] * math.pow(p, 0.5)) # Issue at min vals?
 			newVRight = math.trunc(v1[1] * math.pow(1-p, 0.5) + v2[1] * math.pow(p, 0.5)) # Issue at min vals?
@@ -101,6 +116,12 @@ for i in range(len(array_regular)):
 			out_blend += newV
 
 		file_out.writeframes(out_blend)
+
+
+		#out_space = ""
+		#for j in range(math.trunc(array_overlap[i]/overlap_ratio)):
+		#	out_space += struct.pack("<hh", 0, 0)
+		#file_out.writeframes(out_space)
 
 
 file_in.close()
