@@ -27,30 +27,32 @@ hz = file_in.getframerate()
 for i in range(beats_shift):
 	beats.insert(0, beats[0])
 
+# Beats per bar
+bpb = 6
 
-for i in range(len(beats)/4 - 1):
+for i in range(len(beats)/bpb - 1):
 	array_overlap.append(
 		math.trunc(min(
-			math.trunc(beats[i*4+3][0] * hz) - math.trunc(beats[i*4+2][0] * hz),
-			math.trunc(beats[i*4+4][0] * hz) - math.trunc(beats[i*4+3][0] * hz)
+			math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - math.trunc(beats[i*bpb+2][0] * hz),
+			math.trunc(beats[i*bpb+bpb][0] * hz) - math.trunc(beats[i*bpb+(bpb-1)][0] * hz)
 		) * overlap_ratio)
 	)
 
-for i in range(len(beats)/4 - 1):
+for i in range(len(beats)/bpb - 1):
 	array_regular.append([
-		math.trunc(beats[i*4+0][0] * hz) + 1,
-		math.trunc(beats[i*4+3][0] * hz) - array_overlap[i]
+		math.trunc(beats[i*bpb+0][0] * hz) + 1,
+		math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - array_overlap[i]
 	])
 
 array_regular.append([
-	math.trunc(beats[(len(beats)/4 - 1)*4+0][0] * hz) + 1,
+	math.trunc(beats[(len(beats)/bpb - 1)*bpb+0][0] * hz) + 1,
 	file_in.getnframes() - 1
 ])
 
-for i in range(len(beats)/4 - 1):
+for i in range(len(beats)/bpb - 1):
 	array_blend.append([
-		math.trunc(beats[i*4+3][0] * hz) - array_overlap[i],
-		math.trunc(beats[i*4+4][0] * hz) - array_overlap[i]
+		math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - array_overlap[i],
+		math.trunc(beats[i*bpb+bpb][0] * hz) - array_overlap[i]
 	])
 
 array_regular[0][0] = 0
@@ -63,7 +65,7 @@ if (file_in.getnchannels() != 2):
 if (file_in.getsampwidth() != 2):
 	print "WARNING: Input file has", file_in.getsampwidth(), "bytes per sample. Only 16-bit (2 bytes) supported is supported right now."
 
-shift_names = ["12[34]", "1[23]4", "[12]34", "1]23[4"]
+shift_names = ["1234[56]", "123[45]6", "12[34]56", "1[23]456", "[12]3456", "1]2345[6"]
 
 outName = sys.argv[4]+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
@@ -75,7 +77,7 @@ file_out.setframerate(file_in.getframerate())
 
 for i in range(len(array_regular)):
 
-	print "" + str(i+1) + "/" + str(len(array_regular)), file_in.tell(), array_regular[i][0]
+	#print "" + str(i+1) + "/" + str(len(array_regular)), file_in.tell(), array_regular[i][0]
 	#file_in.rewind()
 	#file_in.readframes(array_regular[i][0])
 	#print file_in.tell(), array_regular[i][0]
@@ -85,7 +87,7 @@ for i in range(len(array_regular)):
 
 	if i < len(array_blend):
 
-		print array_overlap[i]
+		#print array_overlap[i]
 
 		file_in.setpos(array_blend[i][0])
 		frames1 = file_in.readframes(array_overlap[i])
