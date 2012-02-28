@@ -1,0 +1,44 @@
+#!/bin/bash
+
+# Usage: waltzify file.mp3 beats.json
+
+# TODO: Cache JSON by file hash  (what does Echonest use?)
+
+echo "HI!"
+
+if [ "${2}" = "" ]
+then
+	JSON_FILE="${1}.json"
+	echo "JSON file not passed in. Assuming: ${JSON_FILE}"
+else
+	JSON_FILE="${2}"
+	echo "JSON file passed in: ${JSON_FILE}"
+fi
+
+if [ ! -f "${JSON_FILE}" ]
+then
+	echo "JSON file (${JSON_FILE}) does not exist. Analyzing ${1} using Echonest..."
+    analyze -v "${1}"
+    JSON_FILE="${1}.json"
+fi
+
+
+MUSIC_FILE_IN="${1}"
+
+MUSIC_FILE_TEMP=`mktemp "${MUSIC_FILE_IN}.XXXX"`
+rm "${MUSIC_FILE_TEMP}"
+
+ffmpeg -i "${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FILE_TEMP}"
+
+MUSIC_FILE="${MUSIC_FILE_TEMP}"
+
+
+waltz_blender "${JSON_FILE}" 0 5 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 1 5 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 2 5 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 3 5 "${MUSIC_FILE}" &
+
+waltz_blender "${JSON_FILE}" 0 100 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 1 100 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 2 100 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 3 100 "${MUSIC_FILE}" &
