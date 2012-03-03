@@ -38,7 +38,7 @@ waltz_blender "${JSON_FILE}" 1 5 "${MUSIC_FILE}" &
 waltz_blender "${JSON_FILE}" 2 5 "${MUSIC_FILE}" &
 waltz_blender "${JSON_FILE}" 3 5 "${MUSIC_FILE}" &
 
-waltz_blender "${JSON_FILE}" 0 100 "${MUSIC_FILE}" &
-waltz_blender "${JSON_FILE}" 1 100 "${MUSIC_FILE}" &
-waltz_blender "${JSON_FILE}" 2 100 "${MUSIC_FILE}" &
-waltz_blender "${JSON_FILE}" 3 100 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 0 40 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 1 40 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 2 40 "${MUSIC_FILE}" &
+waltz_blender "${JSON_FILE}" 3 40 "${MUSIC_FILE}" &
