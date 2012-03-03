@@ -93,6 +93,7 @@ def main():
     	Use -d with \"1111\" to find out what four beats will be grouped at a time.\"\
     	")
     parser.add_option("-s", "--slowdown", default=1, help="General factor of slowdown")
+    parser.add_option("-f", "--format", default="mp3", help="Output format (e.g. mp3, wav)")
     parser.add_option("-d", "--debug", action="store_true", help="General factor of slowdown")
     parser.add_option("-v", "--verbose", action="store_true", help="show results on screen")
     
@@ -120,7 +121,7 @@ def main():
     beat_signature = options.pattern;
     if (float(options.slowdown) != 1):
     	beat_signature = beat_signature + "_" + options.slowdown
-    name = name[0]+'_'+beat_signature+'.mp3'
+    name = name[0]+'_'+beat_signature+'.'+options.format
     name = name.replace(' ','')
     
     print "Rendering..."
