@@ -1,0 +1,12 @@
+#!/bin/bash
+
+beatcaster "$1" -p 1122
+beatcaster "$1" -p 2211
+beatcaster "$1" -p 1221
+beatcaster "$1" -p 2112
+beatcaster "$1" -p 1110
+beatcaster "$1" -p 1101
+beatcaster "$1" -p 1011
+beatcaster "$1" -p 0111
+beatcaster "$1" -p 12
+beatcaster "$1" -p 21

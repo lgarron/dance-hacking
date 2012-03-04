@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Usage: wzy [url]
+
+URL="${1}"
+TEMP_FILE=`mktemp /tmp/wzy.XXXXX`
+yt "${URL}" | tee "${TEMP_FILE}"
+FILE=`cat "${TEMP_FILE}" | grep "Destination" | sed "s/^.*: //"`
+rm "${TEMP_FILE}"
+wz "${FILE}"

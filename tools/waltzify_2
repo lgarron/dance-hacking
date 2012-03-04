@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Usage: ./waltzify2 beats.json 0.5 0.05 file.mp3
+
+waltz_blender "$1" 0 "$2" "$4" &
+waltz_blender "$1" 1 "$2" "$4" &
+waltz_blender "$1" 2 "$2" "$4" &
+waltz_blender "$1" 3 "$2" "$4" &
+
+waltz_blender "$1" 0 "$3" "$4" &
+waltz_blender "$1" 1 "$3" "$4" &
+waltz_blender "$1" 2 "$3" "$4" &
+waltz_blender "$1" 3 "$3" "$4" &

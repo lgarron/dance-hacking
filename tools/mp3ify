@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Old. Doesn't preserve full quality.
+#ffmpeg -i "$1" -sameq "$1.mp3"
+
+TEMP=`mktemp "$1.XXXX"`
+#TEMP="${TEMP}.wav"
+rm "${TEMP}"
+
+ffmpeg -i "$1" -sameq -f wav "${TEMP}"
+# VBR to the rescue! [Not anymore. :-( Some iTunes/Quicktime issues.]
+lame -b 128 "${TEMP}" "$1.mp3"
+rm "${TEMP}"

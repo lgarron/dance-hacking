@@ -1,0 +1,13 @@
+#!/bin/bash
+
+FILENAME=`basename "$1"`
+TMP_FILE="/tmp/quadify-$FILENAME"
+echo $FILENAME
+echo $TMP_FILE
+
+cat "$1" > "$TMP_FILE"
+cat "$1" >> "$TMP_FILE"
+cat "$1" >> "$TMP_FILE"
+cat "$1" >> "$TMP_FILE"
+ffmpeg -i "$TMP_FILE" -sameq "$1.quad.wav"
+rm "$TMP_FILE"
