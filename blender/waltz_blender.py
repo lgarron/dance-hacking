@@ -14,6 +14,17 @@ beats_in = open(sys.argv[1], 'r')
 beats = json.load(beats_in)
 beats_in.close()
 
+beats_original = beats
+beats = [beats_original[0]];
+
+# Hack to accomodate moderation tango beats for Richard.
+# We remove the last four beats of every 8, and combine them with the first of the next.
+# The rest of the program sees 1234(56781)234(56781)234..., which makes for e.g. [12]34[(56781)2]34[(56781)2]34... ~ [12]345678[12]345678[12]34...
+for i in range (len(beats_original)):
+  if (((i+7) % 8) < 4):
+    beats.append(beats_original[i]);
+    print i
+
 file_in = wave.open(sys.argv[4], 'r')
 print(file_in.getparams())
 
