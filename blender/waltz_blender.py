@@ -15,6 +15,15 @@ beats = json.load(beats_in)
 beats_in.close()
 
 beats_original = beats
+beats = [];
+
+# Beat doubling for tango.
+for i in range (len(beats_original)):
+    beats.append(beats_original[i])
+    if i < len(beats_original)-1:
+    	beats.append([(beats_original[i][0] + beats_original[i+1][0])/2])
+
+beats_original = beats
 beats = [beats_original[0]];
 
 # Hack to accomodate moderation tango beats for Richard.
