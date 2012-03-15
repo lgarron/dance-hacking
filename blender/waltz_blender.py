@@ -23,6 +23,10 @@ for i in range (len(beats_original)):
     if i < len(beats_original)-1:
     	beats.append([(beats_original[i][0] + beats_original[i+1][0])/2])
 
+# For offsetting
+for i in range(beats_shift):
+	beats.insert(0, beats[0])
+
 beats_original = beats
 beats = [beats_original[0]];
 
@@ -42,10 +46,6 @@ array_blend = []
 array_overlap = []
 
 hz = file_in.getframerate()
-
-# For offsetting
-for i in range(beats_shift):
-	beats.insert(0, beats[0])
 
 
 for i in range(len(beats)/4 - 1):
@@ -83,7 +83,7 @@ if (file_in.getnchannels() != 2):
 if (file_in.getsampwidth() != 2):
 	print "WARNING: Input file has", file_in.getsampwidth(), "bytes per sample. Only 16-bit (2 bytes) supported is supported right now."
 
-shift_names = ["12[34]", "1[23]4", "[12]34", "1]23[4"]
+shift_names = ["12[34]5678", "1[23]45678", "[12]345678", "1]234567[8", "123456[78]", "12345[67]8", "1234[56]78", "1234[56]78"]
 
 outName = sys.argv[4]+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
