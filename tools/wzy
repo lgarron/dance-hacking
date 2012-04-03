@@ -1,10 +1,58 @@
 #!/bin/bash
 
-# Usage: wzy [url]
+# Usage: ytd [url]
 
+#Constants
+MUSIC_FOLDER="${HOME}/Documents/Throw/Music"
+URL_ARCHIVE_FOLDER="${MUSIC_FOLDER}/Archive"
+
+# Get the URL
+# Frontmost Chrome tab by default.
 URL="${1}"
-TEMP_FILE=`mktemp /tmp/wzy.XXXXX`
-yt "${URL}" | tee "${TEMP_FILE}"
-FILE=`cat "${TEMP_FILE}" | grep "Destination" | sed "s/^.*: //"`
-rm "${TEMP_FILE}"
-wz "${FILE}"
+if [[ "${URL}" == "" ]]
+then
+  URL="`chrometab`"
+fi
+
+# Print out the URL, just in case.
+echo "URL: ${URL}"
+echo "--------"
+
+cd "${HOME}/Documents/Throw/Music/temp"
+
+# Target file name.
+TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`
+FILE=`youtube-dl -o "%(title)s.%(ext)s" --get-filename "${URL}"`
+
+# Make a new folder for the download.
+cd "${MUSIC_FOLDER}"
+#NEW_FOLDER="`unixtime` - ${FILE}"
+NEW_FOLDER="${TITLE}"
+mkdir "${NEW_FOLDER}"
+cd "${NEW_FOLDER}"
+open .
+
+# For opening again later.
+# echo "[InternetShortcut]\nURL=${URL}" > "${TITLE}.url"
+WEBLOC_WITH_ESCAPED_URL=`echo "${TITLE}.webloc" | sed "s/\&/\&amp;/g"`
+weblocify "${URL}" "${WEBLOC_WITH_ESCAPED_URL}"
+weblocify "${URL}" "${URL_ARCHIVE_FOLDER}/${WEBLOC_WITH_ESCAPED_URL}" # TODO: Use URL or time to avoid exact title collisions.
+
+# youtube-dl
+youtube-dl -c -o "%(title)s.%(ext)s" --write-description --write-info-json "${URL}"
+
+# Convert to high-quality .mp3
+mp3ify "${FILE}"
+MP3_FILE="$TITLE.mp3"
+mv "${FILE}.mp3" "${MP3_FILE}"
+
+# Analyze the .mp3 version.
+analyze "${MP3_FILE}"
+
+# Full-quality .wav file.
+wavify "${FILE}"
+WAV_FILE="$TITLE.wav"
+mv "${FILE}.wav" "${WAV_FILE}"
+
+# Go!
+wz "${WAV_FILE}" "${MP3_FILE}.json"
