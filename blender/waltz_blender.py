@@ -28,21 +28,38 @@ for i in range(beats_shift):
 	beats.insert(0, beats[0])
 
 # Beats per bar
-bpb = 6
+bpb = 4
+
+def idx(i, j):
+	return math.trunc(beats[i*bpb+j][0] * hz)
 
 for i in range(len(beats)/bpb - 1):
-	array_overlap.append(
-		math.trunc(min(
-			math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - math.trunc(beats[i*bpb+2][0] * hz),
-			math.trunc(beats[i*bpb+bpb][0] * hz) - math.trunc(beats[i*bpb+(bpb-1)][0] * hz)
-		) * overlap_ratio)
-	)
+	if (i % 2) ==0:
+		array_overlap.append(
+			math.trunc(min(
+				idx(i, 3) - idx(i, 2),
+				idx(i, 4) - idx(i, 3)
+			) * overlap_ratio)
+		)
+	else:
+		array_overlap.append(
+			math.trunc(min(
+				idx(i, 2) - idx(i, 1),
+				idx(i, 4) - idx(i, 3)
+			) * overlap_ratio)
+		)
 
 for i in range(len(beats)/bpb - 1):
-	array_regular.append([
-		math.trunc(beats[i*bpb+0][0] * hz) + 1,
-		math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - array_overlap[i]
-	])
+	if (i % 2) == 0:
+			array_regular.append([
+			idx(i, 0) + 1,
+			idx(i, 3) - array_overlap[i]
+		])
+	else:
+		array_regular.append([
+			idx(i, 0) + 1,
+			idx(i, 2) - array_overlap[i]
+		])
 
 array_regular.append([
 	math.trunc(beats[(len(beats)/bpb - 1)*bpb+0][0] * hz) + 1,
@@ -50,10 +67,16 @@ array_regular.append([
 ])
 
 for i in range(len(beats)/bpb - 1):
-	array_blend.append([
-		math.trunc(beats[i*bpb+(bpb-1)][0] * hz) - array_overlap[i],
-		math.trunc(beats[i*bpb+bpb][0] * hz) - array_overlap[i]
-	])
+	if (i % 2) == 0:
+		array_blend.append([
+			idx(i, 3) - array_overlap[i],
+			idx(i, 4) - array_overlap[i]
+		])
+	else:
+		array_blend.append([
+			idx(i, 2) - array_overlap[i],
+			idx(i, 4) - array_overlap[i]
+		])
 
 array_regular[0][0] = 0
 array_regular[-1][1] = file_in.getnframes() - 1
