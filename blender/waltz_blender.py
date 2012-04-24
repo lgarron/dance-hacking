@@ -37,14 +37,14 @@ for i in range(len(beats)/bpb - 1):
 	array_overlap.append(
 		math.trunc(min(
 			idx(i, 3) - idx(i, 2),
-			idx(i, 6) - idx(i, 5)
+			idx(i, 7) - idx(i, 6)
 		) * overlap_ratio)
 		)
 
 for i in range(len(beats)/bpb - 1):
 		array_regular.append([
-		idx(i, -2) + 1,
-		idx(i, 3) - array_overlap[i]
+		idx(i, -1) + 1,
+		idx(i, 4) - array_overlap[i]
 	])
 	
 array_regular.append([
@@ -54,8 +54,8 @@ array_regular.append([
 
 for i in range(len(beats)/bpb - 1):
 	array_blend.append([
-		idx(i, 3) - array_overlap[i],
-		idx(i, 6) - array_overlap[i]
+		idx(i, 4) - array_overlap[i],
+		idx(i, 7) - array_overlap[i]
 	])
 
 array_regular[0][0] = 0
