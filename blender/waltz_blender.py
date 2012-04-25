@@ -11,7 +11,14 @@ overlap_ratio = float(sys.argv[3]) / 100;
 
 # Read in
 beats_in = open(sys.argv[1], 'r')
-beats = json.load(beats_in)
+analysis_data = json.load(beats_in)
+
+b = analysis_data["beats"]
+beats = []
+for i in range(len(b)):
+	beats.append([b[i]["start"]])
+
+
 beats_in.close()
 
 file_in = wave.open(sys.argv[4], 'r')
