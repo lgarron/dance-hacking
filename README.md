@@ -13,4 +13,3 @@ Requires Python and the [Echonest Remix API](https://code.google.com/p/echo-nest
 - `blender/waltz_blender.py` - Blends beats to turn 4/4 songs into waltzes.
 - `blender/wz` - Automatically calls `analyze` and tries the most common waltzifications.
 - `beatcaster.py` - Reasonably clean way to recast beats.
-- `old/` - Miscellaneous edited code files. Feel free to try anything, but don't trust it.
