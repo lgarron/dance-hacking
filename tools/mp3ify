@@ -9,5 +9,5 @@ rm "${TEMP}"
 
 ffmpeg -i "$1" -sameq -f wav "${TEMP}"
 # VBR to the rescue! [Not anymore. :-( Some iTunes/Quicktime issues.]
-lame --preset extreme "${TEMP}" "$1.mp3"
+lame --preset extreme "${TEMP}" "${1%.*}.mp3"
 rm "${TEMP}"
