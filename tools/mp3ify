@@ -8,6 +8,7 @@ TEMP=`mktemp "$1.XXXX"`
 rm "${TEMP}"
 
 ffmpeg -i "$1" -sameq -f wav "${TEMP}"
-# VBR to the rescue! [Not anymore. :-( Some iTunes/Quicktime issues.]
+
+# VBR to the rescue!
 lame --preset extreme "${TEMP}" "${1%.*}.mp3"
 rm "${TEMP}"
