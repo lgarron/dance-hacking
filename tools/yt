@@ -18,7 +18,7 @@ fi
 echo "URL: ${URL}"
 echo "--------"
 
-cd "${HOME}/Documents/Throw/Music/temp"
+cd "${MUSIC_FOLDER}/temp"
 
 # Target file name.
 TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`

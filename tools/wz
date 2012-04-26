@@ -4,8 +4,6 @@
 
 # TODO: Cache JSON by file hash  (what does Echonest use?)
 
-echo "HI!"
-
 if [ "${2}" = "" ]
 then
 	JSON_FILE="${1}.json"
