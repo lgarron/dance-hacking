@@ -113,10 +113,13 @@ hack_data.append({
 num_bars = len(beats)/bpb - 1
 for i in range(num_bars):
 
+	def b(j, k): blend_beats(i, j, k)
+	def c(j): copy_beat(i, j)
+
 	# This determines the hack structure
-	copy_beat(i, 1)
-	copy_beat(i, 2)
-	blend_beats(i, 3, 4)
+	c(1)
+	c(2)
+	b(3, 4)
 
 
 
