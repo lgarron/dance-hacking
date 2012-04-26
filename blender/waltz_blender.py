@@ -4,19 +4,66 @@
 # Usage ./waltz_blender.py file.wav beats.json 0 100
 # Usage ./waltz_blender.py file.wav beats.json [offset in beats, normally 0, 1, 2, or 3] [percent overlap, normally 0 to 100]
 
+
+
+# Assumed beats per bar.
+DEFAULT_BEATS_PER_BAR = 4
+
+# This determines the hack structure
+DEFAULT_PATTERN = "12[34]"
+
+# Normally 0. Can be any other number less than beats_per_bar
+DEFAULT_BEATS_SHIFT = 0
+
+# Common values are 0.05 and 1.
+DEFAULT_OVERLAP_RATIO = 1
+
+
+
+# Now, time for the real work.
 import wave, binascii, json, sys, struct, math
 
 # Config
 in_file_name = sys.argv[1]
 beats_file_name = sys.argv[2]
-beats_shift = 0
-overlap_ratio = 1
+beats_shift = DEFAULT_BEATS_SHIFT
+pattern = DEFAULT_PATTERN
+overlap_ratio = DEFAULT_OVERLAP_RATIO
+beats_per_bar = DEFAULT_BEATS_PER_BAR
 
 if len(sys.argv) > 3:
-	beats_shift = int(sys.argv[3]) # Amount of beats to shift (e.g. try everything with the second beat as the first)
+	overlap_ratio = float(sys.argv[3]) / 100 # Percent of the end of a beat that overlaps with the part right before the beginning of the next.
 
 if len(sys.argv) > 4:
-	overlap_ratio = float(sys.argv[4]) / 100 # Percent of the end of a beat that overlaps with the part right before the beginning of the next.
+	pattern = sys.argv[4] # Beat Pattern
+
+if len(sys.argv) > 5:
+	beats_per_bar = int(sys.argv[5])
+
+if len(sys.argv) > 6:
+	beats_shift = int(sys.argv[6]) # Amount of beats to shift (e.g. try everything with the second beat as the first)
+
+
+# c(beat) copies a beat straight
+# b(b1, b2) blends from the start of b1 to the end of b2
+
+def hack(b, c):
+	i = 0
+	while i < len(pattern):
+		if str.isdigit(pattern[i]):
+			p = int(pattern[i])
+			c(p)
+		elif pattern[i] == "[":
+			p3 = pattern[i+3]
+			if p3 != "]":
+				print "WARNING: Pattern is irregular. No closing ] at position " + str(i+3)
+			p1 = int(pattern[i+1])
+			p2 = int(pattern[i+2])
+			b(p1, p2)
+			i += 3
+		else:
+			print "WARNING: Pattern is irregular at position " + str(i)
+		i += 1
 
 
 
@@ -58,16 +105,13 @@ if (file_in.getsampwidth() != 2):
 # Frames of audio data per second.
 hz = file_in.getframerate()
 
-# Assumed beats per bar.
-bpb = 4
-
 # If we want to hack everything on a different beat, just shift everything.
 for i in range(beats_shift):
 	beats.insert(0, beats[0])
 
 # Returns the sample in the file that is at the i-th bar, j-th beat.
 def idx(i, j):
-  return math.trunc(beats[i*bpb+j][0] * hz)
+  return math.trunc(beats[i*beats_per_bar+j][0] * hz)
 
 
 
@@ -110,16 +154,13 @@ hack_data.append({
 
 
 
-num_bars = len(beats)/bpb - 1
+num_bars = len(beats)/beats_per_bar - 1
 for i in range(num_bars):
 
 	def b(j, k): blend_beats(i, j, k)
 	def c(j): copy_beat(i, j)
 
-	# This determines the hack structure
-	c(1)
-	c(2)
-	b(3, 4)
+	hack(b, c)
 
 
 
@@ -138,8 +179,18 @@ hack_data.append({
 
 # Get ready to write the file.
 shift_names = ["12[34]", "1[23]4", "[12]34", "1]23[4"]
+name = str(shift_names[beats_shift])
 
-outName = in_file_name+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
+name = ""
+def name_b(j, k):
+	global name
+	name += "[" + str(j) + str(k) + "]"
+def name_c(j):
+	global name
+	name += str(j)
+hack(name_b, name_c)
+
+outName = in_file_name+" - Pattern " + name + " - Shift " + str(beats_shift) + " - " + str(beats_per_bar) + " Beats Per Bar - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
 file_out.setnchannels(file_in.getnchannels())
 file_out.setsampwidth(file_in.getsampwidth())

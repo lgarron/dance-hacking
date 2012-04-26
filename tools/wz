@@ -31,12 +31,12 @@ ffmpeg -i "${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FILE_TEMP}"
 MUSIC_FILE="${MUSIC_FILE_TEMP}"
 
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 0 5 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 1 5 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 2 5 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 3 5 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 5 "12[34]" 4 0 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 5 "12[34]" 4 1 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 5 "12[34]" 4 2 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 5 "12[34]" 4 3 &
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 0 100 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 1 100 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 2 100 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 3 100 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 100 "12[34]" 4 0 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 100 "12[34]" 4 1 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 100 "12[34]" 4 2 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" 100 "12[34]" 4 3 &
