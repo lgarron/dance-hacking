@@ -17,6 +17,9 @@ DEFAULT_OVERLAP_RATIO = 1
 # This may never get used.
 DEFAULT_BEATS_PER_BAR = 4
 
+# beats or tatums (smaller parts of beats)
+SUBDIVISIONS = "beats"
+
 
 
 # Now, time for the real work.
@@ -121,7 +124,7 @@ if type(analysis_data) == list:
 	beats = analysis_data
 elif type(analysis_data) == dict:
 	# Parse the echonest format manually.
-	b = analysis_data["beats"]
+	b = analysis_data[SUBDIVISIONS]
 	beats = []
 	for i in range(len(b)):
 		beats.append([b[i]["start"]])

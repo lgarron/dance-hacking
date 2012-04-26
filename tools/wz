@@ -23,7 +23,7 @@ fi
 
 MUSIC_FILE_IN="${1}"
 PATTERN="${3}"
-if [ "${PATTERN}" -eq "" ]
+if [ "${PATTERN}" = "" ]
 then
   PATTERN="12[34]"
 fi
