@@ -46,12 +46,6 @@ if (file_in.getsampwidth() != 2):
 	print "WARNING: Input file has", file_in.getsampwidth(), "bytes per sample. Only 16-bit (2 bytes) supported is supported right now."
 
 
-
-# Initialize arrays for storing the beat data
-array_regular = []
-array_blend = []
-array_overlap = []
-
 # Frames of audio data per second.
 hz = file_in.getframerate()
 
@@ -66,40 +60,67 @@ for i in range(beats_shift):
 def idx(i, j):
   return math.trunc(beats[i*bpb+j][0] * hz)
 
+
+
+hack_data = []
+
+# Note that this accounts for indexing so that "1" is the start of the first beat.
+def copy_beat(i, j):
+  hack_data.append({
+  	"kind": "copy",
+  	"segment": {
+  		"start": idx(i, j-1),
+  		"end": idx(i, j)
+  	}
+  })
+
+def blend_beats(i, j, k):
+  hack_data.append({
+  	"kind": "blend",
+  	"segment1": {
+  		"start": idx(i, j-1),
+  		"end": idx(i, j)
+  	},
+  	"segment2": {
+  		"start": idx(i, k-1),
+  		"end": idx(i, k)
+  	}
+  })
+
+
+
+# Everything up to the first beat
+hack_data.append({
+	"kind": "copy",
+	"segment": {
+		"start": 0,
+		"end": idx(0, 0)
+	}
+})
+
+
+
+
 num_bars = len(beats)/bpb - 1
-
-# Figure out the maximum overlap among beats 2 (which occurs from index 2 to index 3) and 3.
 for i in range(num_bars):
-  array_overlap.append(
-    math.trunc(min(
-      idx(i, 3) - idx(i, 2),
-      idx(i, 4) - idx(i, 3)
-    ) * overlap_ratio)
-  )
 
-# For each bar, take everything at the beginning, until the blended overlap.
-for i in range(num_bars):
-  array_regular.append([
-    idx(i, 0),
-    idx(i, 3) - array_overlap[i] - 1
-  ])
+	# This determines the hack structure
+	copy_beat(i, 1)
+	copy_beat(i, 2)
+	blend_beats(i, 3, 4)
 
-# Add everything after the final beat.
-array_regular.append([
-  math.trunc(beats[(len(beats)/bpb - 1)*bpb+0][0] * hz) + 1,
-  file_in.getnframes() - 1
-])
 
-# Blend starting from the beginnings of beats 3 and 4.
-for i in range(num_bars):
-  array_blend.append([
-    idx(i, 3) - array_overlap[i],
-    idx(i, 4) - array_overlap[i]
-  ])
 
-# Make sure that the first and last beat extend to the ends of the song.
-array_regular[0][0] = 0
-array_regular[-1][1] = file_in.getnframes() - 1
+
+
+# Add everything from the final bar onwards.
+hack_data.append({
+	"kind": "copy",
+	"segment": {
+		"start": idx(num_bars, 0),
+		"end": file_in.getnframes()
+	}
+})
 
 
 
@@ -113,58 +134,73 @@ file_out.setsampwidth(file_in.getsampwidth())
 file_out.setframerate(file_in.getframerate())
 # file_out.setnframes(file_in.getnframes())
 
-
-for i in range(len(array_regular)):
-
-	print "" + str(i+1) + "/" + str(len(array_regular)), file_in.tell(), array_regular[i][0]
-
-	# Read and write the regular part of the bar.
-	file_in.setpos(array_regular[i][0])
-	frames = file_in.readframes(array_regular[i][1] + 1 - array_regular[i][0])
+def _copy(seg):
+	file_in.setpos(seg["segment"]["start"])
+	num_frames = seg["segment"]["end"] - seg["segment"]["start"]
+	frames = file_in.readframes(num_frames)
 	file_out.writeframes(frames)
 
-	if i < len(array_blend):
+def _blend(seg):
 
-		# Read the data from first beat.
-		file_in.setpos(array_blend[i][0])
-		frames1 = file_in.readframes(array_overlap[i])
+	num_overlap_samples = math.trunc(
+		overlap_ratio * min(
+			seg["segment1"]["end"] - seg["segment1"]["start"],
+			seg["segment2"]["end"] - seg["segment2"]["start"]
+		)
+	)
 
-		# Read the data from second beat.
-		file_in.setpos(array_blend[i][1])
-		frames2 = file_in.readframes(array_overlap[i])
-		
-		out_blend = ""
+	_copy({
+		"kind": "copy",
+		"segment": {
+			"start": seg["segment1"]["start"],
+			"end": seg["segment1"]["end"] - num_overlap_samples
+		}
+	})
 
-		for j in range(array_overlap[i]):
+	# Read the data from first beat.
+	file_in.setpos(seg["segment1"]["end"] - num_overlap_samples)
+	frames1 = file_in.readframes(num_overlap_samples)
 
-			v1 = struct.unpack("<hh", frames1[j * 4: j * 4+4])
-			v2 = struct.unpack("<hh", frames2[j * 4: j * 4+4])
+	# Read the data from second beat.
+	file_in.setpos(seg["segment2"]["end"] - num_overlap_samples)
+	frames2 = file_in.readframes(num_overlap_samples)
+	
+	out_blend = ""
 
-			p = float(j)/array_overlap[i]
+	def clip(i):
+		return max(-32768, min(32767, math.trunc(i)))
 
-			mp1 = math.pow(1-p, 0.5)
-			mp2 = math.pow(p, 0.5)
+	for j in range(num_overlap_samples):
 
-			newVLeft  = math.trunc(v1[0] * mp1 + v2[0] * mp2) # Issue at min vals?
-			newVRight = math.trunc(v1[1] * mp1 + v2[1] * mp2) # Issue at min vals?
+		s1_data = struct.unpack("<hh", frames1[j*4: j*4+4])
+		s2_data = struct.unpack("<hh", frames2[j*4: j*4+4])
+
+		s2_weight = float(j)/num_overlap_samples
+
+		s1_scale = math.pow(1-s2_weight, 0.5)
+		s2_scale = math.pow(s2_weight, 0.5)
+
+		new_s1  = clip(s1_data[0] * s1_scale + s2_data[0] * s2_scale)
+		new_s2 = clip(s1_data[1] * s1_scale + s2_data[1] * s2_scale)
+
+		newV = struct.pack("<hh", new_s1, new_s2)
+
+		#print sample1_data, sample2_data, new_sample1, newVRight, j, overlapSamples, struct.unpack(">hh", newV), a, b, a == new_sample1, b == new_sample2t
+
+		out_blend += newV
+
+	file_out.writeframes(out_blend)
 
 
-			newVLeft  = max(-32768, min(32767, newVLeft))
-			newVRight = max(-32768, min(32767, newVRight))
+handle = {
+	"copy": _copy,
+	"blend": _blend
+}
 
-			newV = struct.pack("<hh", newVLeft, newVRight)
- 
-			#print v1, v2, newVLeft, newVRight, j, overlapSamples, struct.unpack(">hh", newV), a, b, a == newVLeft, b == newVRight
-
-			out_blend += newV
-
-		file_out.writeframes(out_blend)
-
-
-		#out_space = ""
-		#for j in range(math.trunc(array_overlap[i]/overlap_ratio)):
-		#	out_space += struct.pack("<hh", 0, 0)
-		#file_out.writeframes(out_space)
+# Go!
+for seg in hack_data:
+	print(seg)
+	handle[seg["kind"]](seg)
 
 
 file_in.close()
