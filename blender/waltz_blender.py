@@ -1,18 +1,27 @@
 #!/usr/bin/python
 
-# Usage ./waltz_blender.py beats.json 0 100 file.mp3
-# Usage ./waltz_blender.py beats.json [offset in beats, normally 0, 1, 2, or 3] [percent overlap, normally 0 to 100] file.mp3
+# Usage ./waltz_blender.py file.wav
+# Usage ./waltz_blender.py file.wav beats.json 0 100
+# Usage ./waltz_blender.py file.wav beats.json [offset in beats, normally 0, 1, 2, or 3] [percent overlap, normally 0 to 100]
 
 import wave, binascii, json, sys, struct, math
 
 # Config
-beats_shift = int(sys.argv[2]) # Amount of beats to shift (e.g. try everything with the second beat as the first)
-overlap_ratio = float(sys.argv[3]) / 100 # Percent of the end of a beat that overlaps with the part right before the beginning of the next.
+in_file_name = sys.argv[1]
+beats_file_name = sys.argv[2]
+beats_shift = 0
+overlap_ratio = 1
+
+if len(sys.argv) > 3:
+	beats_shift = int(sys.argv[3]) # Amount of beats to shift (e.g. try everything with the second beat as the first)
+
+if len(sys.argv) > 4:
+	overlap_ratio = float(sys.argv[4]) / 100 # Percent of the end of a beat that overlaps with the part right before the beginning of the next.
 
 
 
 # Read in beat data
-beats_in = open(sys.argv[1], 'r')
+beats_in = open(beats_file_name, 'r')
 analysis_data = json.load(beats_in)
 
 # Default: assume we just have a list of beats
@@ -35,7 +44,7 @@ beats_in.close()
 
 
 # Open the audio file
-file_in = wave.open(sys.argv[4], 'r')
+file_in = wave.open(in_file_name, 'r')
 print(file_in.getparams())
 
 # Make sure the file is okay.
@@ -127,7 +136,7 @@ hack_data.append({
 # Get ready to write the file.
 shift_names = ["12[34]", "1[23]4", "[12]34", "1]23[4"]
 
-outName = sys.argv[4]+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
+outName = in_file_name+" - Pattern " + str(shift_names[beats_shift]) + " - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
 file_out.setnchannels(file_in.getnchannels())
 file_out.setsampwidth(file_in.getsampwidth())
