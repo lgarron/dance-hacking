@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Usage: waltzify file.mp3 beats.json
+
+# TODO: Cache JSON by file hash  (what does Echonest use?)
+
+if [ "${2}" = "" ]
+then
+  JSON_FILE="${1}.json"
+  echo "JSON file not passed in. Assuming: ${JSON_FILE}"
+else
+  JSON_FILE="${2}"
+  echo "JSON file passed in: ${JSON_FILE}"
+fi
+
+if [ ! -f "${JSON_FILE}" ]
+then
+  echo "JSON file (${JSON_FILE}) does not exist. Analyzing ${1} using Echonest..."
+    analyze -v "${1}"
+    JSON_FILE="${1}.json"
+fi
+
+
+MUSIC_FILE_IN="${1}"
+
+TIME=$(date "+%Y-%m-%d at %H-%M-%S")
+MUSIC_FOLDER_TEMP=`mktemp "${MUSIC_FILE_IN}.${TIME}.XXXX"`
+rm "${MUSIC_FOLDER_TEMP}"
+mkdir "${MUSIC_FOLDER_TEMP}"
+cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}"
+
+ffmpeg -i "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
+
+MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
+
+
+
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 0 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 1 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 2 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 3 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 4 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 5 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 6 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 7 8&
+
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 0 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 1 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 2 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 3 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 4 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 5 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 6 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 7 8&

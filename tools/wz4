@@ -22,11 +22,6 @@ fi
 
 
 MUSIC_FILE_IN="${1}"
-PATTERN="${3}"
-if [ "${PATTERN}" -eq "" ]
-then
-  PATTERN="12[34]"
-fi
 
 TIME=$(date "+%Y-%m-%d at %H-%M-%S")
 MUSIC_FOLDER_TEMP=`mktemp "${MUSIC_FILE_IN}.${TIME}.XXXX"`
@@ -39,6 +34,13 @@ ffmpeg -i "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FOLDER_
 MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
 
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 100 &
+
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 0 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 1 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 2 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 3 &
+
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 0 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 1 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 2 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 3 &
