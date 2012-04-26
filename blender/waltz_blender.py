@@ -5,10 +5,6 @@
 # Usage ./waltz_blender.py file.wav beats.json [offset in beats, normally 0, 1, 2, or 3] [percent overlap, normally 0 to 100]
 
 
-
-# Assumed beats per bar.
-DEFAULT_BEATS_PER_BAR = 4
-
 # This determines the hack structure
 DEFAULT_PATTERN = "12[34]"
 
@@ -18,6 +14,9 @@ DEFAULT_BEATS_SHIFT = 0
 # Common values are 0.05 and 1.
 DEFAULT_OVERLAP_RATIO = 1
 
+# This may never get used.
+DEFAULT_BEATS_PER_BAR = 4
+
 
 
 # Now, time for the real work.
@@ -26,10 +25,11 @@ import wave, binascii, json, sys, struct, math
 # Config
 in_file_name = sys.argv[1]
 beats_file_name = sys.argv[2]
-beats_shift = DEFAULT_BEATS_SHIFT
-pattern = DEFAULT_PATTERN
 overlap_ratio = DEFAULT_OVERLAP_RATIO
+pattern = DEFAULT_PATTERN
 beats_per_bar = DEFAULT_BEATS_PER_BAR
+beats_per_bar_was_specified = False
+beats_shift = DEFAULT_BEATS_SHIFT
 
 if len(sys.argv) > 3:
 	overlap_ratio = float(sys.argv[3]) / 100 # Percent of the end of a beat that overlaps with the part right before the beginning of the next.
@@ -39,6 +39,7 @@ if len(sys.argv) > 4:
 
 if len(sys.argv) > 5:
 	beats_per_bar = int(sys.argv[5])
+	beats_per_bar_was_specified = True
 
 if len(sys.argv) > 6:
 	beats_shift = int(sys.argv[6]) # Amount of beats to shift (e.g. try everything with the second beat as the first)
@@ -64,6 +65,27 @@ def hack(b, c):
 		else:
 			print "WARNING: Pattern is irregular at position " + str(i)
 		i += 1
+
+
+
+# Automatically detect the number of beats per bar based on the pattern
+if not(beats_per_bar_was_specified):
+
+	max_beat_index = 0
+	def update_max_beat_index(i):
+		global max_beat_index
+		if i > max_beat_index:
+			max_beat_index = i
+
+	def update_max_beat_index_b(j, k):
+		update_max_beat_index(j)
+		update_max_beat_index(k)
+	def update_max_beat_index_c(j):
+		update_max_beat_index(j)
+
+	hack(update_max_beat_index_b, update_max_beat_index_c)
+
+	beats_per_bar = max_beat_index
 
 
 
@@ -190,7 +212,7 @@ def name_c(j):
 	name += str(j)
 hack(name_b, name_c)
 
-outName = in_file_name+" - Pattern " + name + " - Shift " + str(beats_shift) + " - " + str(beats_per_bar) + " Beats Per Bar - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
+outName = in_file_name + " - Pattern " + name + " - Shift " + str(beats_shift) + " - " + str(beats_per_bar) + " Beats Per Bar - Overlap " + str(math.trunc(100*overlap_ratio)) + " percent.wav";
 file_out = wave.open(outName, 'w')
 file_out.setnchannels(file_in.getnchannels())
 file_out.setsampwidth(file_in.getsampwidth())
