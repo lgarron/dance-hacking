@@ -23,4 +23,4 @@ ANALYZE=`curl \
 	
 URL=`echo $ANALYZE | sed "s/^.*analysis_url.: \"\([^\"]*\)\".*\$/\1/"`
 
-curl "${URL}" > "${FILE_NAME}.full.json"
+curl "${URL}" > "${FILE_NAME}.json"

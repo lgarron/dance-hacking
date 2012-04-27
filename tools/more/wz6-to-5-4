@@ -16,7 +16,7 @@ fi
 if [ ! -f "${JSON_FILE}" ]
 then
   echo "JSON file (${JSON_FILE}) does not exist. Analyzing ${1} using Echonest..."
-    analyze -v "${1}"
+    analyze "${1}"
     JSON_FILE="${1}.json"
 fi
 
