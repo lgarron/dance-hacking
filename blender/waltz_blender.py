@@ -292,9 +292,18 @@ handle = {
 	"blend": _blend
 }
 
+def print_segment(seg):
+	if seg["kind"] == "copy":
+		sys.stdout.write("-")
+	elif seg["kind"] == "blend":
+		sys.stdout.write(">")
+	else:
+		sys.stdout.write("?")
+	sys.stdout.flush()
+
 # Go!
 for seg in hack_data:
-	print(seg)
+	print_segment(seg)
 	handle[seg["kind"]](seg)
 
 
