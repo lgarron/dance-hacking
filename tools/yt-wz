@@ -4,7 +4,8 @@
 
 #Constants
 MUSIC_FOLDER="${HOME}/Documents/Throw/Music"
-URL_ARCHIVE_FOLDER="${MUSIC_FOLDER}/Archive"
+URL_ARCHIVE_FOLDER="${MUSIC_FOLDER}/Archive/links"
+cd "${MUSIC_FOLDER}/Archive/temp"
 
 # Get the URL
 # Frontmost Chrome tab by default.
@@ -17,8 +18,6 @@ fi
 # Print out the URL, just in case.
 echo "URL: ${URL}"
 echo "--------"
-
-cd "${MUSIC_FOLDER}/temp"
 
 # Target file name.
 TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`
