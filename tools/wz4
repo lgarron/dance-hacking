@@ -40,6 +40,8 @@ waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 1 &
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 2 &
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 5 3 &
 
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 25 0 &
+
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 0 &
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 1 &
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]" 100 2 &
