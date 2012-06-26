@@ -4,6 +4,7 @@
 
 FILE_NAME="${1}"
 FILE_TYPE="${FILE_NAME##*.}"
+JSON_CACHE_FOLDER="${HOME}/Documents/Throw/Music/Archive/JSON/"
 
 echo "Uploading..."
 
@@ -40,3 +41,4 @@ echo "Getting the analysis..."
 echo "URL: ${URL}"
 
 curl "${URL}" > "${FILE_NAME}.json"
+cp "${FILE_NAME}.json" "${JSON_CACHE_FOLDER}/${FILE_NAME}.json"
