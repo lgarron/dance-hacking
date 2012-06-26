@@ -21,7 +21,9 @@ echo "--------"
 
 # Target file name.
 TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`
-FILE=`youtube-dl -o "%(title)s.%(ext)s" --get-filename "${URL}"`
+TITLE="${TITLE//[^a-zA-Z0-9-=\(\)\. ]/}"
+FILE_ORIGINAL=`youtube-dl -o "%(title)s.%(ext)s" --get-filename "${URL}"`
+FILE="${FILE_ORIGINAL//[^a-zA-Z0-9-=\(\)\. ]/}"
 
 # Make a new folder for the download.
 cd "${MUSIC_FOLDER}"
@@ -38,7 +40,7 @@ weblocify "${URL}" "${WEBLOC_WITH_ESCAPED_URL}"
 weblocify "${URL}" "${URL_ARCHIVE_FOLDER}/${WEBLOC_WITH_ESCAPED_URL}" # TODO: Use URL or time to avoid exact title collisions.
 
 # youtube-dl
-youtube-dl -c -o "%(title)s.%(ext)s" --write-description --write-info-json "${URL}"
+youtube-dl -c -o "${FILE}" --write-description --write-info-json "${URL}"
 
 # Convert to high-quality .mp3
 mp3ify "${FILE}"
