@@ -35,20 +35,20 @@ MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
 
 
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 0 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 1 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 2 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 3 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 4 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 5 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 6 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 7 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 0 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 1 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 2 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 3 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 4 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 5 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 6 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 5 7 8
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 0 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 1 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 2 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 3 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 4 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 5 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 6 8&
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 7 8&
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 0 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 1 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 2 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 3 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 4 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 5 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 6 8
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "12[34]5[68]" 100 7 8

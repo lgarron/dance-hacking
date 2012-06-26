@@ -34,11 +34,14 @@ rm "${MUSIC_FOLDER_TEMP}"
 mkdir "${MUSIC_FOLDER_TEMP}"
 cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}"
 
+BPM=`bpm "${JSON_FILE}"`
+echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
+
 ffmpeg -i "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
 
 MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
 
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25 &
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 100 &
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 100
