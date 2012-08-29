@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Usage ./waltz_blender.py file.wav
+# Usage ./waltz_blender.py file.wav beats.json
 # Usage ./waltz_blender.py file.wav beats.json "12[34]" 100 0 4
 # Usage ./waltz_blender.py file.wav beats.json [beat pattern] [percent overlap, normally 0 to 100] [offset in beats, normally 0, 1, 2, or 3] [beats per bar]
 
@@ -28,6 +28,10 @@ import wave, binascii, json, sys, struct, math
 # Config
 in_file_name = sys.argv[1]
 beats_file_name = sys.argv[2]
+
+print "in_file_name:", in_file_name
+print "beats_file_name:", beats_file_name
+
 overlap_ratio = DEFAULT_OVERLAP_RATIO
 pattern = DEFAULT_PATTERN
 beats_per_bar = DEFAULT_BEATS_PER_BAR
