@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Old. Doesn't preserve full quality.
-#ffmpeg -i "$1" -sameq "$1.mp3"
+# Old. Doesn't detect quality dynamically.
+#ffmpeg -i "$1" -ab 192k "$1.mp3"
 
 TEMP=`mktemp "$1.XXXX"`
 #TEMP="${TEMP}.wav"
