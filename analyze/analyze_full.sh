@@ -59,5 +59,5 @@ URL=`echo $ANALYZE | sed "s/^.*analysis_url.: \"\([^\"]*\)\".*\$/\1/"`
 echo "Getting the analysis..."
 echo "URL: ${URL}"
 
-curl "${URL}" > "${FILE_NAME}.json"
+curl --insecure "${URL}" > "${FILE_NAME}.json"
 cp "${FILE_NAME}.json" "${JSON_CACHE_FOLDER}/${FILE_NAME}.json"
