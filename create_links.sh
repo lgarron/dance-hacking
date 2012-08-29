@@ -24,6 +24,7 @@ ln -s "../analyze/analyze.py" "analyze.py"
 ln -s "../analyze/analyze_full.sh" "analyze"
 
 ln -s "../lib/json.py" "json.py"
+ln -s "../lib/youtube-dl" "youtube-dl"
 
 echo ""
 echo "Add the following to your ~/.bash_profile:"
