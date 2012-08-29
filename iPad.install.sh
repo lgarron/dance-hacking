@@ -10,6 +10,18 @@ DANCE_HACKING_DIR=`dirname ${FULL_SCRIPT_NAME}`
 
 MUSIC_ROOT="${DE_FACTO_HOME_DIR}/jb/music"
 
+function must_be_installed {
+  echo -n "Checking if ${1} is installed... "
+  which -s "$1"
+  if [ "$?" -eq 0 ]
+  then 
+    echo "Good."
+  else
+    echo "Nope. Aborting."
+    exit 1
+  fi
+}
+
 cat <<HEREDOC
 Assuming that the following packages are installed (will *not* check):
   - ffmpeg
@@ -17,6 +29,11 @@ Assuming that the following packages are installed (will *not* check):
   - Python
   - cURL
 HEREDOC
+
+must_be_installed "ffmpeg"
+must_be_installed "openssl"
+must_be_installed "python"
+must_be_installed "curl"
 
 cd ${DE_FACTO_HOME_DIR}
 
