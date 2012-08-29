@@ -36,6 +36,7 @@ cd "${MUSIC_ROOT}/dance-hacking"
 ./create_symlinks.sh > "/dev/null"
 
 cp "${MUSIC_ROOT}/dance-hacking/iPad.bashrc" "${DE_FACTO_HOME_DIR}/.bashrc"
+cp "${MUSIC_ROOT}/dance-hacking/iPad.yt-wz-auto.sh" "${DE_FACTO_HOME_DIR}/yt-wz-auto"
 
 cd "${MUSIC_ROOT}"
 

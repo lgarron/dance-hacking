@@ -21,3 +21,9 @@ From now on, it's much easier to SSH into the iPad, and use an SFTP client to up
 
   source ~/.bashrc
   yt-wz http://www.youtube.com/watch?v=aDHxhhB8710
+
+- If you have control over some URL on the internet, you can use yt-wz-auto instead, which will look at the URL for what file to download. This can be very useful if your Terminal program on iPad is not convenient for pasting but you have, say, an editor app like PlainText that syncs with Dropbox (where you can share the URL).
+
+## Notes
+
+- WARNING: yt-wz will try to download the highest-quality YouTube source by default. This can easily be 100MB or more. Be aware of download speeds and data charges.
