@@ -23,6 +23,8 @@ ln -s "../analyze/analyze_full.sh" "analyze_full.sh"
 ln -s "../analyze/analyze.py" "analyze.py"
 ln -s "../analyze/analyze_full.sh" "analyze"
 
+ln -s "../lib/json.py" "json.py"
+
 echo ""
 echo "Add the following to your ~/.bash_profile:"
 echo ""

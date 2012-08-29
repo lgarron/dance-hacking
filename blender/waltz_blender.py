@@ -21,7 +21,8 @@ DEFAULT_BEATS_PER_BAR = 4
 SUBDIVISIONS = "beats"
 
 
-
+import sys
+sys.path.append("/var/mobile/jb/music/dance-hacking/links")
 # Now, time for the real work.
 import wave, binascii, json, sys, struct, math
 
@@ -107,14 +108,14 @@ if beats_per_bar_was_specified:
 	out_file_name += " - " + str(beats_per_bar) + " Beats Per Bar"
 if beats_shift_was_specified:
 	out_file_name += " - Shifted " + str(beats_shift) + " Beats"
-out_file_name += " - Overlap " + str(math.trunc(100*overlap_ratio)) + " Percent"
+out_file_name += " - Overlap " + str(math.floor(100*overlap_ratio)) + " Percent"
 out_file_name += ".wav";
 
 
 
 # Read in beat data
 beats_in = open(beats_file_name, 'r')
-analysis_data = json.load(beats_in)
+analysis_data = json.read(beats_in.read())
 
 # Default: assume we just have a list of beats
 
@@ -156,7 +157,7 @@ for i in range(beats_shift):
 
 # Returns the sample in the file that is at the i-th bar, j-th beat.
 def idx(i, j):
-  return math.trunc(beats[i*beats_per_bar+j][0] * hz)
+  return math.floor(beats[i*beats_per_bar+j][0] * hz)
 
 
 
@@ -237,7 +238,7 @@ def _copy(seg):
 
 def _blend(seg):
 
-	num_overlap_samples = math.trunc(
+	num_overlap_samples = math.floor(
 		overlap_ratio * min(
 			seg["segment1"]["end"] - seg["segment1"]["start"],
 			seg["segment2"]["end"] - seg["segment2"]["start"]
@@ -263,7 +264,7 @@ def _blend(seg):
 	out_blend = ""
 
 	def clip(i):
-		return max(-32768, min(32767, math.trunc(i)))
+		return max(-32768, min(32767, math.floor(i)))
 
 	for j in range(num_overlap_samples):
 
