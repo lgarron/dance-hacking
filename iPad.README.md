@@ -10,27 +10,14 @@
 
 From now on, it's much easier to SSH into the iPad, and use an SFTP client to upload files. Beware that the iPad won't have bsic commands like "man" and "unzip", or programs like "git" (unless you install them).
 
-- Create the following folders:
-
-mkdir /var/mobile/jb/
-mkdir /var/mobile/jb/music
-mkdir /var/mobile/jb/music/Music
-mkdir /var/mobile/jb/music/Music/temp
-mkdir /var/mobile/jb/music/Music/Archive
-mkdir /var/mobile/jb/music/Music/Archive/temp
-mkdir /var/mobile/jb/music/Music/Archive/links
-mkdir /var/mobile/jb/music/Music/Archive/JSON
-
-- Copy dance-hacking to /var/mobile/jb/music/dance-hacking
-- cd to /var/mobile/jb/music/dance-hacking/ and run `./create_links` (you will get instructions about adding something to .bash_profile, but this is unnecessary.)
-
-Copy iPad.bashrc to /var/mobile/.bashrc
+- Upload the entire contents of the dance-hacking folder to "/var/mobile/dance-hacking" on the iPad.
+- Run "/var/mobile/dance-hacking/iPad.install.sh" in the iPad from the Terminal. This automates the entire install process.
 
 ## Usage
 
 - Start a terminal app on the iPad
 - Make sure you're in /var/mobile (e.g. using "pwd")
-- Run the following (sample URL of "Twinkle, Twinkle, Little Star" by the ThePianoGuys included, because it's short and easy to hack):
+- Run the following (sample URL included here):
 
-  source .bashrc
+  source ~/.bashrc
   yt-wz http://www.youtube.com/watch?v=aDHxhhB8710
