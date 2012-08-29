@@ -42,6 +42,6 @@ ffmpeg -i "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FOLDER_
 MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
 
 
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25
-waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 100
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5   && mp3ify "${MUSIC_FILE} - Pattern 12[34] - Overlap 5.0 Percent.wav"    && rm "${MUSIC_FILE} - Pattern 12[34] - Overlap 5.0 Percent.wav"
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25  && mp3ify "${MUSIC_FILE} - Pattern 12[34] - Overlap 25.0 Percent.wav"   && rm "${MUSIC_FILE} - Pattern 12[34] - Overlap 25.0 Percent.wav"
+waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 100 && mp3ify "${MUSIC_FILE} - Pattern 12[34] - Overlap 100.0 Percent.wav"  && rm "${MUSIC_FILE} - Pattern 12[34] - Overlap 100.0 Percent.wav"
