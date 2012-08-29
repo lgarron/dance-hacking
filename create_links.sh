@@ -27,5 +27,5 @@ echo ""
 echo "Add the following to your ~/.bash_profile:"
 echo ""
 PWD=`pwd`
-echo "export PATH=\"\$PATH\":${PWD}"
+echo "export PATH=\"\$PATH:${PWD}\""
 echo ""
