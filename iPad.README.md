@@ -1,4 +1,6 @@
-# Dance Hacking on an iPad.
+# Dance Hacking on an iPad
+
+Would this work on an iPhone? Probably. Haven't tested.
 
 ## Important Setup Steps
 
@@ -7,11 +9,22 @@
   - OpenSSH (make sure to change passwords)
   - Python
   - cURL
+  - MobileTerminal
 
-From now on, it's much easier to SSH into the iPad, and use an SFTP client to upload files. Beware that the iPad won't have bsic commands like "man" and "unzip", or programs like "git" (unless you install them).
+From now on, it's much easier to SSH into the iPad, and use an SFTP client to upload files. Beware that the iPad won't have basic commands like "man" and "unzip", or programs like "git" (unless you install them).
+
+- Read "OpenSSH Access How-To" in Cydia to find the iPad's IP address and log in.
+- Read "Root Password How-To" in Cydia and change your default passwords.
 
 - Upload the entire contents of the dance-hacking folder to "/var/mobile/dance-hacking" on the iPad.
-- Run "/var/mobile/dance-hacking/iPad.install.sh" in the iPad from the Terminal. This automates the entire install process.
+
+  # (Do this on your computer)
+  cd path/to/your/dance-hacking/
+  scp -r . mobile@[iPad-IP-address]:/var/mobile/dance-hacking
+
+- Run the following command in the iPad from the Terminal. It automates the entire install process:
+  
+  /var/mobile/dance-hacking/iPad.install.sh
 
 ## Usage
 
