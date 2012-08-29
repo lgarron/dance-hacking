@@ -22,6 +22,9 @@ __version__ = '2012.02.27'
 
 UPDATE_URL = 'https://raw.github.com/rg3/youtube-dl/master/youtube-dl'
 
+import sys
+sys.path.append("/var/mobile/jb/music/dance-hacking/links")
+
 
 import cookielib
 import datetime
@@ -813,7 +816,7 @@ class FileDownloader(object):
 			infofn = filename + u'.info.json'
 			self.report_writeinfojson(infofn)
 			try:
-				json.dump
+				json.write(dict())
 			except (NameError,AttributeError):
 				self.trouble(u'ERROR: No JSON encoder found. Update to Python 2.6+, setup a json module, or leave out --write-info-json.')
 				return
@@ -821,7 +824,7 @@ class FileDownloader(object):
 				infof = open(_encodeFilename(infofn), 'wb')
 				try:
 					json_info_dict = dict((k,v) for k,v in info_dict.iteritems() if not k in ('urlhandle',))
-					json.dump(json_info_dict, infof)
+					infof.write(json.write(json_info_dict))
 				finally:
 					infof.close()
 			except (OSError, IOError):
