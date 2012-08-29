@@ -4,7 +4,7 @@
 
 FILE_NAME="${1}"
 FILE_TYPE="${FILE_NAME##*.}"
-JSON_CACHE_FOLDER="${HOME}/Documents/Throw/Music/Archive/JSON/"
+JSON_CACHE_FOLDER="/var/mobile/jb/music/Music/Archive/JSON/"
 
 echo "Computing hash..."
 

@@ -3,7 +3,7 @@
 # Usage: yt [url]
 
 #Constants
-MUSIC_FOLDER="${HOME}/Documents/Throw/Music"
+MUSIC_FOLDER="/var/mobile/jb/music/Music"
 URL_ARCHIVE_FOLDER="${MUSIC_FOLDER}/Archive"
 
 # Get the URL
