@@ -22,7 +22,7 @@ SUBDIVISIONS = "beats"
 
 
 import sys
-sys.path.append("/var/mobile/jb/music/dance-hacking/links")
+sys.path.append("/var/mobile/jb/music/dance-hacking/symlinks")
 # Now, time for the real work.
 import wave, binascii, json, sys, struct, math
 

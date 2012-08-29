@@ -1,8 +1,8 @@
 #!/bin/bash
 
-mkdir links
+mkdir symlinks
 
-cd links
+cd symlinks
 
 ln -s "../tools/bpm.js" "bpm"
 ln -s "../tools/mp3ify" "mp3ify"

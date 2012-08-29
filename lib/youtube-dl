@@ -23,7 +23,7 @@ __version__ = '2012.02.27'
 UPDATE_URL = 'https://raw.github.com/rg3/youtube-dl/master/youtube-dl'
 
 import sys
-sys.path.append("/var/mobile/jb/music/dance-hacking/links")
+sys.path.append("/var/mobile/jb/music/dance-hacking/symlinks")
 
 
 import cookielib
