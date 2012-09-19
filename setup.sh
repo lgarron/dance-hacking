@@ -49,6 +49,9 @@ ln -s "../lib/youtube-dl" "youtube-dl" 2> /dev/null
 ln -s "../lib/weblocify" "weblocify" 2> /dev/null
 ln -s "../lib/browser-tab-osx-chrome" "browser-tab" 2> /dev/null # Assumes OS is OSX and desired browser is Chrome.
 
+ln -s "../lib/argparse.py" "argparse.py" 2> /dev/null
+ln -s "../lib/json.py" "json.py" 2> /dev/null
+
 echo "Creating dance hacking folder at ${DANCE_HACKING_MUSIC_FOLDER}"
 
 mkdir -p "${DANCE_HACKING_MUSIC_FOLDER}/Archive"
