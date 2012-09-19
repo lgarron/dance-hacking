@@ -1,14 +1,17 @@
 #!/bin/bash
 
-# Old. Doesn't detect quality dynamically.
-#ffmpeg -i "$1" -ab 192k "$1.mp3"
+command_exists () {
+    type "$1" &> /dev/null ;
+}
 
-TEMP=`mktemp "$1.XXXX"`
-#TEMP="${TEMP}.wav"
-rm "${TEMP}"
-
-ffmpeg -i "$1" -sameq -f wav "${TEMP}"
-
-# VBR to the rescue!
-lame --preset extreme "${TEMP}" "${1}.mp3"
-rm "${TEMP}"
+if command_exists lame
+then 
+  TEMP=`mktemp "$1.XXXX"`
+  ffmpeg -i "$1" -sameq -f wav "${TEMP}"
+  # VBR to the rescue!
+  lame --preset extreme "${TEMP}" "${1}.mp3"
+  rm "${TEMP}"
+else
+  # 192k is a decent tradeoff for files that might still be reprocessed in the future.
+  ffmpeg -i "$1" -ab 192k "$1.mp3"
+fi
