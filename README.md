@@ -17,3 +17,24 @@ Requires Python and the [Echonest Remix API](https://code.google.com/p/echo-nest
 - `tools/wz` - Automatically calls `analyze` and tries the most common waltzifications with waltz_blender
 
 For some of this to work, the scrips have to be in the path, e.g. `waltz_blender.py` as `waltz_blender`.
+
+## Installation Cheat Sheet
+
+### Quick Install
+
+    wget "https://github.com/lgarron/dance-hacking/zipball/master" -O "dance-hacking.zip" &&
+    unzip "dance-hacking.zip" &&
+    mv $(ls . | grep "lgarron-dance-hacking") dance-hacking &&
+    cd dance-hacking &&
+    ./setup.sh &&
+    . ~/.bash_profile
+
+### Fix Python version for Echonest 1.4 installation on OSX
+
+    function copy_to_python_2_7 {sudo cp -r "/Library/Python/2.6/site-packages/${1}" "/Library/Python/2.7/site-packages/${1}"}
+    for i in "cAction.so" "dirac.so" "echonest" "pyechonest" "soundtouch.so" "The_Echo_Nest_Remix_API-1.4-py2.6.egg-info"; do copy_to_python_2_7 "${i}"; done
+
+### Use the Echonest binary as ffmpeg
+
+    which ffmpeg
+    if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
