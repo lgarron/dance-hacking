@@ -25,9 +25,11 @@ ln -s "../analyze/analyze_full.sh" "analyze"
 
 ln -s "../lib/youtube-dl" "youtube-dl"
 
+BASH_PROFILE_LOCATION=$(cd "${HOME}" && pwd)/".bash_profile"
 echo ""
-echo "Add the following to your ~/.bash_profile:"
+echo "Find your Echonest API key and add the following two lines to ${BASH_PROFILE_LOCATION}"
 echo ""
 PWD=`pwd`
+echo "export ECHO_NEST_API_KEY=\"\""
 echo "export PATH=\"\$PATH:${PWD}\""
 echo ""

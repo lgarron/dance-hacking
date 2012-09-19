@@ -2,6 +2,12 @@
 
 # Needs an externally defined variable $ECHO_NEST_API_KEY in order to work.
 
+if [ -z "$ECHO_NEST_API_KEY" ]
+then
+	echo "No \$ECHO_NEST_API_KEY environment variable has been set. Cannot analyze using Echonest."
+	exit 0
+fi
+
 FILE_NAME="${1}"
 FILE_TYPE="${FILE_NAME##*.}"
 JSON_CACHE_FOLDER="${HOME}/Documents/Throw/Music/Archive/JSON/"
