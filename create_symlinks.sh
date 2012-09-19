@@ -24,6 +24,7 @@ ln -s "../analyze/analyze.py" "analyze.py"
 ln -s "../analyze/analyze_full.sh" "analyze"
 
 ln -s "../lib/youtube-dl" "youtube-dl"
+ln -s "../lib/weblocify" "weblocify"
 ln -s "../lib/browser-tab-osx-chrome" "browser-tab" # Assumes OS is OSX and desired browser is Chrome.
 
 BASH_PROFILE_LOCATION=$(cd "${HOME}" && pwd)/".bash_profile"
