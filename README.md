@@ -29,6 +29,11 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
     ./setup.sh &&
     . ~/.bash_profile
 
+#### Troubleshooting
+
+    curl -L "https://github.com/lgarron/dance-hacking/zipball/master" -o "dance-hacking.zip"
+    curl --insecure -L "https://github.com/lgarron/dance-hacking/zipball/master" -o "dance-hacking.zip"
+
 ### Fix Python version for Echonest 1.4 installation on OSX
 
     function copy_to_python_2_7 {sudo cp -r "/Library/Python/2.6/site-packages/${1}" "/Library/Python/2.7/site-packages/${1}"}
@@ -42,11 +47,15 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 ## Dependencies
 
 - ffmpeg
-- lame (optional, allows for slightly better-quality .mp3 files due to VBR.)
 - Python
 - cURL
 - youtube-dl
 - the Echonest Track API
+
+### Optional Dependencies
+
+- lame (optional, allows for slightly better-quality .mp3 files due to VBR.)
+- wget, zip/unzip (optional, for easy setup.)
 
 ## Other Considerations
 
