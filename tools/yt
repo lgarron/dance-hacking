@@ -26,6 +26,13 @@ echo "--------"
 # Target file name.
 TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`
 TITLE="${TITLE//[^a-zA-Z0-9-=\(\)\. ]/}"
+
+if [ -z "$TITLE" ]
+then
+  echo "Could not determine title. Maybe the URL was not valid?"
+  exit 1
+fi
+
 FILE=`youtube-dl -o "%(title)s.%(ext)s" --get-filename "${URL}"`
 FILE="${FILE//[^a-zA-Z0-9-=\(\)\. ]/}"
 
