@@ -44,6 +44,7 @@ ln -s "../analyze/analyze_full.sh" "analyze_full.sh" 2> /dev/null
 ln -s "../analyze/analyze.py" "analyze.py" 2> /dev/null
 ln -s "../analyze/analyze_full.sh" "analyze" 2> /dev/null
 
+ln -s "../lib/md5-python" "md5-python" 2> /dev/null
 ln -s "../lib/youtube-dl" "youtube-dl" 2> /dev/null
 ln -s "../lib/weblocify" "weblocify" 2> /dev/null
 ln -s "../lib/browser-tab-osx-chrome" "browser-tab" 2> /dev/null # Assumes OS is OSX and desired browser is Chrome.

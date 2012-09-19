@@ -10,7 +10,7 @@ Requires Python and the [Echonest Remix API](https://code.google.com/p/echo-nest
 ## Files
 
 - `analyze/analyze.py` - Outputs the beats of a song to JSON (naïvely, but it works).
-- `analyze/analyze.sh` - Outputs more complete info form Echonest.
+- `analyze/analyze_full.sh` - Outputs more complete info from Echonest.
 - `beatcaster/beatcaster.py` - Reasonably clean way to recast beats by modifying their tempo.
 - `blender/waltz_blender.py` - Blends beats to turn 4/4 songs into waltzes.
 - `inception/inception.py` - Make everything into a mind heist.
@@ -38,3 +38,17 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 
     which ffmpeg
     if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
+
+## Dependencies
+
+- ffmpeg
+- lame (optional, allows for slightly better-quality .mp3 files due to VBR.)
+- Python
+- cURL
+- youtube-dl
+- the Echonest Track API
+
+## Other Considerations
+
+- Self-update `youtube-dl`.
+- bpm-tap fo manual beat data.

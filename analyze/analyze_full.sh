@@ -15,7 +15,7 @@ CHECKING_SLEEP="2"
 
 echo "Computing hash..."
 
-FILE_MD5=`openssl md5 "${FILE_NAME}" | sed "s/^.*= //"`
+FILE_MD5=`md5-python "${FILE_NAME}" | sed "s/^.*= //"`
 
 function get_profile {
 	curl "http://developer.echonest.com/api/v4/track/profile?api_key=${ECHO_NEST_API_KEY}&format=json&md5=${FILE_MD5}&bucket=audio_summary" 2> /dev/null
