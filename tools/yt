@@ -52,7 +52,7 @@ weblocify "${URL}" "${WEBLOC_WITH_ESCAPED_URL}"
 weblocify "${URL}" "${URL_ARCHIVE_FOLDER}/${WEBLOC_WITH_ESCAPED_URL}" # TODO: Use URL or time to avoid exact title collisions.
 
 # youtube-dl
-youtube-dl -c -o "${FILE}" --write-description --write-info-json "${URL}"
+youtube-dl -c -o "${FILE}" --write-description "${URL}"
 
 # Full-quality .wav file.
 wavify "${FILE}"
