@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ECHO_NEST_API_DEV_KEY="VRNSDARJUIWRYJAUX"
+
 # Maybe it's set, else try to get from the arguments.
 if [ -z "${ECHO_NEST_API_KEY}" ]
 then
@@ -7,8 +9,12 @@ then
 fi
 if [ -z "${ECHO_NEST_API_KEY}" ]
 then
-  echo -n "Enter your Echonest API key: "
+  echo -n "Enter your Echonest API key (leave blank to use the dev key, but you should eventually get your own): "
   read ECHO_NEST_API_KEY
+fi
+if [ -z "${ECHO_NEST_API_KEY}" ]
+then
+  ECHO_NEST_API_KEY="${ECHO_NEST_API_DEV_KEY}"
 fi
 
 # Try to get the music folder from the arguments.
