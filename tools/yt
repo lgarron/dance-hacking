@@ -12,11 +12,11 @@ fi
 URL_ARCHIVE_FOLDER="${DANCE_HACKING_MUSIC_FOLDER}/Archive/links"
 
 # Get the URL
-# Frontmost Chrome tab by default.
 URL="${1}"
 if [[ "${URL}" == "" ]]
 then
-  URL="`chrometab`"
+  # Try to get it from the browser.
+  URL=$(browser-tab)
 fi
 
 # Print out the URL, just in case.
