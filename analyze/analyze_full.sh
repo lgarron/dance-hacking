@@ -10,7 +10,7 @@ fi
 
 FILE_NAME="${1}"
 FILE_TYPE="${FILE_NAME##*.}"
-JSON_CACHE_FOLDER="${HOME}/Documents/Throw/Music/Archive/JSON/"
+JSON_CACHE_FOLDER="${DANCE_HACKING_MUSIC_FOLDER}/Archive/JSON/"
 CHECKING_SLEEP="2"
 
 echo "Computing hash..."

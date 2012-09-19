@@ -3,8 +3,13 @@
 # Usage: yt [url]
 
 #Constants
-MUSIC_FOLDER="${HOME}/Documents/Throw/Music"
-URL_ARCHIVE_FOLDER="${MUSIC_FOLDER}/Archive"
+
+if [ -z "${DANCE_HACKING_MUSIC_FOLDER}" ]
+then
+  echo "No \$DANCE_HACKING_MUSIC_FOLDER environment variable set."
+fi
+
+URL_ARCHIVE_FOLDER="${DANCE_HACKING_MUSIC_FOLDER}/Archive/links"
 
 # Get the URL
 # Frontmost Chrome tab by default.
@@ -18,16 +23,15 @@ fi
 echo "URL: ${URL}"
 echo "--------"
 
-cd "${MUSIC_FOLDER}/temp"
-
 # Target file name.
 TITLE=`youtube-dl -o "%(title)s" --get-filename "${URL}"`
 TITLE="${TITLE//[^a-zA-Z0-9-=\(\)\. ]/}"
 FILE=`youtube-dl -o "%(title)s.%(ext)s" --get-filename "${URL}"`
 FILE="${FILE//[^a-zA-Z0-9-=\(\)\. ]/}"
 
+
 # Make a new folder for the download.
-cd "${MUSIC_FOLDER}"
+cd "${DANCE_HACKING_MUSIC_FOLDER}"
 #NEW_FOLDER="`unixtime` - ${FILE}"
 NEW_FOLDER="${TITLE}"
 mkdir "${NEW_FOLDER}"

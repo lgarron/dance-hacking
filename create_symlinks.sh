@@ -31,5 +31,6 @@ echo "Find your Echonest API key and add the following two lines to ${BASH_PROFI
 echo ""
 PWD=`pwd`
 echo "export ECHO_NEST_API_KEY=\"\""
+echo "export DANCE_HACKING_MUSIC_FOLDER=\"\""
 echo "export PATH=\"\$PATH:${PWD}\""
 echo ""
