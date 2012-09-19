@@ -4,14 +4,26 @@ command_exists () {
     type "$1" &> /dev/null ;
 }
 
-if command_exists lame
-then 
-  TEMP=`mktemp "$1.XXXX"`
-  ffmpeg -i "$1" -sameq -f wav "${TEMP}"
-  # VBR to the rescue!
-  lame --preset extreme "${TEMP}" "${1}.mp3"
-  rm "${TEMP}"
+function convert_wav_to_mp3 {
+  if command_exists lame
+  then
+    lame --preset extreme "${1}" "${2}"
+  else
+    # 192k is a decent tradeoff for files that might still be reprocessed in the future.
+    ffmpeg -i "${1}" -ab 192k "${2}"
+  fi
+}
+
+
+FILE_TYPE="${1##*.}"
+
+if [ "${FILE_TYPE}" = "wav" ]
+then
+  convert_wav_to_mp3 "${1}" "${1}.mp3"
 else
-  # 192k is a decent tradeoff for files that might still be reprocessed in the future.
-  ffmpeg -i "$1" -ab 192k "$1.mp3"
+  TEMP=`mktemp "$1.XXXX"`
+  rm "${TEMP}"
+  wavify "$1" "${TEMP}"
+  convert_wav_to_mp3 "${TEMP}" "${1}.mp3"
+  rm "${TEMP}"
 fi

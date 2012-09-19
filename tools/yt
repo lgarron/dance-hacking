@@ -54,15 +54,15 @@ weblocify "${URL}" "${URL_ARCHIVE_FOLDER}/${WEBLOC_WITH_ESCAPED_URL}" # TODO: Us
 # youtube-dl
 youtube-dl -c -o "${FILE}" --write-description --write-info-json "${URL}"
 
-# Convert to high-quality .mp3
-mp3ify "${FILE}"
-MP3_FILE="$TITLE.mp3"
-mv "${FILE}.mp3" "${MP3_FILE}"
-
-# Analyze the .mp3 version.
-analyze "${MP3_FILE}"
-
 # Full-quality .wav file.
 wavify "${FILE}"
 WAV_FILE="$TITLE.wav"
 mv "${FILE}.wav" "${WAV_FILE}"
+
+# Convert to high-quality .mp3
+mp3ify "${WAV_FILE}"
+MP3_FILE="$TITLE.mp3"
+mv "${WAV_FILE}.mp3" "${MP3_FILE}"
+
+# Analyze the .mp3 version.
+analyze "${MP3_FILE}"

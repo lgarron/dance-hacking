@@ -1,3 +1,10 @@
 #!/bin/bash
 
-ffmpeg -i "$1" -sameq "$1.wav"
+OUT_FILE="${2}"
+
+if [ -z "${OUT_FILE}" ]
+then
+  OUT_FILE="${1}.wav"
+fi
+
+ffmpeg -i "$1" -sameq "$1.wav" 2>&1 | grep -E "Input|Output|Stream"
