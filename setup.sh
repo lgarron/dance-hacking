@@ -92,3 +92,10 @@ else
   echo "${BASH_PROFILE_LINES}" >> "${BASH_PROFILE_LOCATION}"
   echo ""
 fi
+
+# In case this was invoked with source, let's set up what we can.
+cd ..
+. "${BASH_PROFILE_LOCATION}"
+
+echo "Updating youtube-dl..."
+youtube-dl --update
