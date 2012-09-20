@@ -2,3 +2,7 @@
 symlinks/*
 *.pyc
 dl/*
+
+lib/en-ffmpeg
+lib/ffmpeg.exe
+lib/pthreadGC2.dll
