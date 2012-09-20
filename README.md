@@ -44,6 +44,16 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
     which ffmpeg
     if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
 
+## Install ffmpeg on Windows
+
+    curl --insecure -OL https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip &&
+    unzip ffmpeg-windows.zip -d lib &&
+    cd symlinks &&
+    ln -s ../lib/ffmpeg.exe ffmpeg.exe &&
+    ln -s ../lib/pthreadGC2.dll pthreadGC2.dll &&
+    cd ..
+
+
 ## Dependencies
 
 - ffmpeg
