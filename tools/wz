@@ -44,6 +44,7 @@ cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
 
 # Convert to .wav for waltz_blender
 
+MUSIC_FILE_IN_EXTENSION="${MUSIC_FILE_IN##*.}"
 if [ "${MUSIC_FILE_IN_EXTENSION}" = "wav" ] # Case-sensitive, but useful for yt-wz
 then
   MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
