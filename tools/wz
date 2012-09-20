@@ -24,9 +24,6 @@ fi
 
 # Calculate BPM
 
-BPM=`bpm "${JSON_FILE}"`
-echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
-
 MUSIC_FILE_IN="${1}"
 PATTERN="${3}"
 if [ "${PATTERN}" = "" ]
@@ -34,6 +31,8 @@ then
   PATTERN="12[34]"
 fi
 
+BPM=`bpm "${JSON_FILE}"`
+echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
 
 # Create output folder.
 
