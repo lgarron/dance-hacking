@@ -54,6 +54,12 @@ weblocify "${URL}" "${URL_ARCHIVE_FOLDER}/${WEBLOC_WITH_ESCAPED_URL}" # TODO: Us
 # youtube-dl
 youtube-dl -c -o "${FILE}" --write-description "${URL}"
 
+if [ ! -f "${FILE}" ]
+then
+  echo "Could not get video. Aborting"
+  exit 1
+fi
+
 # Full-quality .wav file.
 wavify "${FILE}"
 WAV_FILE="$TITLE.wav"
