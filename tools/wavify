@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [ "$#" -lt "1" ]
+then
+  echo "Usage: ${0} in-file.anything [out-file.wav]"
+  exit 1
+fi
+
 OUT_FILE="${2}"
 
 if [ -z "${OUT_FILE}" ]
@@ -7,4 +13,4 @@ then
   OUT_FILE="${1}.wav"
 fi
 
-ffmpeg -i "$1" -sameq "$1.wav" 2>&1 | grep -E "Input|Output|Stream"
+ffmpeg -i "${1}" -f wav "${OUT_FILE}" 2>&1 | grep -E "Input|Output|Stream"
