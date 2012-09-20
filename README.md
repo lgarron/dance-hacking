@@ -17,26 +17,28 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 
 ## Installation Cheat Sheet
 
-### Windows
+### Windows (Using Cygwin)
 
 - Install [cygwin](http://cygwin.com/install.html)
   - Select the following packages: python, curl, zip, openssl
 - Install CA Certificates the "Right" Way (section below)
 - Quick Install (section below)
-- Windows: Install ffmpeg (section below)
 - Try one of the examples (section below)
 
 ### OSX
 
-- Open Terminal and `cd` to a folder where you want to download the dance-hacking source permanently.
+- Optional: Download and install the [Echonest Remix API](http://echonest.github.com/remix/)
+- Open Terminal and `cd` to a folder where you want to download the dance-hacking source (and keep it there).
 - Quick Install (section below)
-- OSX: Install ffmpeg (section below)
 - Try one of the examples (section below)
 
-#### OSX Echonest (optional):
+### Linux
 
-- Download and install the [Echonest Remix API](http://echonest.github.com/remix/)
-  - OSX: Use the Echonest ffmpeg binary (section below)
+- Install curl and ffmpeg (requires password): sudo apt-get install curl ffmpeg
+- Quick Install (section below)
+- Try one of the examples (section below)
+
+NOTE: This works for me in Ubuntu, but the output audio appears to be differently shifted. So, it "works", but maybe not quite as advertised.
 
 ### Quick Install
 
@@ -50,62 +52,44 @@ Please register and get an [Echonest API Key](https://developer.echonest.com/acc
     ./setup.sh &&
     . "${HOME}/.bash_profile"
 
-### OSX: Fix Python version for Echonest 1.4
-
-    function copy_to_python_2_7 {sudo cp -r "/Library/Python/2.6/site-packages/${1}" "/Library/Python/2.7/site-packages/${1}"}
-    for i in "cAction.so" "dirac.so" "echonest" "pyechonest" "soundtouch.so" "The_Echo_Nest_Remix_API-1.4-py2.6.egg-info"; do copy_to_python_2_7 "${i}"; done
-
-### OSX: Use the Echonest ffmpeg binary
-
-    which ffmpeg
-    if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
-
-### OSX: Install ffmpeg
-
-    cd "${DANCE_HACKING_SOURCE_FOLDER}" &&
-    mkdir -p "dl" &&
-    curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-osx.zip" -o "dl/ffmpeg-osx.zip" &&
-    unzip "dl/ffmpeg-osx.zip" -d "lib" &&
-    cd "symlinks" &&
-    ln -s "../lib/en-ffmpeg" "ffmpeg" &&
-    cd ..
-
-### Windows: Install ffmpeg
-
-    cd "${DANCE_HACKING_SOURCE_FOLDER}" &&
-    mkdir -p "dl" &&
-    curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip" -o "dl/ffmpeg-windows.zip" &&
-    unzip "dl/ffmpeg-windows.zip" -d "lib" &&
-    cd symlinks &&
-    ln -s "../lib/ffmpeg.exe" "ffmpeg.exe" &&
-    ln -s "../lib/pthreadGC2.dll" "pthreadGC2.dll" &&
-    cd ..
-
 ### Examples
 
-Waltzify an instrumental version of Adele's "Someone Like You" (30MB download, will produce 260MB of files, creates a folder in your Dance Hacking folder):
+Waltzify an instrumental version of Adele's "Someone Like You" (30MB download, will produce 260MB of files, creates a folder in your "Dance Hacking" folder):
 
     yt-wz http://www.youtube.com/watch?v=L0jbjnqHFCU
 
-Waltzify "Code Name Vivaldi" by ThePianoGuys (136MB download, will produce 340MB of files, creates a folder in your Dance Hacking folder):
+Waltzify "Code Name Vivaldi" by ThePianoGuys (136MB download, will produce 340MB of files, creates a folder in your "Dance Hacking" folder):
 
     yt-wz http://www.youtube.com/watch?v=09RUuTAM2H0
 
 Waltzify a file on your hard drive (creates a JSON analysis file and folder in the same directory as the file):
 
     cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
-    wz "file-name.mp3"
+    wz "file-name.mp3" # Can also be any other audio/video format.
 
-Waltzify with a different beat pattern:
+Waltzify with a different beat pattern (this example is good for creating a redowa with downbeats 1 and 3 moved to 1 and 2):
 
     cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
     analyze "file-name.mp3"
-    wz "file-name.mp3" "file-name.mp3.json" "[12]34" # Good for redowa instead of cross-step, because 1 and 3 become the new downbeats 1 and 2
+    wz "file-name.mp3" "file-name.mp3.json" "[12]34"
 
-Waltzify by speeding up beats instead of blending (requires the remix API to be correctly installed):
+Convert a waltz to 5/4 time:
+
+    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    analyze "file-name.mp3"
+    wz "file-name.mp3" "file-name.mp3.json" "1234[56]"
+
+Waltzify by speeding up beats instead of blending (requires the Echonest Remix API to be installed correctly):
 
     cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
     wz-beatcaster "file-name.mp3"
+
+Advanced waltz_blender use:
+
+    cd path/to/folder/containing/your/file
+    analyze file-name.mp3
+    wavify file-name.mp3
+    waltz_blender file-name.mp3.wav file-name.mp3.json "1[24][52][36]" 50 0 6
 
 ###  No CA Certificates Installed?
 
@@ -130,9 +114,10 @@ Place a file containing "insecure" at `~/.curlrc`.
 Note that this will avoid checking for certificates *for all cURL downloads in the future*, without warning.
 *Probably*, nothing bad will happen. Theoretically, very bad things could happen.
 
-### Not using bash?
+### Default shell is not bash?
 
-[Neither do I](https://github.com/robbyrussell/oh-my-zsh). I'm gonna assume you know what you're doing. :-P
+[Neither is mine](https://github.com/robbyrussell/oh-my-zsh). I'm gonna assume you know what you're doing. :-P  
+(If your default shell is something like tcsh, then... happy hacking? :-)
 
 ## Dependencies
 
@@ -150,15 +135,18 @@ Note that this will avoid checking for certificates *for all cURL downloads in t
 
 ### Optional Dependencies
 
-- git (best installation, keeping up to date... if you know what you're doing)
+- git (for keeping the repo up to date... if you know what you're doing)
 
 ## Tested On
 
 - OSX (Mountain Lion)
 - Windows XP (cygwin)
+- Linux (Ubuntu)
 - iPad (using custom install)
 
 ## Other Considerations
 
 - bpm-tap fo manual beat data.
 - Allow lower-quality youtube-dl downloads.
+- Allow for easy use of tatums instead of beats.
+- Integrate better with actual Echonest Remix API.

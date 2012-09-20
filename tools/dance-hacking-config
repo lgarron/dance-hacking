@@ -1,0 +1,117 @@
+#!/bin/bash
+
+function print_help {
+
+  SCRIPT_NAME=$(basename "${0}")
+
+  echo ""
+  echo "Usage: ${SCRIPT_NAME} [flag]"
+  echo ""
+  echo "Available flags:"
+  echo " -h      # Display help."
+  echo " -f      # Install ffmpeg (try to determine OS automatically)."
+  echo " -w      # Install ffmpeg for Windows (cygwin)."
+  echo " -x      # Install ffmpeg for OSX."
+  echo ""
+}
+
+if [ "$#" -eq "0" ]
+then
+  print_help
+  exit 1
+fi
+
+function cd_to_dance_hacking_source_folder {
+  if [ -z "${DANCE_HACKING_SOURCE_FOLDER}" ]
+  then
+    echo "No \$DANCE_HACKING_SOURCE_FOLDER has been set. Aborting."
+    exit 1
+  else 
+    cd "${DANCE_HACKING_SOURCE_FOLDER}"
+  fi
+}
+
+function install_ffmpeg_osx {
+
+  echo "Installing ffmpeg for OSX..."
+
+  which ffmpeg
+  if [ "$?" -eq "0" ]
+  then
+    echo "ffmpeg is already installed."
+  else
+    which en-ffmpeg
+    if [ "$?" -eq "0" ]
+    then
+      echo "Echonest has already installed en-ffmpeg. Linking it."
+      cd_to_dance_hacking_source_folder
+      cd "symlinks"
+      ln -s "$(which en-ffmpeg)" "ffmpeg"
+    else
+      # Download it
+      echo "Downloading ffmpeg for OSX..."
+      cd_to_dance_hacking_source_folder
+      mkdir -p "dl"
+      curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-osx.zip" -o "dl/ffmpeg-osx.zip"
+      unzip "dl/ffmpeg-osx.zip" -d "lib"
+      cd "symlinks"
+      ln -s "../lib/en-ffmpeg" "ffmpeg"
+      cd .. 
+    fi
+  fi
+
+}
+
+function install_ffmpeg_windows {
+
+  echo "Installing ffmpeg for Windows..."
+
+  which ffmpeg
+  if [ "$?" -eq "0" ]
+  then
+    echo "ffmpeg is already installed."
+  else
+    cd_to_dance_hacking_source_folder
+    mkdir -p "dl"
+    curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip" -o "dl/ffmpeg-windows.zip"
+    unzip "dl/ffmpeg-windows.zip" -d "lib"
+    cd symlinks
+    ln -s "../lib/ffmpeg.exe" "ffmpeg.exe"
+    ln -s "../lib/pthreadGC2.dll" "pthreadGC2.dll"
+    cd ..
+  fi
+}
+
+function install_ffmpeg {
+  case $OSTYPE in
+    cygwin*)
+      install_ffmpeg_windows
+      ;;
+    darwin*)
+      install_ffmpeg_osx
+      ;;
+    \?)
+      echo "Could not determine OS."
+      ;;
+  esac
+}
+
+while getopts ":hfwx" opt; do
+  case $opt in
+    h)
+      print_help
+      ;;
+    f)
+      install_ffmpeg
+      ;;
+    w)
+      install_ffmpeg_windows
+      ;;
+    x)
+      install_ffmpeg_osx
+      ;;
+    \?)
+      echo "Invalid option: -$OPTARG" >&2
+      ;;
+  esac
+done

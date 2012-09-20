@@ -46,6 +46,8 @@ ln -s "../tools/wz4" "wz4" 2> /dev/null
 ln -s "../tools/yt" "yt" 2> /dev/null
 ln -s "../tools/yt-wz" "yt-wz" 2> /dev/null
 
+ln -s "../tools/dance-hacking-config" "dance-hacking-config" 2> /dev/null
+
 ln -s "../blender/waltz_blender.py" "waltz_blender" 2> /dev/null
 
 ln -s "../beatcaster/beatcaster.py" "beatcaster" 2> /dev/null
@@ -98,9 +100,14 @@ else
   echo ""
 fi
 
-# In case this was invoked with source, let's set up what we can.
+# Actually try to load .bash_profile
 cd ..
 . "${BASH_PROFILE_LOCATION}"
 
+# Install ffmpeg
+dance-hacking-config -f
+
+# Update youtube-dl
+echo ""
 echo "Updating youtube-dl..."
 youtube-dl --update
