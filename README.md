@@ -4,23 +4,44 @@ Lucas Garron
 
 Various scripts used for dance hacking at Stanford using the Echonest Remix API
 
-## Usage
-Requires Python and the [Echonest Remix API](https://code.google.com/p/echo-nest-remix/)
-
 ## Files
 
-- `analyze/analyze.py` - Outputs the beats of a song to JSON (naïvely, but it works).
-- `analyze/analyze_full.sh` - Outputs more complete info from Echonest.
-- `beatcaster/beatcaster.py` - Reasonably clean way to recast beats by modifying their tempo.
-- `blender/waltz_blender.py` - Blends beats to turn 4/4 songs into waltzes.
-- `inception/inception.py` - Make everything into a mind heist.
-- `tools/wz` - Automatically calls `analyze` and tries the most common waltzifications with waltz_blender
+- `wz` - Automatically calls `analyze` and tries the most common waltzifications with waltz_blender
+- `analyze` - Uploads a song to Echonest and downloads a `.json file with the analysis.
+- `waltz_blender` - Blends beats. By default, turns 4/4 songs into waltzes.
+- `wz-beatcaster` - Reasonably clean way to recast beats by modifying their tempo.
+- `inception` - Make everything into a mind heist.
+- `yt-wz` - One step from YouTube to waltz.
 
 For some of this to work, the scrips have to be in the path, e.g. `waltz_blender.py` as `waltz_blender`.
 
 ## Installation Cheat Sheet
 
+### Windows
+
+- Install [cygwin](http://cygwin.com/install.html)
+  - Select the following packages: python, curl, zip, openssl
+- Install CA Certificates the "Right" Way (section below)
+- Quick Install (section below)
+- Windows: Install ffmpeg (section below)
+- Try one of the examples (section below)
+
+### OSX
+
+- Open Terminal and `cd` to a folder where you want to download the dance-hacking source permanently.
+- Quick Install (section below)
+- OSX: Install ffmpeg (section below)
+- Try one of the examples (section below)
+
+#### OSX Echonest (optional):
+
+- Download and install the [Echonest Remix API](http://echonest.github.com/remix/)
+  - OSX: Use the Echonest ffmpeg binary (section below)
+
 ### Quick Install
+
+Please register and get an [Echonest API Key](https://developer.echonest.com/account/register).
+(If you just want to try it, this install will work because I'm nice and I'm providing a default API key, but you should get your own.)
 
     curl -L "https://github.com/lgarron/dance-hacking/zipball/master" -o "dance-hacking.zip" &&
     unzip "dance-hacking.zip" &&
@@ -29,9 +50,66 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
     ./setup.sh &&
     . "${HOME}/.bash_profile"
 
-###  No CA certs Installed
+### OSX: Fix Python version for Echonest 1.4
 
-#### "Right" Way
+    function copy_to_python_2_7 {sudo cp -r "/Library/Python/2.6/site-packages/${1}" "/Library/Python/2.7/site-packages/${1}"}
+    for i in "cAction.so" "dirac.so" "echonest" "pyechonest" "soundtouch.so" "The_Echo_Nest_Remix_API-1.4-py2.6.egg-info"; do copy_to_python_2_7 "${i}"; done
+
+### OSX: Use the Echonest ffmpeg binary
+
+    which ffmpeg
+    if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
+
+### OSX: Install ffmpeg
+
+    cd "${DANCE_HACKING_SOURCE_FOLDER}" &&
+    mkdir -p "dl" &&
+    curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-osx.zip" -o "dl/ffmpeg-osx.zip" &&
+    unzip "dl/ffmpeg-osx.zip" -d "lib" &&
+    cd "symlinks" &&
+    ln -s "../lib/en-ffmpeg" "ffmpeg" &&
+    cd ..
+
+### Windows: Install ffmpeg
+
+    cd "${DANCE_HACKING_SOURCE_FOLDER}" &&
+    mkdir -p "dl" &&
+    curl -L "https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip" -o "dl/ffmpeg-windows.zip" &&
+    unzip "dl/ffmpeg-windows.zip" -d "lib" &&
+    cd symlinks &&
+    ln -s "../lib/ffmpeg.exe" "ffmpeg.exe" &&
+    ln -s "../lib/pthreadGC2.dll" "pthreadGC2.dll" &&
+    cd ..
+
+### Examples
+
+Waltzify an instrumental version of Adele's "Someone Like You" (30MB download, will produce 260MB of files, creates a folder in your Dance Hacking folder):
+
+    yt-wz http://www.youtube.com/watch?v=L0jbjnqHFCU
+
+Waltzify "Code Name Vivaldi" by ThePianoGuys (136MB download, will produce 340MB of files, creates a folder in your Dance Hacking folder):
+
+    yt-wz http://www.youtube.com/watch?v=09RUuTAM2H0
+
+Waltzify a file on your hard drive (creates a JSON analysis file and folder in the same directory as the file):
+
+    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    wz "file-name.mp3"
+
+Waltzify with a different beat pattern:
+
+    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    analyze "file-name.mp3"
+    wz "file-name.mp3" "file-name.mp3.json" "[12]34" # Good for redowa instead of cross-step, because 1 and 3 become the new downbeats 1 and 2
+
+Waltzify by speeding up beats instead of blending (requires the remix API to be correctly installed):
+
+    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    wz-beatcaster "file-name.mp3"
+
+###  No CA Certificates Installed?
+
+#### Install CA Certificates the "Right" Way
 
     if [ -z "$(curl-config --ca)" ] 
     then
@@ -45,44 +123,34 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
         fi
     fi
 
-#### Quick & Dirty (Unsafe) Way
+#### Ignore CA Certificates: Quick & Dirty (Unsafe) Way
 
-    echo "insecure" >> "${HOME}/.curlrc"
+Place a file containing "insecure" at `~/.curlrc`.
 
-### OSX: Fix Python version for Echonest 1.4
+Note that this will avoid checking for certificates *for all cURL downloads in the future*, without warning.
+*Probably*, nothing bad will happen. Theoretically, very bad things could happen.
 
-    function copy_to_python_2_7 {sudo cp -r "/Library/Python/2.6/site-packages/${1}" "/Library/Python/2.7/site-packages/${1}"}
-    for i in "cAction.so" "dirac.so" "echonest" "pyechonest" "soundtouch.so" "The_Echo_Nest_Remix_API-1.4-py2.6.egg-info"; do copy_to_python_2_7 "${i}"; done
+### Not using bash?
 
-### OSX: Use the Echonest binary
-
-    which ffmpeg
-    if [ $? -eq 1 ]; then sudo ln -s /usr/local/bin/en-ffmpeg /usr/local/bin/ffmpeg; fi
-
-## Windows: Install ffmpeg
-
-    cd "${DANCE_HACKING_SOURCE_FOLDER}"
-    curl -OL https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip &&
-    unzip ffmpeg-windows.zip -d lib &&
-    cd symlinks &&
-    ln -s ../lib/ffmpeg.exe ffmpeg.exe &&
-    ln -s ../lib/pthreadGC2.dll pthreadGC2.dll &&
-    cd ..
+[Neither do I](https://github.com/robbyrussell/oh-my-zsh). I'm gonna assume you know what you're doing. :-P
 
 ## Dependencies
 
 - ffmpeg
 - Python
 - cURL
-- youtube-dl
-- the Echonest Track API
+- youtube-dl (included)
 
 ### Recommended Dependencies
 
+- Echonest Remix API
 - lame (allows for slightly better-quality .mp3 files due to VBR.)
 - grep, zip/unzip (for more automated setup)
 - OpenSSL (CA certs?)
-- git (best installation, keeping up to date)
+
+### Optional Dependencies
+
+- git (best installation, keeping up to date... if you know what you're doing)
 
 ## Tested On
 
@@ -93,3 +161,4 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 ## Other Considerations
 
 - bpm-tap fo manual beat data.
+- Allow lower-quality youtube-dl downloads.
