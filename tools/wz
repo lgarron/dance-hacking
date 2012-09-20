@@ -2,8 +2,9 @@
 
 # Usage: waltzify file.mp3 beats.json
 
-# TODO: Cache JSON by file hash  (what does Echonest use?)
 
+# Ensure we have the JSON analysis file.
+# TODO: Cache JSON by file hash  (what does Echonest use?)
 if [ "${2}" = "" ]
 then
   JSON_FILE="${1}.json"
@@ -21,6 +22,11 @@ then
 fi
 
 
+# Calculate BPM
+
+BPM=`bpm "${JSON_FILE}"`
+echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
+
 MUSIC_FILE_IN="${1}"
 PATTERN="${3}"
 if [ "${PATTERN}" = "" ]
@@ -28,19 +34,35 @@ then
   PATTERN="12[34]"
 fi
 
+
+# Create output folder.
+
 TIME=$(date "+%Y-%m-%d at %H-%M-%S")
-MUSIC_FOLDER_TEMP=`mktemp "${MUSIC_FILE_IN}.${TIME}.XXXX"`
-rm "${MUSIC_FOLDER_TEMP}"
-mkdir "${MUSIC_FOLDER_TEMP}"
-cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}"
+MUSIC_FOLDER=$(mktemp -d "${MUSIC_FILE_IN}.${TIME}.XXXX")
+cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
 
-BPM=`bpm "${JSON_FILE}"`
-echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
 
-ffmpeg -i "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}" -sameq -f wav "${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
+# Convert to .wav for waltz_blender
 
-MUSIC_FILE="${MUSIC_FOLDER_TEMP}/${MUSIC_FILE_IN}.wav"
+if [ "${MUSIC_FILE_IN_EXTENSION}" = "wav" ] # Case-sensitive, but useful for yt-wz
+then
+  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
+else
+  wavify "${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
+  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN}.wav"
+fi
 
+
+# Sanity Check
+
+if [ ! -f "${MUSIC_FILE}" ]
+then
+	echo "Could not produce .wav file for hacking."
+	exit 1
+fi
+
+
+# Go!
 
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 5
 waltz_blender "${MUSIC_FILE}" "${JSON_FILE}" "${PATTERN}" 25
