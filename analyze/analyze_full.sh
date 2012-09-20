@@ -60,7 +60,8 @@ then
 	echo "URL: ${URL}"
 
 	curl "${URL}" > "${FILE_NAME}.json" 2> /dev/null
-	cp "${FILE_NAME}.json" "${JSON_CACHE_FOLDER}/${FILE_NAME}.json"
+	FILE_BASE_NAME=$(basename "${FILE_NAME}")
+	cp "${FILE_NAME}.json" "${JSON_CACHE_FOLDER}/${FILE_BASE_NAME}.json"
 
 	echo "Written to: ${JSON_CACHE_FOLDER}/${FILE_NAME}.json"
 	exit 0
