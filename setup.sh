@@ -2,6 +2,10 @@
 
 ECHO_NEST_API_DEV_KEY="VRNSDARJUIWRYJAUX"
 
+cd $(dirname "${0}")
+DANCE_HACKING_SOURCE_FOLDER="$(pwd)"
+DANCE_HACKING_SYMLINKS_FOLDER="${DANCE_HACKING_SOURCE_FOLDER}/symlinks"
+
 # Maybe it's set, else try to get from the arguments.
 if [ -z "${ECHO_NEST_API_KEY}" ]
 then
@@ -66,13 +70,14 @@ mkdir -p "${DANCE_HACKING_MUSIC_FOLDER}/Archive/links"
 mkdir -p "${DANCE_HACKING_MUSIC_FOLDER}/Archive/JSON"
 
 function bash_profile_lines {
-  PWD=`pwd`
   echo ""
   echo ""
   echo "## START OF DANCE HACKING"
   echo "export ECHO_NEST_API_KEY=\"${ECHO_NEST_API_KEY}\""
   echo "export DANCE_HACKING_MUSIC_FOLDER=\"${DANCE_HACKING_MUSIC_FOLDER}\""
-  echo "export PATH=\"\$PATH:${PWD}\""
+  echo "export DANCE_HACKING_SOURCE_FOLDER=\"${DANCE_HACKING_SOURCE_FOLDER}\""
+  echo "export PATH=\"\$PATH:${DANCE_HACKING_SYMLINKS_FOLDER}\""
+  echo "export PYTHONPATH=\"\$PYTHONPATH:${DANCE_HACKING_SYMLINKS_FOLDER}\""
   echo "## END OF DANCE HACKING"
   echo ""
 }

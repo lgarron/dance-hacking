@@ -26,7 +26,7 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
     unzip "dance-hacking.zip" &&
     mv $(ls . | grep "lgarron-dance-hacking") dance-hacking &&
     cd dance-hacking &&
-    . setup.sh &&
+    ./setup.sh &&
     . "${HOME}/.bash_profile"
 
 ###  No CA certs Installed
@@ -61,6 +61,7 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 
 ## Windows: Install ffmpeg
 
+    cd "${DANCE_HACKING_SOURCE_FOLDER}"
     curl -OL https://github.com/downloads/lgarron/dance-hacking/ffmpeg-windows.zip &&
     unzip ffmpeg-windows.zip -d lib &&
     cd symlinks &&
