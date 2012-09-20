@@ -31,7 +31,7 @@ cd symlinks
 
 echo "Creating symlinks."
 
-ln -s "../tools/bpm.js" "bpm" 2> /dev/null
+ln -s "../tools/bpm.py" "bpm" 2> /dev/null
 ln -s "../tools/mp3ify" "mp3ify" 2> /dev/null
 ln -s "../tools/quadify-mp3" "quadify-mp3" 2> /dev/null
 ln -s "../tools/quadify-wav" "quadify-wav" 2> /dev/null
