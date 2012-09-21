@@ -6,7 +6,7 @@ Various scripts used for dance hacking at Stanford using the Echonest Remix API
 
 ## Files
 
-- `wz` - Automatically calls `analyze` and tries the most common waltzifications with waltz_blender
+- `wz` - Automatically calls `analyze` and tries the most common waltzifications with `waltz_blender`.
 - `analyze` - Uploads a song to Echonest and downloads a `.json file with the analysis.
 - `waltz_blender` - Blends beats. By default, turns 4/4 songs into waltzes.
 - `wz-beatcaster` - Reasonably clean way to recast beats by modifying their tempo.
@@ -19,6 +19,8 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 
 ### Windows (Using Cygwin)
 
+(Paste into cygwin is Shift-Insert.)
+
 - Install [cygwin](http://cygwin.com/install.html)
   - Select the following packages: python, curl, zip, openssl
 - Install CA Certificates the "Right" Way (section below)
@@ -28,7 +30,7 @@ For some of this to work, the scrips have to be in the path, e.g. `waltz_blender
 ### OSX
 
 - Optional: Download and install the [Echonest Remix API](http://echonest.github.com/remix/)
-- Open Terminal and `cd` to a folder where you want to download the dance-hacking source (and keep it there).
+- Open Terminal and copy: `cd /Applications`
 - Quick Install (section below)
 - Try one of the examples (section below)
 
@@ -64,24 +66,29 @@ Waltzify "Code Name Vivaldi" by ThePianoGuys (136MB download, will produce 340MB
 
 Waltzify a file on your hard drive (creates a JSON analysis file and folder in the same directory as the file):
 
-    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    cd path/to/folder/containing/your/file
     wz "file-name.mp3" # Can also be any other audio/video format.
+
+Or simply:
+
+ cd "path/to/file-name.mp3" # Can ususally be dragged and dropped onto your Terminal window.
 
 Waltzify with a different beat pattern (this example is good for creating a redowa with downbeats 1 and 3 moved to 1 and 2):
 
-    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    cd path/to/folder/containing/your/file
     analyze "file-name.mp3"
     wz "file-name.mp3" "file-name.mp3.json" "[12]34"
 
 Convert a waltz to 5/4 time:
 
-    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    cd path/to/folder/containing/your/file
     analyze "file-name.mp3"
     wz "file-name.mp3" "file-name.mp3.json" "1234[56]"
 
 Waltzify by speeding up beats instead of blending (requires the Echonest Remix API to be installed correctly):
 
-    cd path/to/folder/containing/your/file # Can ususally be dragged and dropped onto your Terminal window.
+    cd path/to/folder/containing/your/file
+    your Terminal window.
     wz-beatcaster "file-name.mp3"
 
 Advanced waltz_blender use:
