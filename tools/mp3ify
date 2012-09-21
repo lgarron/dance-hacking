@@ -9,8 +9,8 @@ function convert_wav_to_mp3 {
   then
     lame --preset extreme "${1}" "${2}"
   else
-    # 192k is a decent tradeoff for files that might still be reprocessed in the future.
-    ffmpeg -i "${1}" -ab 192k "${2}"
+    # 256k is a decent tradeoff for files that might still be reprocessed in the future.
+    ffmpeg -i "${1}" -ab 256k "${2}"
   fi
 }
 
