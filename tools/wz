@@ -3,12 +3,16 @@
 # Usage: waltzify file.mp3 beats.json
 
 
+MUSIC_FILE_IN="${1}"
+MUSIC_FILE_IN_FOLDER=$(dirname "${MUSIC_FILE_IN}")
+MUSIC_FILE_IN_BASENAME=$(basename "${MUSIC_FILE_IN}")
+
 # Ensure we have the JSON analysis file.
 # TODO: Cache JSON by file hash  (what does Echonest use?)
 if [ "${2}" = "" ]
 then
   JSON_FILE="${1}.json"
-  echo "JSON file not passed in. Assuming: ${JSON_FILE}"
+  echo "JSON file not passed in. Will try: ${JSON_FILE}"
 else
   JSON_FILE="${2}"
   echo "JSON file passed in: ${JSON_FILE}"
@@ -24,7 +28,6 @@ fi
 
 # Calculate BPM
 
-MUSIC_FILE_IN="${1}"
 PATTERN="${3}"
 if [ "${PATTERN}" = "" ]
 then
@@ -37,19 +40,21 @@ echo "${BPM}" > "${MUSIC_FILE_IN} - ${BPM}.txt"
 # Create output folder.
 
 TIME=$(date "+%Y-%m-%d at %H-%M-%S")
-MUSIC_FOLDER=$(mktemp -d "${MUSIC_FILE_IN}.${TIME}.XXXX")
-cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
+MUSIC_FOLDER=$(mktemp -d "${MUSIC_FILE_IN_FOLDER}/${MUSIC_FILE_IN_BASENAME}.${TIME}.XXXX")
+echo "${MUSIC_FOLDER}"
+cp "${MUSIC_FILE_IN}"  "${MUSIC_FOLDER}/${MUSIC_FILE_IN_BASENAME}"
 
 
 # Convert to .wav for waltz_blender
 
-MUSIC_FILE_IN_EXTENSION="${MUSIC_FILE_IN##*.}"
+MUSIC_FILE_IN_EXTENSION="${MUSIC_FILE_IN_BASENAME##*.}"
 if [ "${MUSIC_FILE_IN_EXTENSION}" = "wav" ] # Case-sensitive, but useful for yt-wz
 then
-  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
+  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN_BASENAME}"
 else
-  wavify "${MUSIC_FOLDER}/${MUSIC_FILE_IN}"
-  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN}.wav"
+  # TODO: Cygwin workaround for weird characters in the file name.
+  wavify "${MUSIC_FOLDER}/${MUSIC_FILE_IN_BASENAME}"
+  MUSIC_FILE="${MUSIC_FOLDER}/${MUSIC_FILE_IN_BASENAME}.wav"
 fi
 
 
@@ -60,7 +65,6 @@ then
 	echo "Could not produce .wav file for hacking."
 	exit 1
 fi
-
 
 # Go!
 
