@@ -1,18 +1,20 @@
 var a;
 
-var echonestAnalysis = function(file, callback) {
+var echonestAnalysis = function(file) {
 
   var hash;
   var audio_summary_data;
   var audio_analysis_data;
+  var progressCallback = function(data) {console.log(data)};
+  var doneCallback = function(){};
 
   function done() {
-    callback(audio_analysis_data);
+    doneCallback(audio_analysis_data);
   }
 
   function get_audio_analysis() {
       var url = audio_summary_data.track.audio_summary.analysis_url;
-      console.log("Audio analysis, unproxied URL: " + url);
+      progressCallback("Audio analysis, unproxied URL: " + url);
       
       //Proxy URL to get around AWS CORS restrictions.
       var url = url.replace("https://echonest-analysis.s3.amazonaws.com", "http://www.garron.us/api/echonest/s3/proxy");
@@ -21,7 +23,7 @@ var echonestAnalysis = function(file, callback) {
           type: "GET",
           url: url,
           success: function (data) {
-              console.log("Retrieved data.")
+              progressCallback("Retrieved data.")
               audio_analysis_data = JSON.parse(data); // global
               done();
           }
@@ -29,7 +31,7 @@ var echonestAnalysis = function(file, callback) {
   };
 
   var get_audio_summary = function() {
-    console.log("Polling for audio summary...")
+    progressCallback("Polling for audio summary...")
     $.ajax({
       type: "GET",
       url: 'http://developer.echonest.com/api/v4/track/profile?api_key=EJ7ZVMPNXWVFXS1KE&format=jsonp&md5=' + hash + '&bucket=audio_summary',
@@ -64,7 +66,7 @@ var echonestAnalysis = function(file, callback) {
         loadNext();
       } else {
         hash = spark.end();
-        console.log("Hash computed: " + hash);
+        progressCallback("Hash computed: " + hash);
         callback(hash);
       }
     };
@@ -81,7 +83,7 @@ var echonestAnalysis = function(file, callback) {
 
   function upload(callback) {
 
-    console.log("Starting analysis process...");
+    progressCallback("Starting analysis process...");
 
     var formData = new FormData();
     formData.append("api_key", "VRNSDARJUIWRYJAUX");
@@ -92,13 +94,17 @@ var echonestAnalysis = function(file, callback) {
     xhr.open("POST", "http://developer.echonest.com/api/v4/track/upload", true);
     xhr.onload = callback;
 
-    console.log("Uploading...");
+    progressCallback("Uploading...");
     xhr.send(formData);
   }
 
-  function analysis() {
+  function analysis(theCallback) {
 
-    function upload_callback(e) {console.log("Upload finished.");};
+    if (theCallback) {
+      doneCallback = theCallback;
+    }
+
+    function upload_callback(e) {progressCallback("Upload finished.");};
     upload(file, upload_callback);
 
     function md5sum_callback(fileHash) {
@@ -109,6 +115,13 @@ var echonestAnalysis = function(file, callback) {
 
   }
 
-  analysis();
+  function setProgressCallback(callback) {
+    progressCallback = callback;
+  }
+
+  return {
+    "setProgressCallback": setProgressCallback,
+    "go": analysis
+  };
 
 };

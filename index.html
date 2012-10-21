@@ -30,11 +30,20 @@
   }
   </style>
   <script>
+    function displayString(str) {
+      $("#output").html(str);
+    }
     function callback(audio_analysis) {
-      $("#output").html("BPM is: " + audio_analysis.track.tempo);
+      displayString("BPM is: " + audio_analysis.track.tempo);
     }
     function go(file) {
-      echonestAnalysis(file, callback);
+      try {
+        echonest = echonestAnalysis(file);
+        echonest.setProgressCallback(displayString);
+        echonest.go(callback);
+      }
+      catch (e) {
+      }
     }
   </script>
 </head>
