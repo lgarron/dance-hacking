@@ -31,10 +31,14 @@
   </style>
   <script>
     function displayString(str) {
+      console.log(str);
       $("#output").html(str);
+      $("#output").fadeOut(100).fadeIn(100);
     }
+    var aa; // for easy console probing.
     function callback(audio_analysis) {
-      displayString("BPM is: " + audio_analysis.track.tempo);
+      aa = audio_analysis
+      displayString("BPM of \"" + aa.meta.title + "\" is: " + audio_analysis.track.tempo);
     }
     function go(file) {
       try {
@@ -43,6 +47,7 @@
         echonest.go(callback);
       }
       catch (e) {
+        console.log(e);
       }
     }
   </script>

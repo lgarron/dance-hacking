@@ -7,13 +7,14 @@ var echonestAnalysis = function(file) {
   var audio_analysis_data;
   var progressCallback = function(data) {console.log(data)};
   var doneCallback = function(){};
+  var doneUploading = false;
 
   function done() {
     doneCallback(audio_analysis_data);
   }
 
   function get_audio_analysis() {
-      var url = audio_summary_data.track.audio_summary.analysis_url;
+      var url = audio_summary_data.response.track.audio_summary.analysis_url;
       progressCallback("Audio analysis, unproxied URL: " + url);
       
       //Proxy URL to get around AWS CORS restrictions.
@@ -30,19 +31,40 @@ var echonestAnalysis = function(file) {
       });
   };
 
+  function get_audio_summary_again() {
+    window.setTimeout(get_audio_summary, 5000);
+  }
+
+  var numTries = 0;
+  var maxTries = 30;
   var get_audio_summary = function() {
+    numTries++
+
+    if (numTries > maxTries) {
+      progressCallback("Too many tries (>" + maxTries + ") - please start over");
+    }
+
+    if (!doneUploading) {
+      progressCallback("Still uploading...")
+      get_audio_summary_again();
+      return;
+    };
+
     progressCallback("Polling for audio summary...")
     $.ajax({
       type: "GET",
       url: 'http://developer.echonest.com/api/v4/track/profile?api_key=EJ7ZVMPNXWVFXS1KE&format=jsonp&md5=' + hash + '&bucket=audio_summary',
       dataType: 'jsonp',
       success: function (data) {
-        audio_summary_data = data.response; // global
+        audio_summary_data = data; // global
 
-        if (audio_summary_data.track.status === "complete") {
+        var message = audio_summary_data.response.status.message;
+        var trackStatus = audio_summary_data.response.track.status;
+
+        if (message == "Success" && trackStatus === "complete") {
             get_audio_analysis();
         } else {
-            window.setTimeout(get_audio_summary, 2000);
+            get_audio_summary_again();
         }
       }
     });
@@ -81,7 +103,7 @@ var echonestAnalysis = function(file) {
     loadNext();
   };
 
-  function upload(callback) {
+  function upload(upload_callback) {
 
     progressCallback("Starting analysis process...");
 
@@ -92,7 +114,7 @@ var echonestAnalysis = function(file) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "http://developer.echonest.com/api/v4/track/upload", true);
-    xhr.onload = callback;
+    xhr.onload = upload_callback;
 
     progressCallback("Uploading...");
     xhr.send(formData);
@@ -104,8 +126,11 @@ var echonestAnalysis = function(file) {
       doneCallback = theCallback;
     }
 
-    function upload_callback(e) {progressCallback("Upload finished.");};
-    upload(file, upload_callback);
+    function upload_callback(e) {
+      progressCallback("Upload finished.");
+      doneUploading = true;
+    };
+    upload(upload_callback);
 
     function md5sum_callback(fileHash) {
       hash = fileHash;
