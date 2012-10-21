@@ -42,7 +42,7 @@ var echonestAnalysis = function(file) {
     }
 
 
-    progressCallback("Polling for audio summary...")
+    progressCallback("Polling for audio summary (try #" + numTries + ")...")
     $.ajax({
       type: "GET",
       url: 'http://developer.echonest.com/api/v4/track/profile?api_key=EJ7ZVMPNXWVFXS1KE&format=jsonp&md5=' + hash + '&bucket=audio_summary',
