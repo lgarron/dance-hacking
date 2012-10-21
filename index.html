@@ -32,7 +32,7 @@
   <script>
     function displayString(str) {
       console.log(str);
-      $("#output").stop().fadeOut(100).html(str).fadeIn(100);
+      $("#output").stop().fadeOut(0).html(str).fadeIn(100);
     }
     function callback(audio_analysis) {
       displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo);
