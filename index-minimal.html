@@ -9,9 +9,9 @@
 <center>
 <h1>Echonest Upload!</h1>
 
-<input type="file" onchange="echonestAnalysis(this.files[0]).go(function(aa){output.innerHTML = JSON.stringify(aa);});">
+<input type="file" onchange="echonestAnalysis(this.files[0]).go(function(aa){output.value = JSON.stringify(aa);});">
 <br><br>
-<div id="output">[Result will appear here.]</div>
+<textarea id="output" style="width: 80%; height: 80%;">[Result will appear here.]</textarea>
 </center>
 
 </body>
