@@ -37,18 +37,13 @@ var echonestAnalysis = function(file) {
 
   var numTries = 0;
   var maxTries = 30;
-  var get_audio_summary = function() {
+  var try_get_audio_summary = function(summary_fail_callback) {
     numTries++
 
     if (numTries > maxTries) {
       progressCallback("Too many tries (>" + maxTries + ") - please start over");
     }
 
-    if (!doneUploading) {
-      progressCallback("Still uploading...")
-      get_audio_summary_again();
-      return;
-    };
 
     progressCallback("Polling for audio summary...")
     $.ajax({
@@ -58,17 +53,24 @@ var echonestAnalysis = function(file) {
       success: function (data) {
         audio_summary_data = data; // global
 
-        var message = audio_summary_data.response.status.message;
-        var trackStatus = audio_summary_data.response.track.status;
-
-        if (message == "Success" && trackStatus === "complete") {
+        if (audio_summary_data.response.status.message === "Success" && 
+            audio_summary_data.response.track.status === "complete") {
             get_audio_analysis();
         } else {
-            get_audio_summary_again();
+            summary_fail_callback();
         }
       }
     });
   };
+
+  var get_audio_summary = function() {
+    if (!doneUploading) {
+      progressCallback("Still uploading...")
+      get_audio_summary_again();
+      return;
+    };
+    try_get_audio_summary(get_audio_summary);
+  }
 
   function md5sum(file, callback) {
 
@@ -104,8 +106,7 @@ var echonestAnalysis = function(file) {
   };
 
   function upload(upload_callback) {
-
-    progressCallback("Starting analysis process...");
+    progressCallback("Uploading...");
 
     var formData = new FormData();
     formData.append("api_key", "VRNSDARJUIWRYJAUX");
@@ -116,25 +117,30 @@ var echonestAnalysis = function(file) {
     xhr.open("POST", "http://developer.echonest.com/api/v4/track/upload", true);
     xhr.onload = upload_callback;
 
-    progressCallback("Uploading...");
     xhr.send(formData);
   }
 
   function analysis(theCallback) {
 
+    progressCallback("Starting analysis process...");
+
     if (theCallback) {
       doneCallback = theCallback;
     }
 
-    function upload_callback(e) {
+    function summary_fail_callback() {
+      upload(upload_callback);
+      get_audio_summary();
+    }
+
+    function upload_callback() {
       progressCallback("Upload finished.");
       doneUploading = true;
     };
-    upload(upload_callback);
 
     function md5sum_callback(fileHash) {
       hash = fileHash;
-      get_audio_summary();
+      try_get_audio_summary(summary_fail_callback);
     };    
     var songMD5 = md5sum(file, md5sum_callback);
 
