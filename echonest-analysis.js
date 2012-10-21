@@ -158,6 +158,7 @@ var echonestAnalysis = function(file) {
 
   function setProgressCallback(callback) {
     progressCallback = callback;
+    return this; // Make it chainable.
   }
 
   function audio_summary() {
