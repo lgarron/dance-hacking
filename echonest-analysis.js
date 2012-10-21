@@ -8,6 +8,7 @@ var echonestAnalysis = function(file) {
   var progressCallback = function(data) {console.log(data)};
   var doneCallback = function(){};
   var doneUploading = false;
+  var fractionUploaded = 0;
 
   function done() {
     doneCallback(audio_analysis_data);
@@ -60,14 +61,17 @@ var echonestAnalysis = function(file) {
     });
   };
 
-  function get_audio_summary_again() {
-    window.setTimeout(get_audio_summary, 5000);
+  function get_audio_summary_again(delay) {
+    if (!delay) {
+      delay = 5000;
+    }
+    window.setTimeout(get_audio_summary, delay);
   }
 
   var get_audio_summary = function() {
     if (!doneUploading) {
-      progressCallback("Still uploading...")
-      get_audio_summary_again();
+      progressCallback("Still uploading (" + Math.floor(fractionUploaded*100) + "%)");
+      get_audio_summary_again(1000);
       return;
     };
     try_get_audio_summary(get_audio_summary_again);
@@ -116,6 +120,11 @@ var echonestAnalysis = function(file) {
 
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "http://developer.echonest.com/api/v4/track/upload", true);
+    xhr.upload.addEventListener("progress", function(evt){
+      if (evt.lengthComputable) {
+        fractionUploaded = evt.loaded / evt.total;
+      }
+    }, false);
     xhr.onload = upload_callback;
 
     xhr.send(formData);
