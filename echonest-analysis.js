@@ -3,8 +3,8 @@ var a;
 var echonestAnalysis = function(file) {
 
   var hash;
-  var audio_summary_data;
-  var audio_analysis_data;
+  var audio_summary_data = {};
+  var audio_analysis_data = {};
   var progressCallback = function(data) {console.log(data)};
   var doneCallback = function(){};
   var doneUploading = false;
@@ -15,7 +15,8 @@ var echonestAnalysis = function(file) {
 
   function get_audio_analysis() {
       var url = audio_summary_data.response.track.audio_summary.analysis_url;
-      progressCallback("Audio analysis, unproxied URL: " + url);
+      progressCallback("Unproxied URL: " + url);
+      progressCallback("Getting audio analysis for \"" + audio_summary_data.response.track.title + "\"");
       
       //Proxy URL to get around AWS CORS restrictions.
       var url = url.replace("https://echonest-analysis.s3.amazonaws.com", "http://www.garron.us/api/echonest/s3/proxy");
@@ -30,10 +31,6 @@ var echonestAnalysis = function(file) {
           }
       });
   };
-
-  function get_audio_summary_again() {
-    window.setTimeout(get_audio_summary, 5000);
-  }
 
   var numTries = 0;
   var maxTries = 30;
@@ -63,13 +60,17 @@ var echonestAnalysis = function(file) {
     });
   };
 
+  function get_audio_summary_again() {
+    window.setTimeout(get_audio_summary, 5000);
+  }
+
   var get_audio_summary = function() {
     if (!doneUploading) {
       progressCallback("Still uploading...")
       get_audio_summary_again();
       return;
     };
-    try_get_audio_summary(get_audio_summary);
+    try_get_audio_summary(get_audio_summary_again);
   }
 
   function md5sum(file, callback) {
@@ -150,9 +151,19 @@ var echonestAnalysis = function(file) {
     progressCallback = callback;
   }
 
+  function audio_summary() {
+    return audio_summary_data;
+  }
+
+  function audio_analysis() {
+    return audio_analysis_data;
+  }
+
   return {
     "setProgressCallback": setProgressCallback,
-    "go": analysis
+    "go": analysis,
+    "audio_summary": audio_summary,
+    "audio_analysis": audio_analysis
   };
 
 };

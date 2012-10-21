@@ -32,14 +32,12 @@
   <script>
     function displayString(str) {
       console.log(str);
-      $("#output").html(str);
-      $("#output").fadeOut(100).fadeIn(100);
+      $("#output").stop().fadeOut(100).html(str).fadeIn(100);
     }
-    var aa; // for easy console probing.
     function callback(audio_analysis) {
-      aa = audio_analysis
-      displayString("BPM of \"" + aa.meta.title + "\" is: " + audio_analysis.track.tempo);
+      displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo);
     }
+    var echonest; // For easier console debugging.
     function go(file) {
       try {
         echonest = echonestAnalysis(file);
