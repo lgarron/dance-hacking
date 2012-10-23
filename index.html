@@ -39,8 +39,8 @@
       $("#output_bpm").stop().fadeOut(0).html(str).fadeIn(100);
     }
     function callback(audio_analysis) {
-      $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2));
-      displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo);
+      $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
+      displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100*audio_analysis.track.tempo_confidence ) + "%)");
     }
     var echonest; // For easier console debugging.
     function go(file) {
