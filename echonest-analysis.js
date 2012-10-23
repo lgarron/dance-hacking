@@ -8,6 +8,7 @@ var echonestAnalysis = function(file) {
   var progressCallback = function(data) {console.log(data)};
   var doneCallback = function(){};
   var doneUploading = false;
+  var aborted = false;
   var fractionUploaded = 0;
 
   function done() {
@@ -40,6 +41,8 @@ var echonestAnalysis = function(file) {
 
     if (numTries > maxTries) {
       progressCallback("Too many tries (>" + maxTries + ") - please start over");
+      aborted = true;
+      return;
     }
 
 
@@ -69,6 +72,9 @@ var echonestAnalysis = function(file) {
   }
 
   var get_audio_summary = function() {
+    if (aborted) {
+      return;
+    }
     if (!doneUploading) {
       progressCallback("Still uploading (" + Math.floor(fractionUploaded*100) + "%)");
       get_audio_summary_again(1000);
@@ -112,6 +118,13 @@ var echonestAnalysis = function(file) {
 
   function upload(upload_callback) {
     progressCallback("Uploading...");
+
+    var filetype = file.name.split(".").pop();
+    if (filetype !== "mp3") {
+      progressCallback("Sorry, only .mp3 files work properly at the moment. You added \"" + file.name + "\".");
+      aborted = true;
+      return;
+    }
 
     var formData = new FormData();
     formData.append("api_key", "VRNSDARJUIWRYJAUX");
