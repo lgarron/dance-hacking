@@ -3,6 +3,7 @@
   <script src="spark-md5.js"></script>
   <script src="jquery-1.8.2.js"></script>
   <script src="echonest-analysis.js"></script>
+  <script src="audiojedit.js"></script>
   <script src="drag-drop-file.js"></script>
   <link href="drag-drop-file.css" rel="stylesheet"/>
   <style>
@@ -42,12 +43,49 @@
       $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
       displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100*audio_analysis.track.tempo_confidence ) + "%)");
     }
+
+
+var context = new webkitAudioContext();
+var analyser = context.createAnalyser();
+var xFile;
+var ev;
+
+
+    function goData(data) {
+      source = context.createBufferSource();
+
+          
+        context.decodeAudioData(data, function(buffer) {
+          console.log("decoding");
+            source.buffer = buffer;
+            source.connect(context.destination);
+            source.noteOn(0);
+            console.log("out");
+        }, function(e) {
+            console.log(e);
+        });
+
+    }
+
     var echonest; // For easier console debugging.
     function go(file) {
       try {
-        echonest = echonestAnalysis(file);
-        echonest.setProgressCallback(displayString);
-        echonest.go(callback);
+        //echonest = echonestAnalysis(file);
+        //echonest.setProgressCallback(displayString);
+        //echonest.go(callback);
+
+        xFile = file;
+
+        var reader = new FileReader();
+
+
+        reader.onload = function (fileEvent) {
+          var data = fileEvent.target.result;
+          goData(data);
+        };
+
+        reader.readAsArrayBuffer(file);
+
       }
       catch (e) {
         console.log(e);
