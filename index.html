@@ -46,21 +46,25 @@
 
 
 var context = new webkitAudioContext();
+var context2 = new webkitAudioContext();
 var analyser = context.createAnalyser();
 var xFile;
 var ev;
-
+var w;
+var d
 
     function goData(data) {
-      source = context.createBufferSource();
 
-          
         context.decodeAudioData(data, function(buffer) {
-          console.log("decoding");
-            source.buffer = buffer;
-            source.connect(context.destination);
-            source.noteOn(0);
-            console.log("out");
+          console.log("decoding1.1");
+          w = Wav.createWaveFileData(buffer);
+
+          source = context2.createBufferSource();
+          buffer = context2.createBuffer(w.buffer, false);
+          source.buffer = buffer;
+          source.connect(context2.destination);
+          source.noteOn(0);
+          console.log("out");
         }, function(e) {
             console.log(e);
         });
@@ -80,8 +84,8 @@ var ev;
 
 
         reader.onload = function (fileEvent) {
-          var data = fileEvent.target.result;
-          goData(data);
+          d = fileEvent.target.result;
+          goData(d);
         };
 
         reader.readAsArrayBuffer(file);

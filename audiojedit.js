@@ -157,6 +157,7 @@ Wav.createWaveFileData = (function() {
       writeInt16(sampleR, a, offset + 2);
       offset += 4;
 
+      // Duplicate everything. Will slow the song down 50% (pitch affected).
       writeInt16(sampleL, a, offset);
       writeInt16(sampleR, a, offset + 2);
       offset += 4;
