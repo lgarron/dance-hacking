@@ -159,19 +159,85 @@ Wav.createWaveFileData = (function() {
     }
   };
 
-  var writeAudioBuffer2 = function(audioBuffer, a, offset, beat) {
+  // TODO: Decompose
+  overlap_ratio = 1.00;
+
+  var handle = {};
+  handle["copy"] = function(audioBuffer, a, offset, beat) {
     var n = audioBuffer.length,
         bufferL = audioBuffer.getChannelData(0),
         sampleL,
         bufferR = audioBuffer.getChannelData(1),
         sampleR;
 
-      console.log(beat);
-    startSample = audioBuffer.sampleRate * beat["segment"]["start"];
-    endSample = audioBuffer.sampleRate * beat["segment"]["end"];
-    for (var i = 0; i < n; ++i) {
+      // console.log(beat);
+    startSample = Math.floor(audioBuffer.sampleRate * beat["segment"]["start"]);
+    // console.log(audioBuffer.sampleRate);
+    // console.log(beat["segment"]["start"]);
+    endSample = Math.floor(audioBuffer.sampleRate * beat["segment"]["end"]);
+    //console.log(startSample);
+    // console.log(endSample);
+    for (var i = startSample; i < endSample; ++i) {
       sampleL = bufferL[i] * 32768.0;
       sampleR = bufferR[i] * 32768.0;
+
+      // Clip left and right samples to the limitations of 16-bit.
+      // If we don't do this then we'll get nasty wrap-around distortion.
+      if (sampleL < -32768) { sampleL = -32768; }
+      if (sampleL >  32767) { sampleL =  32767; }
+      if (sampleR < -32768) { sampleR = -32768; }
+      if (sampleR >  32767) { sampleR =  32767; }
+
+      writeInt16(sampleL, a, offset);
+      writeInt16(sampleR, a, offset + 2);
+      offset += 4;
+    }
+    return offset;
+  };
+
+  handle["blend"] = function(audioBuffer, a, offset, beat) {
+    var n = audioBuffer.length,
+        bufferL = audioBuffer.getChannelData(0),
+        sampleL,
+        bufferR = audioBuffer.getChannelData(1),
+        sampleR;
+
+    num_overlap_samples = Math.floor(
+      audioBuffer.sampleRate * overlap_ratio * Math.min(
+        beat["segment1"]["end"] - beat["segment1"]["start"],
+        beat["segment2"]["end"] - beat["segment2"]["start"]
+      )
+    );
+
+    offset = handle["copy"](audioBuffer,
+    a,
+    offset,
+    {
+      "kind": "copy",
+      "segment": {
+        "start": beat["segment1"]["start"],
+        "end": beat["segment1"]["end"] - num_overlap_samples
+      }
+    })
+
+    console.log(num_overlap_samples);
+
+    for (var i = 0; i < num_overlap_samples; ++i) {
+
+      sample1L = bufferL[Math.floor(audioBuffer.sampleRate * beat["segment1"]["end"]) - num_overlap_samples + i] * 32768.0;
+      sample1R = bufferR[Math.floor(audioBuffer.sampleRate * beat["segment1"]["end"]) - num_overlap_samples + i] * 32768.0;
+      sample2L = bufferL[Math.floor(audioBuffer.sampleRate * beat["segment2"]["end"]) - num_overlap_samples + i] * 32768.0;
+      sample2R = bufferR[Math.floor(audioBuffer.sampleRate * beat["segment2"]["end"]) - num_overlap_samples + i] * 32768.0;
+
+      //console.log(sample1L);
+
+      s2_weight = i/num_overlap_samples;
+
+      s1_scale = Math.pow(1-s2_weight, 0.5)
+      s2_scale = Math.pow(s2_weight, 0.5)
+
+      sampleL = sample1L * s1_scale + sample2L * s2_scale
+      sampleR = sample1R * s1_scale + sample2R * s2_scale
 
       // Clip left and right samples to the limitations of 16-bit.
       // If we don't do this then we'll get nasty wrap-around distortion.
@@ -219,13 +285,12 @@ Wav.createWaveFileData = (function() {
     writeInt32(subChunk2Size, waveFileData, 40);      // SubChunk2Size (4)
 
     // Write actual audio data starting at offset 44.
-    writeAudioBuffer(audioBuffer, waveFileData, 44);
-
     console.log("Through");
     var offset = 44;
     for (var i = 0; i < beats.length; i++) {
       console.log("Loop #" + i);
-      //offset = writeAudioBuffer(audioBuffer, waveFileData, offset, beats[i]);
+      fn = handle[beats[i]["kind"]];
+      offset = fn(audioBuffer, waveFileData, offset, beats[i]);
     }
     console.log("Over");
 
