@@ -48,7 +48,7 @@
   .hidden {
     display: none;
   }
-  #download_button {
+  #rehack_button, #download_button {
     font-size: 150%;
   }
   </style>
@@ -302,6 +302,15 @@ var hack_data;
         console.log(e);
       }
     }
+
+    function rehack() {
+      xFile && go(xFile);
+    }
+
+    $(document).ready(function() {
+      document.getElementById("rehack_button").addEventListener("click", rehack);
+    });
+
   </script>
 </head>
 <body>
@@ -323,6 +332,7 @@ var hack_data;
 
 
 <div id="download_button_div" class="hidden">
+  <button id="rehack_button">Re-hack</button><br>
   <audio id="output_audio" controls="controls"></audio><br>
   <button id="download_button">Download .wav</button><br>
 </div>
