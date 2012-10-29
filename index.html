@@ -21,7 +21,7 @@
     padding: 1em;
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
   }
-  #output_bpm, #output_text {
+  #output_bpm, #output_text, #beat_pattern {
     font-size: 120%;
     padding: 0.5em;
     margin: 0.5em;
@@ -32,6 +32,9 @@
   #output_text {
     font-size: 100%;
     height: 40%;
+  }
+  #beat_pattern {
+    text-align: center;
   }
   </style>
   <script>
@@ -44,7 +47,7 @@
       try {
       console.log("Datafying-hack data.");
 
-      pattern = "12[34]";
+      pattern = document.getElementById("beat_pattern").value;
       beats_per_bar = 4;
 
       hack_data = [];
@@ -155,6 +158,7 @@ var aa;
       aa = audio_analysis;
       $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
       displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100*audio_analysis.track.tempo_confidence ) + "%)");
+      displayString("Please wait a moment for waltzification.");
 
       var reader = new FileReader();
 
@@ -181,7 +185,7 @@ var src;
 var buf;
 
     function goData(data) {
-        console.log("gd");
+        console.log("goData()");
         context.decodeAudioData(data, function(buffer) {
 
           buf = buffer;
@@ -198,8 +202,10 @@ var buf;
           source.buffer = buffer;
           source.connect(context2.destination);
           source.noteOn(0);
-          console.log("out");
+          console.log("Done");
+          displayString("Hacked version of \"" + aa.meta.title + "\" is playing.");
         }, function(e) {
+            displayString("Failed to waltzify. :-(<br>File might be too large.");
             console.log(e);
         });
 
@@ -221,16 +227,22 @@ var buf;
 </head>
 <body>
 
+<a href="https://github.com/lgarron/echonest-analysis.js/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
+
 <center>
-<h1>Echonest Upload!</h1>
+<h1>Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
 <div id="new_song">Drag and drop a song here!</div>
 <!--input type="file" name="track" id="track" onchange=""><br-->
 
 <div id="output_bpm">No output yet...</div>
+<input type="text" id="beat_pattern" value="12[34]"><br>
 
 <textarea id="output_text">[Analysis will appear here.]</textarea>
 
+<br>
+Thanks to the <a href="http://the.echonest.com/">Echonest</a> <a href="http://developer.echonest.com/docs/v4/track.html">Track API</a>.<br>
+Only tested in Google Chrome.<br>
 </center>
 
 </body>

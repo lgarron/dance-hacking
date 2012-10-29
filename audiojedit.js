@@ -253,7 +253,7 @@ Wav.createWaveFileData = (function() {
     return offset;
   };
 
-  return function(audioBuffer, beats) {
+  return function(audioBuffer, beats, progressCallback) {
     var frameLength = audioBuffer.length,
         numberOfChannels = audioBuffer.numberOfChannels,
         sampleRate = audioBuffer.sampleRate,

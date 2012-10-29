@@ -1,3 +1,5 @@
+
+var ff;
 var a;
 
 var echonestAnalysis = function(file) {
@@ -120,15 +122,21 @@ var echonestAnalysis = function(file) {
     progressCallback("Uploading...");
 
     var filetype = file.name.split(".").pop();
+    ff = filetype;
+    // Dragging from iTunes sometimes has a weird bug where the file.name includes a terminating null as a final character. So let's only look at the first three.
+    if (filetype.slice(0,3) !== "mp3") {
+      progressCallback("Sorry, only .mp3 files work properly at the moment. You added \"" + file.name + "\" (filetype \"" + filetype + "\").");
+      //aborted = true;
+      //return;
+    }
     if (filetype !== "mp3") {
-      progressCallback("Sorry, only .mp3 files work properly at the moment. You added \"" + file.name + "\".");
-      aborted = true;
-      return;
+      console.log("Filename bug encountered:", file.name, filetype);
+      filetype = filetype.slice(0, filetype.length - 1);
     }
 
     var formData = new FormData();
     formData.append("api_key", "VRNSDARJUIWRYJAUX");
-    formData.append("filetype", "mp3");
+    formData.append("filetype", filetype);
     formData.append("track", file);
 
     var xhr = new XMLHttpRequest();
