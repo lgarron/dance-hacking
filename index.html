@@ -5,6 +5,7 @@
   <script src="echonest-analysis.js"></script>
   <script src="audiojedit.js"></script>
   <script src="drag-drop-file.js"></script>
+  <script src="FileSaver.js"></script>
   <link href="drag-drop-file.css" rel="stylesheet"/>
   <style>
   html {
@@ -35,6 +36,9 @@
   }
   #beat_pattern {
     text-align: center;
+  }
+  .hidden {
+    display: none;
   }
   </style>
   <script>
@@ -183,6 +187,16 @@ var w;
 var d;
 var src;
 var buf;
+    
+    function saveFile() {
+      var blob = new Blob([w]);
+      var fileName = aa.meta.title;
+      if (fileName === "") {
+        fileName = "Song";
+      }
+      var extension = ".wav";
+      saveAs(blob, fileName + extension);
+    }
 
     function goData(data) {
         console.log("goData()");
@@ -204,6 +218,9 @@ var buf;
           source.noteOn(0);
           console.log("Done");
           displayString("Hacked version of \"" + aa.meta.title + "\" is playing.");
+          document.getElementById("download_button_div").classList.remove("hidden")
+          document.getElementById("download_button_div").addEventListener("click", saveFile);
+
         }, function(e) {
             displayString("Failed to waltzify. :-(<br>File might be too large.");
             console.log(e);
@@ -237,6 +254,10 @@ var buf;
 
 <div id="output_bpm">No output yet...</div>
 <input type="text" id="beat_pattern" value="12[34]"><br>
+
+<div id="download_button_div" class="hidden">
+  <button id="download_button">Download .wav</button><br>
+</div>
 
 <textarea id="output_text">[Analysis will appear here.]</textarea>
 

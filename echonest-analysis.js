@@ -88,7 +88,7 @@ var echonestAnalysis = function(file) {
   function md5sum(file, callback) {
 
     var fileReader = new FileReader(),
-        blobSlice = File.prototype.mozSlice || File.prototype.slice,
+        blobSlice = File.prototype.mozSlice || File.prototype.slice || File.prototype.webkitSlice, //webkitSlice for Safari.
         chunkSize = 2097152, // read in chunks of 2MB
         chunks = Math.ceil(file.size / chunkSize),
         currentChunk = 0,
