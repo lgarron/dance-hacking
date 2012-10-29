@@ -156,15 +156,38 @@ Wav.createWaveFileData = (function() {
       writeInt16(sampleL, a, offset);
       writeInt16(sampleR, a, offset + 2);
       offset += 4;
+    }
+  };
 
-      // Duplicate everything. Will slow the song down 50% (pitch affected).
+  var writeAudioBuffer2 = function(audioBuffer, a, offset, beat) {
+    var n = audioBuffer.length,
+        bufferL = audioBuffer.getChannelData(0),
+        sampleL,
+        bufferR = audioBuffer.getChannelData(1),
+        sampleR;
+
+      console.log(beat);
+    startSample = audioBuffer.sampleRate * beat["segment"]["start"];
+    endSample = audioBuffer.sampleRate * beat["segment"]["end"];
+    for (var i = 0; i < n; ++i) {
+      sampleL = bufferL[i] * 32768.0;
+      sampleR = bufferR[i] * 32768.0;
+
+      // Clip left and right samples to the limitations of 16-bit.
+      // If we don't do this then we'll get nasty wrap-around distortion.
+      if (sampleL < -32768) { sampleL = -32768; }
+      if (sampleL >  32767) { sampleL =  32767; }
+      if (sampleR < -32768) { sampleR = -32768; }
+      if (sampleR >  32767) { sampleR =  32767; }
+
       writeInt16(sampleL, a, offset);
       writeInt16(sampleR, a, offset + 2);
       offset += 4;
     }
+    return offset;
   };
 
-  return function(audioBuffer) {
+  return function(audioBuffer, beats) {
     var frameLength = audioBuffer.length,
         numberOfChannels = audioBuffer.numberOfChannels,
         sampleRate = audioBuffer.sampleRate,
@@ -197,6 +220,14 @@ Wav.createWaveFileData = (function() {
 
     // Write actual audio data starting at offset 44.
     writeAudioBuffer(audioBuffer, waveFileData, 44);
+
+    console.log("Through");
+    var offset = 44;
+    for (var i = 0; i < beats.length; i++) {
+      console.log("Loop #" + i);
+      //offset = writeAudioBuffer(audioBuffer, waveFileData, offset, beats[i]);
+    }
+    console.log("Over");
 
     return waveFileData;
   }

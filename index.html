@@ -57,7 +57,16 @@ var d
 
         context.decodeAudioData(data, function(buffer) {
           console.log("decoding1.1");
-          w = Wav.createWaveFileData(buffer);
+          w = Wav.createWaveFileData(buffer, [
+            {"kind": "copy", "segment": {
+                "start": 0,
+                "end": 4.000
+            }},
+            {"kind": "copy", "segment": {
+                "start": 20.000,
+                "end": 4.000
+            }}
+          ]);
 
           source = context2.createBufferSource();
           buffer = context2.createBuffer(w.buffer, false);
