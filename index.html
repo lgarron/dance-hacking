@@ -47,12 +47,63 @@
       $("#output_bpm").stop().fadeOut(0).html(str).fadeIn(100);
     }
 
+    function hack(pattern, b, c) {
+      //console.log("Hack-b-c");
+      var i = 0;
+      while (i < pattern.length) {
+        if (isNumber(pattern[i])) {
+          p = parseFloat(pattern[i]);
+          c(p);
+        }
+        else if (pattern[i] === "[") {
+          p3 = pattern[i+3];
+          if (p3 !== "]") {
+            console.log("WARNING: Pattern is irregular. No closing ] at position " + i+3);
+          }
+          p1 = parseFloat(pattern[i+1]);
+          p2 = parseFloat(pattern[i+2]);
+          b(p1, p2);
+          i += 3;
+        }
+        else {
+          console.log("WARNING: Pattern is irregular. No closing ] at position " + i);
+        }  
+        i += 1;
+      }
+    }
+
+    // From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+    function isNumber(n) {
+      return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+
+    function beats_per_bar(pattern) {
+      max_beat_index = 0;
+      function update_max_beat_index(i) {
+        if (i > max_beat_index) {
+          max_beat_index = i;
+        }
+      }
+      function update_max_beat_index_b(j, k) {
+        update_max_beat_index(j);
+        update_max_beat_index(k);
+      }
+      function update_max_beat_index_c(j) {
+        update_max_beat_index(j);
+      }
+
+      hack(pattern, update_max_beat_index_b, update_max_beat_index_c);
+
+      return max_beat_index;
+    }
+
+
     function hackData(audioData, audio_analysis) {
       try {
       console.log("Datafying-hack data.");
 
       pattern = document.getElementById("beat_pattern").value;
-      beats_per_bar = 4;
+      beats_per_bar = beats_per_bar(pattern);
 
       hack_data = [];
 
@@ -87,37 +138,6 @@
         })
       }
 
-      // From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
-      function isNumber(n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
-      }
-
-      function hack(b, c) {
-        //console.log("Hack-b-c");
-        var i = 0;
-        while (i < pattern.length) {
-          if (isNumber(pattern[i])) {
-            p = parseFloat(pattern[i]);
-            c(p);
-          }
-          else if (pattern[i] === "[") {
-            p3 = pattern[i+3];
-            if (p3 !== "]") {
-              console.log("WARNING: Pattern is irregular. No closing ] at position " + i+3);
-            }
-            p1 = parseFloat(pattern[i+1]);
-            p2 = parseFloat(pattern[i+2]);
-            b(p1, p2);
-            i += 3;
-          }
-          else {
-            console.log("WARNING: Pattern is irregular. No closing ] at position " + i);
-          }  
-          i += 1;
-        }
-      }
-
-
       // Everything up to the first beat
       hack_data.push({
         "kind": "copy",
@@ -134,7 +154,7 @@
         console.log("Bar #" + i);
         function b(j, k) {return blend_beats(i, j, k)};
         function c(j) {return copy_beat(i, j)};
-        hack(b, c);
+        hack(pattern, b, c);
       }
       console.log("Done bars!");
 
@@ -187,9 +207,10 @@ var w;
 var d;
 var src;
 var buf;
+var blob;
+var blob2;
     
     function saveFile() {
-      var blob = new Blob([w]);
       var fileName = aa.meta.title;
       if (fileName === "") {
         fileName = "Song";
@@ -210,19 +231,25 @@ var buf;
           console.log("decoding1.1");
           w = Wav.createWaveFileData(buffer, hackData);
 
-          source = context2.createBufferSource();
-          src = source;
-          buffer = context2.createBuffer(w.buffer, false);
-          source.buffer = buffer;
-          source.connect(context2.destination);
-          source.noteOn(0);
+          //source = context2.createBufferSource();
+          //src = source;
+          //buffer = context2.createBuffer(w.buffer, false);
+          //source.buffer = buffer;
+          //source.connect(context2.destination);
+          //source.noteOn(0);
+          
           console.log("Done");
           displayString("Hacked version of \"" + aa.meta.title + "\" is playing.");
-          document.getElementById("download_button_div").classList.remove("hidden")
-          document.getElementById("download_button_div").addEventListener("click", saveFile);
+          document.getElementById("download_button_div").classList.remove("hidden");
+          document.getElementById("download_button").addEventListener("click", saveFile);
+          blob = new Blob([w]);
+
+          url = webkitURL.createObjectURL(blob);
+          document.getElementById("output_audio").src = url;
+          document.getElementById("output_audio").play();
 
         }, function(e) {
-            displayString("Failed to waltzify. :-(<br>File might be too large.");
+            displayString("Failed to decode audio file (unknown reason). :-(");
             console.log(e);
         });
 
@@ -256,6 +283,7 @@ var buf;
 <input type="text" id="beat_pattern" value="12[34]"><br>
 
 <div id="download_button_div" class="hidden">
+  <audio id="output_audio" controls="controls"></audio>
   <button id="download_button">Download .wav</button><br>
 </div>
 
