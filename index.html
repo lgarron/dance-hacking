@@ -22,7 +22,7 @@
     padding: 1em;
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
   }
-  #output_bpm, #output_text, #beat_pattern {
+  #output_bpm, #output_text, #beat_pattern, #overlap {
     font-size: 120%;
     padding: 0.5em;
     margin: 0.5em;
@@ -38,6 +38,10 @@
     height: 40%;
   }
   #beat_pattern {
+    text-align: center;
+    width: 20%;
+  }
+  #overlap {
     text-align: center;
     width: 20%;
   }
@@ -84,7 +88,7 @@
       return !isNaN(parseFloat(n)) && isFinite(n);
     }
 
-    function beats_per_bar(pattern) {
+    function beatsPerBar(pattern) {
       max_beat_index = 0;
       function update_max_beat_index(i) {
         if (i > max_beat_index) {
@@ -110,7 +114,7 @@
       console.log("Datafying-hack data.");
 
       pattern = document.getElementById("beat_pattern").value;
-      beats_per_bar = beats_per_bar(pattern);
+      beats_per_bar = beatsPerBar(pattern);
 
       hack_data = [];
 
@@ -196,9 +200,10 @@
       console.log(e);
     }
 
-    console.log(num_samples);
 
+      overlap = document.getElementById("overlap").value / 100;
       return {
+        "overlap": overlap,
         "num_samples": num_samples,
         "segments": hack_data
       };
@@ -313,7 +318,8 @@ var hack_data;
 <input id="beat_type_tatums" type="checkbox">
 <label for="beat_type_tatums">Use tatums (divide beats in half)</label>
 <br>
-<input type="text" id="beat_pattern" value="12[34]"><br>
+<input type="text" id="beat_pattern" value="12[34]">
+<input type="number" id="overlap" min="0" max="100" step="5" value="100"><br>
 
 
 <div id="download_button_div" class="hidden">

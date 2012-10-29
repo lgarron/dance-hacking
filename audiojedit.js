@@ -159,11 +159,8 @@ Wav.createWaveFileData = (function() {
     }
   };
 
-  // TODO: Decompose
-  overlap_ratio = 1.00;
-
   var handle = {};
-  handle["copy"] = function(audioBuffer, a, offset, beat) {
+  handle["copy"] = function(audioBuffer, a, offset, beat, overlap) {
     var n = audioBuffer.length,
         bufferL = audioBuffer.getChannelData(0),
         sampleL,
@@ -195,7 +192,7 @@ Wav.createWaveFileData = (function() {
     return offset;
   };
 
-  handle["blend"] = function(audioBuffer, a, offset, beat) {
+  handle["blend"] = function(audioBuffer, a, offset, beat, overlap) {
     var n = audioBuffer.length,
         bufferL = audioBuffer.getChannelData(0),
         sampleL,
@@ -203,7 +200,7 @@ Wav.createWaveFileData = (function() {
         sampleR;
 
     num_overlap_samples = Math.floor(
-      audioBuffer.sampleRate * overlap_ratio * Math.min(
+      audioBuffer.sampleRate * overlap * Math.min(
         beat["segment1"]["end"] - beat["segment1"]["start"],
         beat["segment2"]["end"] - beat["segment2"]["start"]
       )
@@ -216,9 +213,10 @@ Wav.createWaveFileData = (function() {
       "kind": "copy",
       "segment": {
         "start": beat["segment1"]["start"],
-        "end": beat["segment1"]["end"] - num_overlap_samples
+        "end": beat["segment1"]["end"] - (num_overlap_samples / audioBuffer.sampleRate) //TODO: prevent rounding error
       }
-    })
+    },
+    overlap);
 
     //console.log(num_overlap_samples);
 
@@ -255,10 +253,8 @@ Wav.createWaveFileData = (function() {
 
   return function(audioBuffer, hackData, progressCallback) {
 
-    console.log(hackData.num_samples);
-
     var inputFrameLength = audioBuffer.length,
-        outputFrameLength = hackData.num_samples,
+        outputFrameLength = hackData["num_samples"],
         numberOfChannels = audioBuffer.numberOfChannels,
         sampleRate = audioBuffer.sampleRate,
         bitsPerSample = 16,
@@ -271,6 +267,9 @@ Wav.createWaveFileData = (function() {
         subChunk1Size = 16, // for linear PCM
         subChunk2Size = wavDataByteLength,
         chunkSize = 4 + (8 + subChunk1Size) + (8 + subChunk2Size);
+
+    var overlap = hackData["overlap"];
+    console.log(overlap);
 
     writeString('RIFF', waveFileData, 0);
     writeInt32(chunkSize, waveFileData, 4);
@@ -295,7 +294,7 @@ Wav.createWaveFileData = (function() {
     for (var i = 0; i < segments.length; i++) {
       //console.log("Loop #" + i);
       fn = handle[segments[i]["kind"]];
-      offset = fn(audioBuffer, waveFileData, offset, segments[i]);
+      offset = fn(audioBuffer, waveFileData, offset, segments[i], overlap);
     }
     console.log("Over");
 
