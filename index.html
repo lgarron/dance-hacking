@@ -39,9 +39,134 @@
       console.log(str);
       $("#output_bpm").stop().fadeOut(0).html(str).fadeIn(100);
     }
+
+    function hackData(audioData, audio_analysis) {
+      try {
+      console.log("Datafying-hack data.");
+
+      pattern = "12[34]";
+      beats_per_bar = 4;
+
+      hack_data = [];
+
+      beats = audio_analysis["beats"];
+      function idx(i, j) {
+        return beats[i*beats_per_bar+j]["start"];
+      }
+      
+      function copy_beat(i, j) {
+        //console.log("copy_beat");
+        hack_data.push({
+          "kind": "copy",
+          "segment": {
+            "start": idx(i, j-1),
+            "end": idx(i, j)
+          }
+        })
+      }
+
+      function blend_beats(i, j, k) {
+        //console.log("blend_beats");
+        hack_data.push({
+          "kind": "blend",
+          "segment1": {
+            "start": idx(i, j-1),
+            "end": idx(i, j)
+          },
+          "segment2": {
+            "start": idx(i, k-1),
+            "end": idx(i, k)
+          }
+        })
+      }
+
+      // From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+      function isNumber(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      }
+
+      function hack(b, c) {
+        //console.log("Hack-b-c");
+        var i = 0;
+        while (i < pattern.length) {
+          if (isNumber(pattern[i])) {
+            p = parseFloat(pattern[i]);
+            c(p);
+          }
+          else if (pattern[i] === "[") {
+            p3 = pattern[i+3];
+            if (p3 !== "]") {
+              console.log("WARNING: Pattern is irregular. No closing ] at position " + i+3);
+            }
+            p1 = parseFloat(pattern[i+1]);
+            p2 = parseFloat(pattern[i+2]);
+            b(p1, p2);
+            i += 3;
+          }
+          else {
+            console.log("WARNING: Pattern is irregular. No closing ] at position " + i);
+          }  
+          i += 1;
+        }
+      }
+
+
+      // Everything up to the first beat
+      hack_data.push({
+        "kind": "copy",
+        "segment": {
+          "start": 0,
+          "end": idx(0, 0)
+        }
+      })
+
+      console.log("Go bars!");
+      num_bars = Math.floor((beats.length-1)/beats_per_bar);
+      console.log(num_bars);
+      for (var i = 0; i < num_bars; i++) {
+        console.log("Bar #" + i);
+        function b(j, k) {return blend_beats(i, j, k)};
+        function c(j) {return copy_beat(i, j)};
+        hack(b, c);
+      }
+      console.log("Done bars!");
+
+      // Add everything from the final bar onwards.
+      hack_data.push({
+        "kind": "copy",
+        "segment": {
+          "start": idx(num_bars, 0),
+          "end": audioData.duration
+        }
+      })
+
+      $("#output_text").attr("value", JSON.stringify(hack_data, null, 2)).fadeOut(0).fadeIn(400);
+    } catch (e) {
+      console.log(e);
+    }
+
+      return hack_data;
+    }
+
+var aa;
+
     function callback(audio_analysis) {
+
+      aa = audio_analysis;
       $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
       displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100*audio_analysis.track.tempo_confidence ) + "%)");
+
+      var reader = new FileReader();
+
+      reader.onload = function (fileEvent) {
+        console.log("xFileOnload");
+        d = fileEvent.target.result;
+        goData(d);
+      };
+
+      reader.readAsArrayBuffer(xFile);
+      console.log("go-go buffer");
+
     }
 
 
@@ -51,15 +176,24 @@ var analyser = context.createAnalyser();
 var xFile;
 var ev;
 var w;
-var d
+var d;
+var src;
+var buf;
 
     function goData(data) {
-
+        console.log("gd");
         context.decodeAudioData(data, function(buffer) {
+
+          buf = buffer;
+
+          console.log("decoding1.0");
+          hackData = hackData(buffer, aa);
+
           console.log("decoding1.1");
-          w = Wav.createWaveFileData(buffer, [{'kind': 'copy', 'segment': {'start': 0, 'end': 1.09349}}, {'kind': 'copy', 'segment': {'start': 1.09349, 'end': 1.54179}}, {'kind': 'copy', 'segment': {'start': 1.54179, 'end': 1.98841}}, {'segment1': {'start': 1.98841, 'end': 2.4325}, 'kind': 'blend', 'segment2': {'start': 2.4325, 'end': 2.87688}}, {'kind': 'copy', 'segment': {'start': 2.87688, 'end': 3.32217}}, {'kind': 'copy', 'segment': {'start': 3.32217, 'end': 3.76866}}, {'segment1': {'start': 3.76866, 'end': 4.21655}, 'kind': 'blend', 'segment2': {'start': 4.21655, 'end': 4.66325}}, {'kind': 'copy', 'segment': {'start': 4.66325, 'end': 5.10936}}, {'kind': 'copy', 'segment': {'start': 5.10936, 'end': 5.55627}}, {'segment1': {'start': 5.55627, 'end': 6.0022}, 'kind': 'blend', 'segment2': {'start': 6.0022, 'end': 6.44654}}, {'kind': 'copy', 'segment': {'start': 6.44654, 'end': 6.88908}}, {'kind': 'copy', 'segment': {'start': 6.88908, 'end': 7.33103}}, {'segment1': {'start': 7.33103, 'end': 7.77497}, 'kind': 'blend', 'segment2': {'start': 7.77497, 'end': 8.21931}}, {'kind': 'copy', 'segment': {'start': 8.21931, 'end': 8.66244}}, {'kind': 'copy', 'segment': {'start': 8.66244, 'end': 9.10538}}, {'segment1': {'start': 9.10538, 'end': 9.54852}, 'kind': 'blend', 'segment2': {'start': 9.54852, 'end': 9.99185}}, {'kind': 'copy', 'segment': {'start': 9.99185, 'end': 10.43479}}, {'kind': 'copy', 'segment': {'start': 10.43479, 'end': 10.87733}}, {'segment1': {'start': 10.87733, 'end': 11.32106}, 'kind': 'blend', 'segment2': {'start': 11.32106, 'end': 11.76597}}, {'kind': 'copy', 'segment': {'start': 11.76597, 'end': 12.21126}}, {'kind': 'copy', 'segment': {'start': 12.21126, 'end': 12.65754}}, {'segment1': {'start': 12.65754, 'end': 13.10458}, 'kind': 'blend', 'segment2': {'start': 13.10458, 'end': 13.552}}, {'kind': 'copy', 'segment': {'start': 13.552, 'end': 13.99939}}, {'kind': 'copy', 'segment': {'start': 13.99939, 'end': 14.44515}}, {'segment1': {'start': 14.44515, 'end': 14.89009}, 'kind': 'blend', 'segment2': {'start': 14.89009, 'end': 15.3352}}, {'kind': 'copy', 'segment': {'start': 15.3352, 'end': 15.77928}}, {'kind': 'copy', 'segment': {'start': 15.77928, 'end': 16.22314}}, {'segment1': {'start': 16.22314, 'end': 16.66677}, 'kind': 'blend', 'segment2': {'start': 16.66677, 'end': 17.11039}}, {'kind': 'copy', 'segment': {'start': 17.11039, 'end': 17.55558}}, {'kind': 'copy', 'segment': {'start': 17.55558, 'end': 18.00097}}, {'segment1': {'start': 18.00097, 'end': 18.44615}, 'kind': 'blend', 'segment2': {'start': 18.44615, 'end': 18.89112}}, {'kind': 'copy', 'segment': {'start': 18.89112, 'end': 19.3347}}, {'kind': 'copy', 'segment': {'start': 19.3347, 'end': 19.77768}}, {'segment1': {'start': 19.77768, 'end': 20.21887}, 'kind': 'blend', 'segment2': {'start': 20.21887, 'end': 20.65827}}, {'kind': 'copy', 'segment': {'start': 20.65827, 'end': 21.09945}}, {'kind': 'copy', 'segment': {'start': 21.09945, 'end': 21.54162}}, {'segment1': {'start': 21.54162, 'end': 21.98519}, 'kind': 'blend', 'segment2': {'start': 21.98519, 'end': 22.43113}}, {'kind': 'copy', 'segment': {'start': 22.43113, 'end': 22.87727}}, {'kind': 'copy', 'segment': {'start': 22.87727, 'end': 23.32399}}, {'segment1': {'start': 23.32399, 'end': 23.77211}, 'kind': 'blend', 'segment2': {'start': 23.77211, 'end': 24.22002}}, {'kind': 'copy', 'segment': {'start': 24.22002, 'end': 24.66813}}, {'kind': 'copy', 'segment': {'start': 24.66813, 'end': 25.11584}}, {'segment1': {'start': 25.11584, 'end': 25.56175}, 'kind': 'blend', 'segment2': {'start': 25.56175, 'end': 26.00786}}, {'kind': 'copy', 'segment': {'start': 26.00786, 'end': 26.45416}}, {'kind': 'copy', 'segment': {'start': 26.45416, 'end': 26.89947}}, {'segment1': {'start': 26.89947, 'end': 27.34337}, 'kind': 'blend', 'segment2': {'start': 27.34337, 'end': 27.78549}}, {'kind': 'copy', 'segment': {'start': 27.78549, 'end': 28.2268}}, {'kind': 'copy', 'segment': {'start': 28.2268, 'end': 28.66929}}, {'segment1': {'start': 28.66929, 'end': 29.11296}, 'kind': 'blend', 'segment2': {'start': 29.11296, 'end': 29.55663}}, {'kind': 'copy', 'segment': {'start': 29.55663, 'end': 30.00008}}, {'kind': 'copy', 'segment': {'start': 30.00008, 'end': 30.44332}}, {'segment1': {'start': 30.44332, 'end': 30.88654}, 'kind': 'blend', 'segment2': {'start': 30.88654, 'end': 31.32975}}, {'kind': 'copy', 'segment': {'start': 31.32975, 'end': 31.77175}}, {'kind': 'copy', 'segment': {'start': 31.77175, 'end': 32.21393}}, {'segment1': {'start': 32.21393, 'end': 32.65809}, 'kind': 'blend', 'segment2': {'start': 32.65809, 'end': 33.10321}}, {'kind': 'copy', 'segment': {'start': 33.10321, 'end': 33.54832}}, {'kind': 'copy', 'segment': {'start': 33.54832, 'end': 33.9946}}, {'segment1': {'start': 33.9946, 'end': 34.44186}, 'kind': 'blend', 'segment2': {'start': 34.44186, 'end': 34.88871}}, {'kind': 'copy', 'segment': {'start': 34.88871, 'end': 35.33417}}, {'kind': 'copy', 'segment': {'start': 35.33417, 'end': 35.77763}}, {'segment1': {'start': 35.77763, 'end': 36.21989}, 'kind': 'blend', 'segment2': {'start': 36.21989, 'end': 36.66314}}, {'kind': 'copy', 'segment': {'start': 36.66314, 'end': 37.10758}}, {'kind': 'copy', 'segment': {'start': 37.10758, 'end': 37.5526}}, {'segment1': {'start': 37.5526, 'end': 37.99821}, 'kind': 'blend', 'segment2': {'start': 37.99821, 'end': 38.44302}}, {'kind': 'copy', 'segment': {'start': 38.44302, 'end': 38.88722}}, {'kind': 'copy', 'segment': {'start': 38.88722, 'end': 39.3324}}, {'segment1': {'start': 39.3324, 'end': 39.77897}, 'kind': 'blend', 'segment2': {'start': 39.77897, 'end': 40.22395}}, {'kind': 'copy', 'segment': {'start': 40.22395, 'end': 40.66775}}, {'kind': 'copy', 'segment': {'start': 40.66775, 'end': 41.11254}}, {'segment1': {'start': 41.11254, 'end': 41.55715}, 'kind': 'blend', 'segment2': {'start': 41.55715, 'end': 42.00157}}, {'kind': 'copy', 'segment': {'start': 42.00157, 'end': 42.44522}}, {'kind': 'copy', 'segment': {'start': 42.44522, 'end': 42.8861}}, {'segment1': {'start': 42.8861, 'end': 43.327}, 'kind': 'blend', 'segment2': {'start': 43.327, 'end': 43.76931}}, {'kind': 'copy', 'segment': {'start': 43.76931, 'end': 44.21184}}, {'kind': 'copy', 'segment': {'start': 44.21184, 'end': 44.65579}}, {'segment1': {'start': 44.65579, 'end': 45.10056}, 'kind': 'blend', 'segment2': {'start': 45.10056, 'end': 45.54515}}, {'kind': 'copy', 'segment': {'start': 45.54515, 'end': 45.99035}}, {'kind': 'copy', 'segment': {'start': 45.99035, 'end': 46.43657}}, {'segment1': {'start': 46.43657, 'end': 46.88262}, 'kind': 'blend', 'segment2': {'start': 46.88262, 'end': 47.3267}}, {'kind': 'copy', 'segment': {'start': 47.3267, 'end': 47.76921}}, {'kind': 'copy', 'segment': {'start': 47.76921, 'end': 48.21194}}, {'segment1': {'start': 48.21194, 'end': 48.65567}, 'kind': 'blend', 'segment2': {'start': 48.65567, 'end': 49.09982}}, {'kind': 'copy', 'segment': {'start': 49.09982, 'end': 49.54358}}, {'kind': 'copy', 'segment': {'start': 49.54358, 'end': 49.98774}}, {'segment1': {'start': 49.98774, 'end': 50.43409}, 'kind': 'blend', 'segment2': {'start': 50.43409, 'end': 50.88224}}, {'kind': 'copy', 'segment': {'start': 50.88224, 'end': 51.33039}}, {'kind': 'copy', 'segment': {'start': 51.33039, 'end': 51.77734}}, {'segment1': {'start': 51.77734, 'end': 52.2237}, 'kind': 'blend', 'segment2': {'start': 52.2237, 'end': 52.66926}}, {'kind': 'copy', 'segment': {'start': 52.66926, 'end': 53.11402}}, {'kind': 'copy', 'segment': {'start': 53.11402, 'end': 53.55837}}, {'segment1': {'start': 53.55837, 'end': 54.00132}, 'kind': 'blend', 'segment2': {'start': 54.00132, 'end': 54.44365}}, {'kind': 'copy', 'segment': {'start': 54.44365, 'end': 54.88656}}, {'kind': 'copy', 'segment': {'start': 54.88656, 'end': 55.33064}}, {'segment1': {'start': 55.33064, 'end': 55.7757}, 'kind': 'blend', 'segment2': {'start': 55.7757, 'end': 56.22014}}, {'kind': 'copy', 'segment': {'start': 56.22014, 'end': 56.66437}}, {'kind': 'copy', 'segment': {'start': 56.66437, 'end': 57.11036}}, {'segment1': {'start': 57.11036, 'end': 57.55794}, 'kind': 'blend', 'segment2': {'start': 57.55794, 'end': 58.0057}}, {'kind': 'copy', 'segment': {'start': 58.0057, 'end': 58.45186}}, {'kind': 'copy', 'segment': {'start': 58.45186, 'end': 58.89681}}, {'segment1': {'start': 58.89681, 'end': 59.34155}, 'kind': 'blend', 'segment2': {'start': 59.34155, 'end': 59.78648}}, {'kind': 'copy', 'segment': {'start': 59.78648, 'end': 60.2316}}, {'kind': 'copy', 'segment': {'start': 60.2316, 'end': 60.67612}}, {'segment1': {'start': 60.67612, 'end': 61.12063}, 'kind': 'blend', 'segment2': {'start': 61.12063, 'end': 61.56533}}, {'kind': 'copy', 'segment': {'start': 61.56533, 'end': 62.00982}}, {'kind': 'copy', 'segment': {'start': 62.00982, 'end': 62.4545}}, {'segment1': {'start': 62.4545, 'end': 62.89857}, 'kind': 'blend', 'segment2': {'start': 62.89857, 'end': 63.34104}}, {'kind': 'copy', 'segment': {'start': 63.34104, 'end': 63.7835}}, {'kind': 'copy', 'segment': {'start': 63.7835, 'end': 64.22654}}, {'segment1': {'start': 64.22654, 'end': 64.66957}, 'kind': 'blend', 'segment2': {'start': 64.66957, 'end': 65.1124}}, {'kind': 'copy', 'segment': {'start': 65.1124, 'end': 65.55423}}, {'kind': 'copy', 'segment': {'start': 65.55423, 'end': 65.99606}}, {'segment1': {'start': 65.99606, 'end': 66.43927}, 'kind': 'blend', 'segment2': {'start': 66.43927, 'end': 66.88287}}, {'kind': 'copy', 'segment': {'start': 66.88287, 'end': 67.32687}}, {'kind': 'copy', 'segment': {'start': 67.32687, 'end': 67.77246}}, {'segment1': {'start': 67.77246, 'end': 68.21904}, 'kind': 'blend', 'segment2': {'start': 68.21904, 'end': 68.66641}}, {'kind': 'copy', 'segment': {'start': 68.66641, 'end': 69.11418}}, {'kind': 'copy', 'segment': {'start': 69.11418, 'end': 69.56115}}, {'segment1': {'start': 69.56115, 'end': 70.00614}, 'kind': 'blend', 'segment2': {'start': 70.00614, 'end': 70.44935}}, {'kind': 'copy', 'segment': {'start': 70.44935, 'end': 70.89136}}, {'kind': 'copy', 'segment': {'start': 70.89136, 'end': 71.33338}}, {'segment1': {'start': 71.33338, 'end': 71.77599}, 'kind': 'blend', 'segment2': {'start': 71.77599, 'end': 72.218}}, {'kind': 'copy', 'segment': {'start': 72.218, 'end': 72.65962}}, {'kind': 'copy', 'segment': {'start': 72.65962, 'end': 73.10283}}, {'segment1': {'start': 73.10283, 'end': 73.54802}, 'kind': 'blend', 'segment2': {'start': 73.54802, 'end': 73.99441}}, {'kind': 'copy', 'segment': {'start': 73.99441, 'end': 74.44218}}, {'kind': 'copy', 'segment': {'start': 74.44218, 'end': 74.89075}}, {'segment1': {'start': 74.89075, 'end': 75.33614}, 'kind': 'blend', 'segment2': {'start': 75.33614, 'end': 75.77517}}, {'kind': 'copy', 'segment': {'start': 75.77517, 'end': 76.21103}}, {'kind': 'copy', 'segment': {'start': 76.21103, 'end': 76.64549}}, {'segment1': {'start': 76.64549, 'end': 77.07957}, 'kind': 'blend', 'segment2': {'start': 77.07957, 'end': 77.51602}}, {'kind': 'copy', 'segment': {'start': 77.51602, 'end': 77.95407}}, {'kind': 'copy', 'segment': {'start': 77.95407, 'end': 78.39629}}, {'segment1': {'start': 78.39629, 'end': 78.84645}, 'kind': 'blend', 'segment2': {'start': 78.84645, 'end': 79.30058}}, {'kind': 'copy', 'segment': {'start': 79.30058, 'end': 79.7559}}, {'kind': 'copy', 'segment': {'start': 79.7559, 'end': 80.21162}}, {'segment1': {'start': 80.21162, 'end': 80.66296}, 'kind': 'blend', 'segment2': {'start': 80.66296, 'end': 81.11013}}, {'kind': 'copy', 'segment': {'start': 81.11013, 'end': 81.55649}}, {'kind': 'copy', 'segment': {'start': 81.55649, 'end': 82.00265}}, {'segment1': {'start': 82.00265, 'end': 82.44564}, 'kind': 'blend', 'segment2': {'start': 82.44564, 'end': 82.88564}}, {'kind': 'copy', 'segment': {'start': 82.88564, 'end': 83.32583}}, {'kind': 'copy', 'segment': {'start': 83.32583, 'end': 83.76563}}, {'segment1': {'start': 83.76563, 'end': 84.20463}, 'kind': 'blend', 'segment2': {'start': 84.20463, 'end': 84.64323}}, {'kind': 'copy', 'segment': {'start': 84.64323, 'end': 85.08243}}, {'kind': 'copy', 'segment': {'start': 85.08243, 'end': 85.5248}}, {'segment1': {'start': 85.5248, 'end': 85.96896}, 'kind': 'blend', 'segment2': {'start': 85.96896, 'end': 86.41113}}, {'kind': 'copy', 'segment': {'start': 86.41113, 'end': 86.85371}}, {'kind': 'copy', 'segment': {'start': 86.85371, 'end': 87.29926}}, {'segment1': {'start': 87.29926, 'end': 87.74521}, 'kind': 'blend', 'segment2': {'start': 87.74521, 'end': 88.18878}}, {'kind': 'copy', 'segment': {'start': 88.18878, 'end': 88.63056}}, {'kind': 'copy', 'segment': {'start': 88.63056, 'end': 89.07353}}, {'segment1': {'start': 89.07353, 'end': 89.51969}, 'kind': 'blend', 'segment2': {'start': 89.51969, 'end': 89.96804}}, {'kind': 'copy', 'segment': {'start': 89.96804, 'end': 90.41639}}, {'kind': 'copy', 'segment': {'start': 90.41639, 'end': 90.86355}}, {'segment1': {'start': 90.86355, 'end': 91.30993}, 'kind': 'blend', 'segment2': {'start': 91.30993, 'end': 91.75634}}, {'kind': 'copy', 'segment': {'start': 91.75634, 'end': 92.2016}}, {'kind': 'copy', 'segment': {'start': 92.2016, 'end': 92.64531}}, {'segment1': {'start': 92.64531, 'end': 93.08926}, 'kind': 'blend', 'segment2': {'start': 93.08926, 'end': 93.53324}}, {'kind': 'copy', 'segment': {'start': 93.53324, 'end': 93.97805}}, {'kind': 'copy', 'segment': {'start': 93.97805, 'end': 94.42388}}, {'segment1': {'start': 94.42388, 'end': 94.87032}, 'kind': 'blend', 'segment2': {'start': 94.87032, 'end': 95.31736}}, {'kind': 'copy', 'segment': {'start': 95.31736, 'end': 95.76341}}, {'kind': 'copy', 'segment': {'start': 95.76341, 'end': 96.20728}}, {'segment1': {'start': 96.20728, 'end': 96.65017}, 'kind': 'blend', 'segment2': {'start': 96.65017, 'end': 97.09385}}, {'kind': 'copy', 'segment': {'start': 97.09385, 'end': 97.53854}}, {'kind': 'copy', 'segment': {'start': 97.53854, 'end': 97.98263}}, {'segment1': {'start': 97.98263, 'end': 98.42515}, 'kind': 'blend', 'segment2': {'start': 98.42515, 'end': 98.86766}}, {'kind': 'copy', 'segment': {'start': 98.86766, 'end': 99.31118}}, {'kind': 'copy', 'segment': {'start': 99.31118, 'end': 99.75529}}, {'segment1': {'start': 99.75529, 'end': 100.19862}, 'kind': 'blend', 'segment2': {'start': 100.19862, 'end': 100.64074}}, {'kind': 'copy', 'segment': {'start': 100.64074, 'end': 101.08366}}, {'kind': 'copy', 'segment': {'start': 101.08366, 'end': 101.52896}}, {'segment1': {'start': 101.52896, 'end': 101.97584}, 'kind': 'blend', 'segment2': {'start': 101.97584, 'end': 102.4227}}, {'kind': 'copy', 'segment': {'start': 102.4227, 'end': 102.86877}}, {'kind': 'copy', 'segment': {'start': 102.86877, 'end': 103.31403}}, {'segment1': {'start': 103.31403, 'end': 103.75987}, 'kind': 'blend', 'segment2': {'start': 103.75987, 'end': 104.2061}}, {'kind': 'copy', 'segment': {'start': 104.2061, 'end': 104.65113}}, {'kind': 'copy', 'segment': {'start': 104.65113, 'end': 105.09415}}, {'segment1': {'start': 105.09415, 'end': 105.53636}, 'kind': 'blend', 'segment2': {'start': 105.53636, 'end': 105.97875}}, {'kind': 'copy', 'segment': {'start': 105.97875, 'end': 106.4215}}, {'kind': 'copy', 'segment': {'start': 106.4215, 'end': 106.86441}}, {'segment1': {'start': 106.86441, 'end': 107.30629}, 'kind': 'blend', 'segment2': {'start': 107.30629, 'end': 107.74772}}, {'kind': 'copy', 'segment': {'start': 107.74772, 'end': 108.19089}}, {'kind': 'copy', 'segment': {'start': 108.19089, 'end': 108.63482}}, {'segment1': {'start': 108.63482, 'end': 109.0787}, 'kind': 'blend', 'segment2': {'start': 109.0787, 'end': 109.52474}}, {'kind': 'copy', 'segment': {'start': 109.52474, 'end': 109.97155}}, {'kind': 'copy', 'segment': {'start': 109.97155, 'end': 110.41734}}, {'segment1': {'start': 110.41734, 'end': 110.86333}, 'kind': 'blend', 'segment2': {'start': 110.86333, 'end': 111.3087}}, {'kind': 'copy', 'segment': {'start': 111.3087, 'end': 111.75328}}, {'kind': 'copy', 'segment': {'start': 111.75328, 'end': 112.19725}}, {'segment1': {'start': 112.19725, 'end': 112.63864}, 'kind': 'blend', 'segment2': {'start': 112.63864, 'end': 113.07943}}, {'kind': 'copy', 'segment': {'start': 113.07943, 'end': 113.5224}}, {'kind': 'copy', 'segment': {'start': 113.5224, 'end': 113.96696}}, {'segment1': {'start': 113.96696, 'end': 114.41192}, 'kind': 'blend', 'segment2': {'start': 114.41192, 'end': 114.85728}}, {'kind': 'copy', 'segment': {'start': 114.85728, 'end': 115.30244}}, {'kind': 'copy', 'segment': {'start': 115.30244, 'end': 115.7478}}, {'segment1': {'start': 115.7478, 'end': 116.19396}, 'kind': 'blend', 'segment2': {'start': 116.19396, 'end': 116.63813}}, {'kind': 'copy', 'segment': {'start': 116.63813, 'end': 117.07933}}, {'kind': 'copy', 'segment': {'start': 117.07933, 'end': 117.52053}}, {'segment1': {'start': 117.52053, 'end': 117.96412}, 'kind': 'blend', 'segment2': {'start': 117.96412, 'end': 118.40948}}, {'kind': 'copy', 'segment': {'start': 118.40948, 'end': 118.85446}}, {'kind': 'copy', 'segment': {'start': 118.85446, 'end': 119.29684}}, {'segment1': {'start': 119.29684, 'end': 119.73903}, 'kind': 'blend', 'segment2': {'start': 119.73903, 'end': 120.18378}}, {'kind': 'copy', 'segment': {'start': 120.18378, 'end': 120.62971}}, {'kind': 'copy', 'segment': {'start': 120.62971, 'end': 121.07344}}, {'segment1': {'start': 121.07344, 'end': 121.51519}, 'kind': 'blend', 'segment2': {'start': 121.51519, 'end': 121.95856}}, {'kind': 'copy', 'segment': {'start': 121.95856, 'end': 131.08244897959185}}]);
+          w = Wav.createWaveFileData(buffer, hackData);
 
           source = context2.createBufferSource();
+          src = source;
           buffer = context2.createBuffer(w.buffer, false);
           source.buffer = buffer;
           source.connect(context2.destination);
@@ -73,23 +207,11 @@ var d
 
     var echonest; // For easier console debugging.
     function go(file) {
+      xFile = file;
       try {
-        //echonest = echonestAnalysis(file);
-        //echonest.setProgressCallback(displayString);
-        //echonest.go(callback);
-
-        xFile = file;
-
-        var reader = new FileReader();
-
-
-        reader.onload = function (fileEvent) {
-          d = fileEvent.target.result;
-          goData(d);
-        };
-
-        reader.readAsArrayBuffer(file);
-
+        echonest = echonestAnalysis(file);
+        echonest.setProgressCallback(displayString);
+        echonest.go(callback);
       }
       catch (e) {
         console.log(e);
