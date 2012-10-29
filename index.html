@@ -30,15 +30,22 @@
     background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
   }
+  #output_bpm {
+    width: 80%;
+  }
   #output_text {
-    font-size: 100%;
+    font-size: 80%;
     height: 40%;
   }
   #beat_pattern {
     text-align: center;
+    width: 20%;
   }
   .hidden {
     display: none;
+  }
+  #download_button {
+    font-size: 150%;
   }
   </style>
   <script>
@@ -107,9 +114,19 @@
 
       hack_data = [];
 
-      beats = audio_analysis["beats"];
+      var beat_type = (document.getElementById("beat_type_tatums").checked ? "tatums" : "beats");
+      beats = audio_analysis[beat_type];
       function idx(i, j) {
         return beats[i*beats_per_bar+j]["start"];
+      }
+
+      num_samples = 0;
+      function samplesBetweenTimes(t1, t2) {
+        // We must compute these separately, then subtract.
+        // Else, we mgith risk rounding error.
+        var sampleStart = Math.floor(t1 * audioData.sampleRate);
+        var sampleEnd = Math.floor(t2 * audioData.sampleRate);
+        return sampleEnd - sampleStart;
       }
       
       function copy_beat(i, j) {
@@ -120,7 +137,9 @@
             "start": idx(i, j-1),
             "end": idx(i, j)
           }
-        })
+        });
+        // Mimic hacking computation.
+        num_samples += samplesBetweenTimes(idx(i, j-1), idx(i, j));
       }
 
       function blend_beats(i, j, k) {
@@ -135,7 +154,11 @@
             "start": idx(i, k-1),
             "end": idx(i, k)
           }
-        })
+        });
+        num_samples += Math.max(
+          samplesBetweenTimes(idx(i, j-1), idx(i, j)),
+          samplesBetweenTimes(idx(i, k-1), idx(i, k))
+        )
       }
 
       // Everything up to the first beat
@@ -145,13 +168,14 @@
           "start": 0,
           "end": idx(0, 0)
         }
-      })
+      });
+      num_samples += samplesBetweenTimes(0, idx(0, 0));
 
       console.log("Go bars!");
       num_bars = Math.floor((beats.length-1)/beats_per_bar);
       console.log(num_bars);
       for (var i = 0; i < num_bars; i++) {
-        console.log("Bar #" + i);
+        //console.log("Bar #" + i);
         function b(j, k) {return blend_beats(i, j, k)};
         function c(j) {return copy_beat(i, j)};
         hack(pattern, b, c);
@@ -166,13 +190,18 @@
           "end": audioData.duration
         }
       })
+      num_samples += samplesBetweenTimes(idx(num_bars, 0), audioData.duration);
 
-      $("#output_text").attr("value", JSON.stringify(hack_data, null, 2)).fadeOut(0).fadeIn(400);
     } catch (e) {
       console.log(e);
     }
 
-      return hack_data;
+    console.log(num_samples);
+
+      return {
+        "num_samples": num_samples,
+        "segments": hack_data
+      };
     }
 
 var aa;
@@ -208,7 +237,8 @@ var d;
 var src;
 var buf;
 var blob;
-var blob2;
+var blob2
+var hack_data;
     
     function saveFile() {
       var fileName = aa.meta.title;
@@ -226,10 +256,10 @@ var blob2;
           buf = buffer;
 
           console.log("decoding1.0");
-          hackData = hackData(buffer, aa);
+          hack_data = hackData(buffer, aa);
 
           console.log("decoding1.1");
-          w = Wav.createWaveFileData(buffer, hackData);
+          w = Wav.createWaveFileData(buffer, hack_data);
 
           //source = context2.createBufferSource();
           //src = source;
@@ -280,10 +310,14 @@ var blob2;
 <!--input type="file" name="track" id="track" onchange=""><br-->
 
 <div id="output_bpm">No output yet...</div>
+<input id="beat_type_tatums" type="checkbox">
+<label for="beat_type_tatums">Use tatums (divide beats in half)</label>
+<br>
 <input type="text" id="beat_pattern" value="12[34]"><br>
 
+
 <div id="download_button_div" class="hidden">
-  <audio id="output_audio" controls="controls"></audio>
+  <audio id="output_audio" controls="controls"></audio><br>
   <button id="download_button">Download .wav</button><br>
 </div>
 

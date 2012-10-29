@@ -220,7 +220,7 @@ Wav.createWaveFileData = (function() {
       }
     })
 
-    console.log(num_overlap_samples);
+    //console.log(num_overlap_samples);
 
     for (var i = 0; i < num_overlap_samples; ++i) {
 
@@ -253,14 +253,18 @@ Wav.createWaveFileData = (function() {
     return offset;
   };
 
-  return function(audioBuffer, beats, progressCallback) {
-    var frameLength = audioBuffer.length,
+  return function(audioBuffer, hackData, progressCallback) {
+
+    console.log(hackData.num_samples);
+
+    var inputFrameLength = audioBuffer.length,
+        outputFrameLength = hackData.num_samples,
         numberOfChannels = audioBuffer.numberOfChannels,
         sampleRate = audioBuffer.sampleRate,
         bitsPerSample = 16,
         byteRate = sampleRate * numberOfChannels * bitsPerSample / 8,
         blockAlign = numberOfChannels * bitsPerSample / 8,
-        wavDataByteLength = frameLength * numberOfChannels * 2, // 16-bit audio
+        wavDataByteLength = outputFrameLength * numberOfChannels * 2, // 16-bit audio
         headerByteLength = 44,
         totalLength = headerByteLength + wavDataByteLength,
         waveFileData = new Uint8Array(totalLength),
@@ -286,11 +290,12 @@ Wav.createWaveFileData = (function() {
 
     // Write actual audio data starting at offset 44.
     console.log("Through");
+    var segments = hackData["segments"];
     var offset = 44;
-    for (var i = 0; i < beats.length; i++) {
-      console.log("Loop #" + i);
-      fn = handle[beats[i]["kind"]];
-      offset = fn(audioBuffer, waveFileData, offset, beats[i]);
+    for (var i = 0; i < segments.length; i++) {
+      //console.log("Loop #" + i);
+      fn = handle[segments[i]["kind"]];
+      offset = fn(audioBuffer, waveFileData, offset, segments[i]);
     }
     console.log("Over");
 
