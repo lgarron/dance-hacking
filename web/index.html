@@ -22,7 +22,7 @@
     padding: 1em;
     box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
   }
-  #output_bpm, #output_text, #beat_pattern, #overlap {
+  #output_bpm, #output_text, #beat_pattern, #overlap, #url_source {
     font-size: 120%;
     padding: 0.5em;
     margin: 0.5em;
@@ -50,6 +50,10 @@
   }
   #rehack_button, #download_button {
     font-size: 150%;
+  }
+  #url_source {
+    font-size: 75%;
+    width: 50%;
   }
   </style>
   <script>
@@ -303,12 +307,35 @@ var hack_data;
       }
     }
 
+    var msn;
+
+    function goURL() {
+      var url = document.getElementById("url_source").value;
+
+      // CORS :-(
+      // var request = new XMLHttpRequest();
+      // request.open("GET", url, true);
+      // request.responseType = "arraybuffer";
+
+      // request.onload = function() {
+      //   go(request.response);
+      // };
+      // request.send();
+
+      console.log(url);
+      document.getElementById("input_audio").src = url;
+      var mediaSourceNode = context.createMediaElementSource(document.getElementById("input_audio"));
+      msn = mediaSourceNode;
+      //go();
+    }
+
     function rehack() {
       xFile && go(xFile);
     }
 
     $(document).ready(function() {
       document.getElementById("rehack_button").addEventListener("click", rehack);
+      document.getElementById("url_source_go").addEventListener("click", goURL);
     });
 
   </script>
@@ -321,6 +348,9 @@ var hack_data;
 <h1>Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
 <div id="new_song">Drag and drop a song here!</div>
+<input type="text" id="url_source" placeholder="Source URL"></input>
+<button id="url_source_go">Use URL</button><br>
+<audio id="input_audio" controls="controls"></audio><br>
 <!--input type="file" name="track" id="track" onchange=""><br-->
 
 <div id="output_bpm">No output yet...</div>
