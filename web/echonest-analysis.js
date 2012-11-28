@@ -23,7 +23,8 @@ var echonestAnalysis = function(file) {
       progressCallback("Getting audio analysis for \"" + audio_summary_data.response.track.title + "\"");
       
       //Proxy URL to get around AWS CORS restrictions.
-      var url = url.replace("https://echonest-analysis.s3.amazonaws.com", "http://www.garron.us/api/echonest/s3/proxy");
+      var url = url.replace("https://echonest-analysis.s3.amazonaws.com", "http://www.dancehack.com/api/s3/proxy");
+      var url = url.replace("http://echonest-analysis.s3.amazonaws.com", "http://www.dancehack.com/api/s3/proxy");
 
       $.ajax({
           type: "GET",
