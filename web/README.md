@@ -2,9 +2,17 @@
 
 Client-side Echonest analysis made easy.
 
-    echonestAnalysis(file, callback)
+    echonestAnalysis(file).go(callback);
 
 Makes the necessary API calls to get the `audio_analysis` data, and calls `callback(audio_analysis)`.
+
+More advanced:
+
+    var ea = echonestAnalysis(file);
+    ea.go(callback);
+    // Once go() has finished:
+    ea.audio_summary();
+    ea.audio_analysis();
 
 ## Notes and Ideas
 
