@@ -1,0 +1,43 @@
+html {
+  background: #ABC;
+  padding: 1em ;
+  font-family: Helvetica, sans-serif;
+}
+body {
+  background: #EEF;
+  padding: 1em;
+}
+#debug {
+  background-color: rgba(255, 127, 0, 0.5);
+  padding: 1em;
+  box-shadow: 1px 1px 8px rgba(0, 0, 0, 0.2);
+}
+#output_bpm, #output_text, #beat_pattern, #overlap {
+  font-size: 120%;
+  padding: 0.5em;
+  margin: 0.5em;
+  width: 80%;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+#output_bpm {
+  width: 80%;
+}
+#output_text {
+  font-size: 80%;
+  height: 40%;
+}
+#beat_pattern {
+  text-align: center;
+  width: 20%;
+}
+#overlap {
+  text-align: center;
+  width: 20%;
+}
+.hidden {
+  display: none;
+}
+#rehack_button, #download_button {
+  font-size: 150%;
+}
