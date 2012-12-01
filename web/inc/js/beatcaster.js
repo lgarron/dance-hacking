@@ -263,5 +263,6 @@ function rehack() {
 }
 
 $(document).ready(function() {
+  registerFileDragDrop(document.body, document.getElementById("new_song"), go);
   document.getElementById("rehack_button").addEventListener("click", rehack);
 });

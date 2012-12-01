@@ -1,37 +1,51 @@
-function setDragDropVisualFeedback(text, cssClass) {
-  document.getElementById("new_song").innerHTML = text;
-  var cL = document.getElementById("new_song").classList;
-  while (cL.length > 0) {
-    cL.remove(cL[0]);
+function registerFileDragDrop(domElement, feedbackElement, callback) {
+
+  var css_classes = {
+    "over": "drag_drop_over",
+    "out": "drag_drop_out",
+    "done": "drag_drop_done"
+  };
+
+  var feedback_text = {
+    "over": "Let Go!",
+    "out": "Come back! :-(",
+    "done": "Got it!"
+  };
+
+  function setDragDropVisualFeedback(type) {
+    feedbackElement.innerHTML = feedback_text[type]
+    var cL = feedbackElement.classList;
+    for (i in css_classes) {
+      cL.remove(css_classes[i]);
+    }
+    feedbackElement.classList.add(css_classes[type]);
   }
-  document.getElementById("new_song").classList.add(cssClass);
-}
 
-function dragEnter(ev) {
-  return true;
-}
+  function dragEnter(event) {
+    return true;
+  }
 
-function dragOver(ev) {
-  setDragDropVisualFeedback("Let Go!", "over");
-  return false;
-}
+  function dragOver(event) {
+    setDragDropVisualFeedback("over");
+    return false;
+  }
 
-function dragLeave(ev) {
-  setDragDropVisualFeedback("Come back! :-(", "out");
-  return false;
-}
+  function dragLeave(event) {
+    setDragDropVisualFeedback("out");
+    return false;
+  }
 
-function dragDrop(ev) {
-  setDragDropVisualFeedback("Got it!", "done");
-  var src = ev.dataTransfer.files[0];
-  go(src);
-  ev.preventDefault();
-  return false;
-}
+  function dragDrop(event) {
+    setDragDropVisualFeedback("done");
+    var src = event.dataTransfer.files[0];
+    callback(src);
+    event.preventDefault();
+    return false;
+  }
 
-$(document).ready(function(){
-  document.body.addEventListener("dragenter", dragEnter, false );
-  document.body.addEventListener("dragover", dragOver, false );
-  document.body.addEventListener("dragleave", dragLeave, false );
-  document.body.addEventListener("drop", dragDrop, false );
-});
+  domElement.addEventListener("dragenter", dragEnter, false);
+  domElement.addEventListener("dragover", dragOver, false);
+  domElement.addEventListener("dragleave", dragLeave, false);
+  domElement.addEventListener("drop", dragDrop, false);
+
+}
