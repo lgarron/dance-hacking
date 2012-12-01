@@ -48,7 +48,7 @@ var echonestAnalysis = function(file) {
     numTries++
 
     if (numTries > MAX_TRIES) {
-      progressCallback("Too many tries (>" + maxTries + ") - please start over");
+      progressCallback("Too many tries (>" + MAX_TRIES + ") - please start over");
       aborted = true;
       return;
     }
