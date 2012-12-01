@@ -2,6 +2,14 @@
 
 var echonestAnalysis = function(file) {
 
+  // Constants
+  var UPLOAD_POLLING_INTERVAL = 1000; //ms
+  var ANALYSIS_POLLING_INTERVAL = 5000; //ms
+  var MAX_TRIES = 30;
+  var DEV_API_KEY = "VRNSDARJUIWRYJAUX";
+
+  // Closure-specific variables.
+  var api_key = DEV_API_KEY;
   var hash;
   var audio_summary_data = {};
   var audio_analysis_data = {};
@@ -36,11 +44,10 @@ var echonestAnalysis = function(file) {
   };
 
   var numTries = 0;
-  var maxTries = 30;
   var try_get_audio_summary = function(summary_fail_callback) {
     numTries++
 
-    if (numTries > maxTries) {
+    if (numTries > MAX_TRIES) {
       progressCallback("Too many tries (>" + maxTries + ") - please start over");
       aborted = true;
       return;
@@ -50,7 +57,7 @@ var echonestAnalysis = function(file) {
     progressCallback("Polling for audio summary (try #" + numTries + ")...")
     $.ajax({
       type: "GET",
-      url: 'http://developer.echonest.com/api/v4/track/profile?api_key=EJ7ZVMPNXWVFXS1KE&format=jsonp&md5=' + hash + '&bucket=audio_summary',
+      url: 'http://developer.echonest.com/api/v4/track/profile?api_key=' + api_key + '&format=jsonp&md5=' + hash + '&bucket=audio_summary',
       dataType: 'jsonp',
       success: function (data) {
         audio_summary_data = data; // global
@@ -67,7 +74,7 @@ var echonestAnalysis = function(file) {
 
   function get_audio_summary_again(delay) {
     if (!delay) {
-      delay = 5000;
+      delay = ANALYSIS_POLLING_INTERVAL;
     }
     window.setTimeout(get_audio_summary, delay);
   }
@@ -78,7 +85,7 @@ var echonestAnalysis = function(file) {
     }
     if (!doneUploading) {
       progressCallback("Still uploading (" + Math.floor(fractionUploaded*100) + "%)");
-      get_audio_summary_again(1000);
+      get_audio_summary_again(UPLOAD_POLLING_INTERVAL);
       return;
     };
     try_get_audio_summary(get_audio_summary_again);
@@ -134,7 +141,7 @@ var echonestAnalysis = function(file) {
     }
 
     var formData = new FormData();
-    formData.append("api_key", "VRNSDARJUIWRYJAUX");
+    formData.append("api_key", api_key);
     formData.append("filetype", filetype);
     formData.append("track", file);
 
