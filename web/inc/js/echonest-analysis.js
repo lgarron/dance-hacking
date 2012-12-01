@@ -1,6 +1,4 @@
-
-var ff;
-var a;
+"use strict";
 
 var echonestAnalysis = function(file) {
 
@@ -123,7 +121,7 @@ var echonestAnalysis = function(file) {
     progressCallback("Uploading...");
 
     var filetype = file.name.split(".").pop();
-    ff = filetype;
+    var ff = filetype;
     // Dragging from iTunes sometimes has a weird bug where the file.name includes a terminating null as a final character. So let's only look at the first three.
     if (filetype.slice(0,3) !== "mp3") {
       progressCallback("Sorry, only .mp3 files work properly at the moment. You added \"" + file.name + "\" (filetype \"" + filetype + "\").");

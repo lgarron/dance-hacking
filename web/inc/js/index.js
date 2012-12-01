@@ -1,9 +1,20 @@
+"use strict";
 
+var current_hack = {
+  hack_data: null,
+  audio_analysis: null,
+  blob: null,
+  xFile: null
+};
+var debug_data = {
+  buffer: null,
+  d: null,
+  w: null
+}
 
-var aa;
 function callback(audio_analysis) {
 
-  aa = audio_analysis;
+  current_hack.audio_analysis = audio_analysis;
   $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
   displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
@@ -12,57 +23,25 @@ function callback(audio_analysis) {
 
   reader.onload = function(fileEvent) {
     console.log("xFileOnload");
-    d = fileEvent.target.result;
+     var d = fileEvent.target.result;
+     debug_data.d = d;
     goData(d);
   };
 
-  reader.readAsArrayBuffer(xFile);
+  reader.readAsArrayBuffer(current_hack.xFile);
   console.log("go-go buffer");
 
 }
 
 
-var context = new webkitAudioContext();
-var context2 = new webkitAudioContext();
-var analyser = context.createAnalyser();
-var xFile;
-var ev;
-var w;
-var d;
-var src;
-var buf;
-var blob;
-var blob2
-var hack_data;
 
 function saveFile() {
-  var fileName = aa.meta.title;
+  var fileName = current_hack.audio_analysis.meta.title;
   if(fileName === "") {
     fileName = "Song";
   }
   var extension = ".wav";
-  saveAs(blob, fileName + extension);
-}
-
-
-function callback(audio_analysis) {
-
-  aa = audio_analysis;
-  $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
-  displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
-  displayString("Please wait a moment for waltzification.");
-
-  var reader = new FileReader();
-
-  reader.onload = function(fileEvent) {
-    console.log("xFileOnload");
-    d = fileEvent.target.result;
-    goData(d);
-  };
-
-  reader.readAsArrayBuffer(xFile);
-  console.log("go-go buffer");
-
+  saveAs(current_hack.blob, fileName + extension);
 }
 
 function displayString(str) {
@@ -71,35 +50,32 @@ function displayString(str) {
 }
 function goData(data) {
   console.log("goData()");
+
+  var context = new webkitAudioContext();
   context.decodeAudioData(data, function(buffer) {
 
-    buf = buffer;
+    debug_data.buffer = buffer;
 
     console.log("decoding1.0");
-    hack_data = beatcaster.hackData(
+    current_hack.hack_data = beatcaster.hackData(
       buffer,
-      aa,
+      current_hack.audio_analysis,
       document.getElementById("beat_pattern").value,
       document.getElementById("overlap").value / 100,
       document.getElementById("beat_type_tatums").checked
     );
 
     console.log("decoding1.1");
-    w = Wav.createWaveFileData(buffer, hack_data);
+    var w = Wav.createWaveFileData(buffer, current_hack.hack_data);
+    debug_data.w = w;
 
-    //source = context2.createBufferSource();
-    //src = source;
-    //buffer = context2.createBuffer(w.buffer, false);
-    //source.buffer = buffer;
-    //source.connect(context2.destination);
-    //source.noteOn(0);
     console.log("Done");
-    displayString("Hacked version of \"" + aa.meta.title + "\" is playing.");
+    displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
     document.getElementById("download_button_div").classList.remove("hidden");
     document.getElementById("download_button").addEventListener("click", saveFile);
-    blob = new Blob([w]);
+    current_hack.blob = new Blob([w]);
 
-    url = webkitURL.createObjectURL(blob);
+    var url = webkitURL.createObjectURL(current_hack.blob);
     document.getElementById("output_audio").src = url;
     document.getElementById("output_audio").play();
 
@@ -114,7 +90,7 @@ var echonest; // For easier console debugging.
 
 
 function go(file) {
-  xFile = file;
+  current_hack.xFile = file;
   try {
     echonest = echonestAnalysis(file);
     echonest.setProgressCallback(displayString);
@@ -125,7 +101,7 @@ function go(file) {
 }
 
 function rehack() {
-  xFile && go(xFile);
+  current_hack.xFile && go(current_hack.xFile);
 }
 
 $(document).ready(function() {
