@@ -100,8 +100,35 @@ function processAnalysis(audio_analysis) {
 
 }
 
+// From http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/index.js
+// Used at http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/
+// See original demo at https://github.com/aadsm/JavaScript-ID3-Reader/issues/3
+function setBackground(file) {
+  console.log("Loading ID3 tags.");
+  var url = file.urn || file.name;
+  var reader = new FileAPIReader(file);
+  ID3.loadTags(url, function() {
+    console.log("Loaded ID3 tags.");
+    var tags = ID3.getAllTags(url);
+    var image = tags.picture;
+    if (typeof image !== "undefined") {
+      document.body.background = "data:" + image.format + ";base64," + Base64.encodeBytes(image.data);
+    }
+    else {
+      console.log("No image.");
+    }
+  }, {
+    tags: ["picture"],
+    dataReader: reader
+  });
+}
+
 function startHack(file) {
   current_hack.file = file;
+
+  try {setBackground(current_hack.file); }
+  catch (e) {console.log(e); }
+
   try {
     var echonest = echonestAnalysis(file);
     echonest.setProgressCallback(displayString);
