@@ -22,24 +22,28 @@ function registerFileDragDrop(domElement, feedbackElement, callback) {
   }
 
   function dragEnter(event) {
+    event.preventDefault();
     return true;
   }
 
   function dragOver(event) {
+    event.preventDefault();
     setDragDropVisualFeedback("over");
     return false;
   }
 
   function dragLeave(event) {
+    event.preventDefault();
     setDragDropVisualFeedback("out");
     return false;
   }
 
   function dragDrop(event) {
+    event.stopPropagation(); // Stops some browsers from redirecting.
+    event.preventDefault();
     setDragDropVisualFeedback("done");
     var src = event.dataTransfer.files[0];
     callback(src);
-    event.preventDefault();
     return false;
   }
 
