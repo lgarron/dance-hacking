@@ -38,6 +38,9 @@ body {
   font-size: 80%;
   height: 40%;
 }
+#output_audio {
+  width: 75%;
+}
 #beat_pattern {
   text-align: center;
   width: 20%;

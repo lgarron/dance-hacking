@@ -36,6 +36,13 @@
   <hr><br>
 </div>
 
+<div id="download_button_div" class="hidden">
+  <audio id="output_audio" controls="controls"></audio><br>
+  <br>
+  <button id="download_button">Download .wav</button>
+  <button id="rehack_button">Re-hack</button><br><br>
+</div>
+
 <input id="beat_type_tatums" type="checkbox">
 <label for="beat_type_tatums">Use tatums (divide beats in half)</label>
 <input id="autoplay_hack" type="checkbox">
@@ -44,12 +51,6 @@
 <input type="text" id="beat_pattern" value="12[34]">
 <input type="number" id="overlap" min="0" max="100" step="5" value="100"><br>
 
-
-<div id="download_button_div" class="hidden">
-  <button id="rehack_button">Re-hack</button><br>
-  <audio id="output_audio" controls="controls"></audio><br>
-  <button id="download_button">Download .wav</button><br>
-</div>
 <textarea id="output_text">[Full analysis will appear here.]</textarea>
 
 <br>
