@@ -2,7 +2,7 @@
 
 var echonestAnalysis = (function() {
 
-var analysis_cache = {};
+var analysis_cache = localStorage;
 
 return function(file) {
 
@@ -42,7 +42,7 @@ return function(file) {
           success: function (data) {
               progressCallback("Retrieved data.")
               audio_analysis_data = JSON.parse(data); // global
-              analysis_cache[hash] = audio_analysis_data;
+              analysis_cache[hash] = data;
               done();
           }
       });
@@ -185,7 +185,7 @@ return function(file) {
 
       if (analysis_cache[hash]) {
         console.log("Retrieved analysis from cache.");
-        audio_analysis_data = analysis_cache[hash];
+        audio_analysis_data = JSON.parse(analysis_cache[hash]);
         done();
       }
       else {
