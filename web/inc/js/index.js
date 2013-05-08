@@ -25,6 +25,25 @@ function rehack() {
   current_hack.file && startHack(current_hack.file);
 }
 
+function display_analysis (audio_analysis) {
+  $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
+  $("#analysis_title").html(audio_analysis.meta.title);
+  var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
+  $("#analysis_time").html(time);
+  $("#analysis_artist").html(audio_analysis.meta.artist);
+  $("#analysis_album").html(audio_analysis.meta.album);
+  $("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
+  var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  $("#analysis_key").html(keys[audio_analysis.track.key]);
+  var modes = ["Minor", "Major"];
+  $("#analysis_mode").html(modes[audio_analysis.track.mode]);
+  $("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
+  $("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
+  $("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
+  document.getElementById("analysis_info").classList.remove("hidden");
+
+}
+
 function hackSong(data) {
 
   var context = new webkitAudioContext();
@@ -48,8 +67,12 @@ function hackSong(data) {
     document.getElementById("download_button").addEventListener("click", saveFile);
 
     document.getElementById("output_audio").src = hackedSongBlobURL;
-    document.getElementById("output_audio").play();
-    displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
+    if (document.getElementById("autoplay_hack").checked) {
+      document.getElementById("output_audio").play();
+    }
+    //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
+    document.getElementById("new_song").classList.add("hidden");
+    document.getElementById("output_bpm").classList.add("hidden");
     
     document.getElementById("rehack_button").addEventListener("click", rehack);
 
@@ -63,7 +86,7 @@ function hackSong(data) {
 function processAnalysis(audio_analysis) {
 
   current_hack.audio_analysis = audio_analysis;
-  $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
+  display_analysis(audio_analysis);
   displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
 
