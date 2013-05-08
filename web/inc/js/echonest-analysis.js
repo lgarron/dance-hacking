@@ -1,6 +1,10 @@
 "use strict";
 
-var echonestAnalysis = function(file) {
+var echonestAnalysis = (function() {
+
+var analysis_cache = {};
+
+return function(file) {
 
   // Constants
   var UPLOAD_POLLING_INTERVAL = 1000; //ms
@@ -38,6 +42,7 @@ var echonestAnalysis = function(file) {
           success: function (data) {
               progressCallback("Retrieved data.")
               audio_analysis_data = JSON.parse(data); // global
+              analysis_cache[hash] = audio_analysis_data;
               done();
           }
       });
@@ -177,7 +182,15 @@ var echonestAnalysis = function(file) {
 
     function md5sum_callback(fileHash) {
       hash = fileHash;
-      try_get_audio_summary(summary_fail_callback);
+
+      if (analysis_cache[hash]) {
+        console.log("Retrieved analysis from cache.");
+        audio_analysis_data = analysis_cache[hash];
+        done();
+      }
+      else {
+        try_get_audio_summary(summary_fail_callback);
+      }
     };    
     var songMD5 = md5sum(file, md5sum_callback);
 
@@ -204,3 +217,4 @@ var echonestAnalysis = function(file) {
   };
 
 };
+})();
