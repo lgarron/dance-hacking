@@ -1,12 +1,10 @@
-type Pattern = string
-type BlendFunction = any
-type CopyFunction = any
+import {Analysis} from "./common"
 
 function log(str) {
   console.log("[Beatcaster] " + str);
 }
 
-export function hack(pattern: Pattern, blend: BlendFunction, copy: CopyFunction) {
+function hack(pattern, blend, copy) {
   //log("Hack-b-c");
   var i = 0;
   while(i < pattern.length) {
@@ -29,13 +27,13 @@ export function hack(pattern: Pattern, blend: BlendFunction, copy: CopyFunction)
   }
 }
 
-  // // From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
+// From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 
 function isNumber(n) {
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function beatsPerBar(pattern: Pattern) {
+function beatsPerBar(pattern) {
   var max_beat_index = 0;
 
   function update_max_beat_index(i) {
@@ -59,8 +57,8 @@ function beatsPerBar(pattern: Pattern) {
 }
 
 
-function hackData(audioData, audio_analysis, pattern: Pattern, overlap: number, tatumsQ: boolean) {
-  try {
+export function hackData(audioData, audio_analysis: Analysis, pattern, overlap: number, tatumsQ: boolean) {
+  // try {
     //log("Datafying-hack data.");
     const beats_per_bar = beatsPerBar(pattern);
 
@@ -145,9 +143,9 @@ function hackData(audioData, audio_analysis, pattern: Pattern, overlap: number, 
 
     log("Done generating hack data!");
 
-  } catch(e) {
-    log(e);
-  }
+  // } catch(e) {
+  //   log(e);
+  // }
 
   return {
     "overlap": overlap,

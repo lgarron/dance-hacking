@@ -1,0 +1,20 @@
+#new_song, #num_beats {
+  font-size: 120%;
+  padding: 0.5em;
+  margin: 0.5em;
+  width: 400px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+#new_song.drag_drop_over {
+  background: rgba(255, 255, 0, 0.5);
+}
+#new_song.drag_drop_out {
+  background: rgba(255, 0, 0, 0.5);
+}
+#new_song.drag_drop_done {
+  background: rgba(0, 255, 0, 0.5);
+}
+#new_song.drag_drop_error {
+  background: rgba(255, 0, 0, 0.7);
+}
