@@ -13,7 +13,7 @@
 
 /*! @source http://purl.eligrey.com/github/FileSaver.js/blob/master/FileSaver.js */
 
-var saveAs = saveAs || (function(view) {
+var saveAsOrig = (function(view) {
 	"use strict";
 	var
 		  doc = view.document
@@ -211,3 +211,5 @@ var saveAs = saveAs || (function(view) {
 	view.addEventListener("unload", process_deletion_queue, false);
 	return saveAs;
 }(self));
+
+export const saveAs = saveAsOrig

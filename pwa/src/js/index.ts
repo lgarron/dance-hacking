@@ -3,6 +3,7 @@ import {analyze} from "./analyze"
 import {Analysis} from "./common"
 import {hackData} from "./beatcaster"
 import {createWaveFileData} from "./wav"
+import {saveAs} from "./lib/FileSaver.ts"
 
 var current_hack = {
   hack_data: null,
@@ -17,7 +18,7 @@ function displayString(str) {
 }
 
 function saveFile() {
-  var fileName = current_hack.audio_analysis.meta.title;
+  var fileName = "Filename"; //current_hack.audio_analysis.meta.title;
   if(fileName === "") {
     fileName = "Song";
   }
