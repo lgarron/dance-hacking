@@ -57,15 +57,14 @@ function beatsPerBar(pattern) {
 }
 
 
-export function hackData(audioData, audio_analysis: Analysis, pattern, overlap: number, tatumsQ: boolean) {
+export function hackData(audioData, audio_analysis: Analysis, pattern, overlap: number) {
   // try {
     //log("Datafying-hack data.");
     const beats_per_bar = beatsPerBar(pattern);
 
     var hack_data = [];
 
-    var beat_type = (tatumsQ ? "tatums" : "beats");
-    var beats = audio_analysis[beat_type];
+    var beats = audio_analysis.beats;
 
     // Number of samples in the hacked song.
     var num_samples = 0;
