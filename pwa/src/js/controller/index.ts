@@ -1,22 +1,47 @@
 import {TimeStamp} from "../model"
 import {App} from "./app"
 
-export class Controller {
-  constructor(private app: App) {
+class Lock {
+  message?: string = null;
+
+  check(message: string) {
+    if (!!this.message) {
+      throw `Controller was already locked (${this.message}) while trying to perform an action (${message}).`
+    }
   }
 
+  lock(message: string) {
+    this.check(message);
+    this.message = message
+  }
+
+  unlock() {
+    if (!this.message) {
+      throw "Tried to unlock a controller that was not locked!";
+    }
+    this.message = null
+  }
+}
+
+export class Controller {
+  private lock: Lock = new Lock();
+  constructor(private app: App) {}
+
+  // TODO: Allow terminating a pending song load?
   async loadSong(url: string) {
-    console.log("load")
-    // TODO: Lock class as "processing".
+    this.lock.lock("loading song");
     await this.app.model.reset(url);
+    this.lock.unlock();
   }
 
   addSectionMarker(timeStamp: TimeStamp) {
+    this.lock.check("adding section marker")
     const preparation = this.app.model.preparation;
     console.log(preparation);
   }
 
   addBeatMarker(timeStamp: TimeStamp) {
+    this.lock.check("adding beat marker")
     console.warn("Unimplemented: addBeatMarker")
   }
 }

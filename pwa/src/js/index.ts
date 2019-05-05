@@ -2,9 +2,10 @@ import "./main.ts"
 import {App} from "./app"
 import KingChanticleer from "../audio/king-chanticleer.mp3"
 
-window.addEventListener("load", function {
+window.addEventListener("load", async function {
   const app = new App()
   window["app"] = app;
   document.body.appendChild(app.appView.element);
-  app.controller.loadSong(KingChanticleer)
+  await app.controller.loadSong(KingChanticleer)
+  app.controller.addSectionMarker(0.10)
 })

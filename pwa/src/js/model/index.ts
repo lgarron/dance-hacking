@@ -30,7 +30,6 @@ export class WorkspaceModel {
     const playerView = this.app.appView.playerView;
 
     await playerView.setAudio(url);
-    console.log("awaited!")
     this.preparation.sections.push({
       start: 0,
       end: playerView.audio.duration
