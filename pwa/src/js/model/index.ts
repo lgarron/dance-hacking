@@ -6,5 +6,7 @@ export interface Beat {
 }
 
 export interface Section {
-  parts: Beat[]
+  start: TimeStamp
+  end: TimeStamp
+  beats: Beat[]
 }

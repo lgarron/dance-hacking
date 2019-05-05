@@ -1,29 +1,38 @@
 app {
   width: 100%;
   height: 100%;
-  display: flex;
   box-sizing: border-box;
-  padding: 2em;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 5em 1fr;
+  grid-gap: 1em;
+  padding: 1em;
+}
+
+player {
+  background: rgba(0, 0, 0, 0.1);
+  grid-column-start: 1;
+  grid-column-end: 3;
 }
 
 .panel {
+  background: rgba(0, 0, 0, 0.1);
   flex: 1 0 0;
   box-sizing: border-box;
   border: 1px solid #0004;
 }
 
 section {
-  background: rbga(255, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.1);
   display: inline-block;
-  margin: 5px;
-  padding: 2px;
-  border: 2px solid blue;
+  margin: 0.25em;
+  padding: 0.5em;
+  border: 1px solid black;
 }
 
 section-list {
-  background: rbga(0, 255, 0, 0.5);
-  border: 2px solid black;
-  padding: 5px;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.5em;
   display: flex;
   flex-direction: column;
 }
