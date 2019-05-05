@@ -43,15 +43,28 @@ export class AppView extends View {
 
 export class PlayerView extends View {
   audio: HTMLAudioElement = new Audio();
+  private resolve: () => void
   constructor() {
     super("player");
     this.element.appendChild(this.audio);
     this.audio.setAttribute("controls", "");
     this.audio.setAttribute("preload", "yes");
+    this.audio.addEventListener("loadedmetadata", this.loadedmetadata.bind(this))
   }
 
-  setAudioURL(url: string) {
-    this.audio.src = url
+  // TODO: Why can't the return type be `Promise<void>`?s
+  async setAudio(url: string): Promise<{}> {
+    const promise = new Promise(this.promise.bind(this));
+    this.audio.src = url;
+    return promise;
+  }
+
+  private promise(resolve: () => void, reject: (Error) => void): void {
+      this.resolve = resolve
+  }
+
+  private loadedmetadata() {
+    this.resolve()
   }
 }
 

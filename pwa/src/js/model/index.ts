@@ -10,7 +10,7 @@ export interface Beat {
 export interface Section {
   start: TimeStamp
   end: TimeStamp
-  beats: Beat[]
+  beats?: Beat[]
 }
 
 export class Preparation {
@@ -18,14 +18,22 @@ export class Preparation {
 }
 
 export class WorkspaceModel {
-  audioUrl: string
-  preparation: Preparation = new Preparation();
+  audioURL?: string = null
+  preparation: Preparation = new Preparation()
   constructor(private app: App) {
-
   }
 
-  setAudioURL(url: string) {
-    this.audioUrl = url;
-    this.app.appView.playerView.setAudioURL(url);
+  async reset(url?: string): Promise<void> {
+    this.audioURL = url
+    this.preparation = new Preparation();
+
+    const playerView = this.app.appView.playerView;
+
+    await playerView.setAudio(url);
+    console.log("awaited!")
+    this.preparation.sections.push({
+      start: 0,
+      end: playerView.audio.duration
+    })
   }
 }
