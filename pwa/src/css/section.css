@@ -1,0 +1,29 @@
+app {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  box-sizing: border-box;
+  padding: 2em;
+}
+
+.panel {
+  flex: 1 0 0;
+  box-sizing: border-box;
+  border: 1px solid #0004;
+}
+
+section {
+  background: rbga(255, 0, 0, 0.5);
+  display: inline-block;
+  margin: 5px;
+  padding: 2px;
+  border: 2px solid blue;
+}
+
+section-list {
+  background: rbga(0, 255, 0, 0.5);
+  border: 2px solid black;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+}

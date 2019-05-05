@@ -3,51 +3,10 @@
   <script src="js/index.ts"></script>
 
   <link href="css/drag-drop-file.css" rel="stylesheet"/>
+  <link href="css/section.css" rel="stylesheet"/>
   <link href="css/style.css" rel="stylesheet"/>
 </head>
 <body>
-
-<a href="https://github.com/lgarron/dance-hacking/tree/master/web"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"></a>
-
-<div id="content0"><div id="content">
-<center>
-<h1 id="title">Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
-
-<div id="new_song">Drag and drop a song here!</div>
-<!--input type="file" name="track" id="track" onchange=""><br-->
-
-<div id="output_bpm">No output yet...</div>
-
-<div id="analysis_info" class="hidden">
-  <h2><span id="analysis_title">[Title]</span> (<span id="analysis_time">[Time]</span>)</h2>
-  <h3><span id="analysis_artist">[Artist]</span> - <span id="analysis_album">[Album]</span><br>
-  Key: <span id="analysis_key">[Key]</span> <span id="analysis_mode">[Mode]</span> (<span id="analysis_key_confidence">[Key]</span>% / <span id="analysis_mode_confidence">[Mode]</span>% confidence)<br>
-  BPM: <span id="analysis_bpm">[BPM]</span> (<span id="analysis_bpm_confidence">[BPM]</span>% confidence)</h3>
-  <hr><br>
-</div>
-
-<div id="download_button_div" class="hidden">
-  <audio id="output_audio" controls="controls"></audio><br>
-  <br>
-  <button id="download_button">Download .wav</button>
-  <button id="rehack_button">Re-hack</button><br><br>
-</div>
-
-<input id="beat_type_tatums" type="checkbox">
-<label for="beat_type_tatums">Use tatums (divide beats in half)</label>
-<input id="autoplay_hack" type="checkbox">
-<label for="autoplay_hack">Start playing immediately</label>
-<br>
-<input type="text" id="beat_pattern" value="12[34]">
-<input type="number" id="overlap" min="0" max="100" step="5" value="100"><br>
-
-<textarea id="output_text">[Full analysis will appear here.]</textarea>
-
-<br>
-Thanks to the <a href="http://the.echonest.com/">Echonest</a> <a href="http://developer.echonest.com/docs/v4/track.html">Track API</a>.<br>
-Only tested in Google Chrome.<br>
-</center>
-</div></div>
 
 </body>
 </html>
