@@ -6,5 +6,5 @@ window.addEventListener("load", function {
   const app = new App()
   window["app"] = app;
   document.body.appendChild(app.appView.element);
-  app.loadSong(KingChanticleer)
+  app.controller.loadSong(KingChanticleer)
 })

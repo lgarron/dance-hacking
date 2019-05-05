@@ -50,7 +50,7 @@ export class PlayerView extends View {
     this.audio.setAttribute("preload", "yes");
   }
 
-  setAudio(url: string) {
+  setAudioURL(url: string) {
     this.audio.src = url
   }
 }

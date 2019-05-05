@@ -1,3 +1,5 @@
+import {App} from "../app"
+
 export type TimeStamp = number
 
 export interface Beat {
@@ -16,5 +18,14 @@ export class Preparation {
 }
 
 export class WorkspaceModel {
+  audioUrl: string
   preparation: Preparation = new Preparation();
+  constructor(private app: App) {
+
+  }
+
+  setAudioURL(url: string) {
+    this.audioUrl = url;
+    this.app.appView.playerView.setAudioURL(url);
+  }
 }
