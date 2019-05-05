@@ -1,5 +1,4 @@
 import {Section} from "../model"
-import KingChanticleer from "../../audio/king-chanticleer.mp3"
 
 class View {
   element: HTMLElement
@@ -43,11 +42,16 @@ export class AppView extends View {
 }
 
 export class PlayerView extends View {
-  audio: HTMLAudioElement = new Audio(KingChanticleer)
+  audio: HTMLAudioElement = new Audio();
   constructor() {
     super("player");
     this.element.appendChild(this.audio);
     this.audio.setAttribute("controls", "");
+    this.audio.setAttribute("preload", "yes");
+  }
+
+  setAudio(url: string) {
+    this.audio.src = url
   }
 }
 

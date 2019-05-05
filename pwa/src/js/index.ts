@@ -1,8 +1,10 @@
 import "./main.ts"
-import {AppView, SectionView, SectionListView} from "./view"
+import {App} from "./app"
+import KingChanticleer from "../audio/king-chanticleer.mp3"
 
 window.addEventListener("load", function {
-  const appView = new AppView()
-  window["appView"] = appView;
-  document.body.appendChild(appView.element);
+  const app = new App()
+  window["app"] = app;
+  document.body.appendChild(app.appView.element);
+  app.loadSong(KingChanticleer)
 })

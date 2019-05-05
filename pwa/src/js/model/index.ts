@@ -10,3 +10,11 @@ export interface Section {
   end: TimeStamp
   beats: Beat[]
 }
+
+export class Preparation {
+  sections: Section[] = []
+}
+
+export class WorkspaceModel {
+  preparation: Preparation = new Preparation();
+}
