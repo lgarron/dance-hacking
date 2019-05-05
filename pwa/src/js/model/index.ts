@@ -53,4 +53,9 @@ export class WorkspaceModel {
     sections.splice(i + 1, 0, newSection);
     this.app.view.preparationView.sectionListView.split(i, newSection)
   }
+
+  addSectionMarkerNow() {
+    console.log(this.app.view.playerView.audio.currentTime)
+    this.addSectionMarker(this.app.view.playerView.audio.currentTime)
+  }
 }

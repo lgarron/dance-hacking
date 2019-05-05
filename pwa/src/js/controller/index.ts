@@ -39,6 +39,11 @@ export class Controller {
     this.app.model.addSectionMarker(timeStamp)
   }
 
+  addSectionMarkerNow() {
+    this.lock.check("adding section to current timestamp")
+    this.app.model.addSectionMarkerNow()
+  }
+
   addBeatMarker(timeStamp: TimeStamp) {
     this.lock.check("adding beat marker")
     console.warn("Unimplemented: addBeatMarker")
