@@ -1,4 +1,4 @@
-import {TimeStamp} from "../model"
+import {TimeStamp, Section} from "../model"
 import {App} from "./app"
 
 class Lock {
@@ -36,8 +36,7 @@ export class Controller {
 
   addSectionMarker(timeStamp: TimeStamp) {
     this.lock.check("adding section marker")
-    const preparation = this.app.model.preparation;
-    console.log(preparation);
+    this.app.model.addSectionMarker(timeStamp)
   }
 
   addBeatMarker(timeStamp: TimeStamp) {

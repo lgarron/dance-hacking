@@ -4,6 +4,6 @@ import {Controller} from "./controller"
 
 export class App {
   model: WorkspaceModel = new WorkspaceModel(this);
-  appView: AppView = new AppView(this);
+  view: AppView = new AppView(this);
   controller: Controller = new Controller(this);
 }

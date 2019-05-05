@@ -27,12 +27,30 @@ export class WorkspaceModel {
     this.audioURL = url
     this.preparation = new Preparation();
 
-    const playerView = this.app.appView.playerView;
+    const playerView = this.app.view.playerView;
 
     await playerView.setAudio(url);
-    this.preparation.sections.push({
+    const newSection = {
       start: 0,
       end: playerView.audio.duration
-    })
+    };
+    this.preparation.sections.push(newSection)
+    this.app.view.preparationView.sectionListView.add(newSection)
+  }
+
+  addSectionMarker(timeStamp: TimeStamp) {
+    const sections = this.app.model.preparation.sections;
+    var i = 0;
+    while (i < sections.length && timeStamp > sections[i].end) {
+      i++;
+    }
+    console.log(i);
+    const newSection = {
+      start: timeStamp,
+      end: sections[i].end
+    }
+    sections[i].end = timeStamp;
+    sections.splice(i + 1, 0, newSection);
+    this.app.view.preparationView.sectionListView.split(i, newSection)
   }
 }

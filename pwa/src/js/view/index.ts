@@ -11,9 +11,13 @@ class View {
 }
 
 export class SectionView extends View {
-  constructor(public section: Section) {
+  constructor(private section: Section) {
     super("section");
-    this.element.textContent = `Section (${section.start} — ${section.end})`
+    this.update();
+  }
+
+  update() {
+    this.element.textContent = `Section (${this.section.start} — ${this.section.end})`
   }
 }
 
@@ -23,9 +27,30 @@ export class SectionListView extends View {
     super("section-list")
   }
 
-  add(sectionView: SectionView) {
-    this.sectionViews.push(sectionView)
-    this.element.appendChild(sectionView.element);
+  add(section: Section) {
+    const newSectionView = new SectionView(section);
+    this.sectionViews.push(newSectionView)
+    this.element.appendChild(newSectionView.element);
+  }
+
+  // Tell the section at the old index to update (i.e. it should update to
+  // reflect changes in its model), and add the new section after it.
+  split(oldIndex: number, newSection: Section) {
+    const oldSectionView = this.sectionViews[oldIndex];
+    oldSectionView.update();
+
+    const newSectionView = new SectionView(newSection);
+    this.sectionViews.splice(oldIndex + 1, 0, newSectionView);
+    oldSectionView.element.insertAdjacentElement("afterend", newSectionView.element);
+  }
+
+  reset(sections: Section[] = []) {
+    this.element.textContent = "";
+    this.sectionViews = [];
+    for (const section of sections) {
+      this.add(section);
+    }
+
   }
 }
 
@@ -73,17 +98,6 @@ export class PreparationView extends View {
   constructor() {
     super("preparation", "panel")
     this.element.appendChild(this.sectionListView.element);
-
-    this.sectionListView.add(new SectionView({
-      start: 0,
-      end: 4.51,
-      beats: []
-    }));
-    this.sectionListView.add(new SectionView({
-      start: 4.51,
-      end: 20.00,
-      beats: []
-    }));
   }
 }
 
