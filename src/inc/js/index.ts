@@ -276,7 +276,7 @@ function hackSong(data) {
       );
 
       const w = createWaveFileData(buffer, current_hack.hack_data);
-      current_hack.blob = new Blob([w]);
+      current_hack.blob = new Blob([w], { type: "audio/wav" });
       const hackedSongBlobURL = webkitURL.createObjectURL(current_hack.blob);
 
       // Update UI
