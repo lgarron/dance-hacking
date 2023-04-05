@@ -117,12 +117,14 @@ class App {
     buttonListener("#rewind_beats", () => {
       this.songData.deleteBeats(-4, 4);
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      button("#add_beat").focus();
     });
 
     buttonListener("#clear_beats", () => this.songData.clearBeats());
     buttonListener("#play_from_final_beat", () => {
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
       this.originalAudioElem.play();
+      button("#add_beat").focus();
     });
 
     buttonListener("#save_beats", () => {
@@ -142,13 +144,20 @@ class App {
     fileInputListener("#load_beats", async (file: File) => {
       this.songData!.setData(JSON.parse(await file.text()));
     });
+
+    buttonListener("#hack", () => {
+      current_hack.file = this.songData!.file;
+      current_hack.audio_analysis = this.songData!.songData.beats;
+      startHack();
+    });
   }
 
   async setSongData(songData: SongData) {
     this.songData = songData;
     this.originalAudioElem.src = URL.createObjectURL(songData.file);
-    button("#save_beats").disabled = false;
-    button("#load_beats").disabled = false;
+    document
+      .querySelectorAll(".song-enables")
+      .forEach((elem: HTMLInputElement) => (elem.disabled = false));
   }
 }
 
@@ -174,7 +183,7 @@ import { createWaveFileData } from "./wav";
 
 function displayString(str) {
   console.log(str);
-  document.querySelector("#output_bpm")!.textContent = str;
+  // document.querySelector("#output_bpm")!.textContent = str;
   // .stop().fadeOut(0).html(str).fadeIn(100); // TODO
 }
 
@@ -236,9 +245,12 @@ function hackSong(data) {
 
       // Update UI
 
-      document
-        .getElementById("download_button_div")!
-        .classList.remove("hidden");
+      // document
+      //   .getElementById("download_button_div")!
+      //   .classList.remove("hidden");
+      (
+        document.getElementById("download_button") as HTMLButtonElement
+      ).disabled = false;
       document
         .getElementById("download_button")!
         .addEventListener("click", saveFile);
@@ -253,13 +265,13 @@ function hackSong(data) {
         outputAudioElem.play();
       }
       //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
-      document.getElementById("new_song")!.classList.add("hidden");
-      document.getElementById("song_json")!.classList.add("hidden");
-      document.getElementById("output_bpm")!.classList.add("hidden");
+      // document.getElementById("new_song")!.classList.add("hidden");
+      // document.getElementById("song_json")!.classList.add("hidden");
+      // document.getElementById("output_bpm")!.classList.add("hidden");
 
-      document
-        .getElementById("rehack_button")!
-        .addEventListener("click", rehack);
+      // document
+      //   .getElementById("rehack_button")!
+      //   .addEventListener("click", rehack);
     },
     function (e) {
       displayString("Failed to decode audio file (unknown reason). :-(");
@@ -270,7 +282,7 @@ function hackSong(data) {
 
 function processAnalysis(audio_analysis) {
   current_hack.audio_analysis = audio_analysis;
-  display_analysis(audio_analysis);
+  // display_analysis(audio_analysis);
   // displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
 
@@ -334,13 +346,13 @@ function startHack() {
   processAnalysis(current_hack.audio_analysis);
 }
 
-registerFileDragDrop(
-  document.getElementById("new_song")!,
-  document.getElementById("new_song")!,
-  startHackSong,
-);
-registerFileDragDrop(
-  document.getElementById("song_json")!,
-  document.getElementById("song_json")!,
-  startHackJSON,
-);
+// registerFileDragDrop(
+//   document.getElementById("new_song")!,
+//   document.getElementById("new_song")!,
+//   startHackSong,
+// );
+// registerFileDragDrop(
+//   document.getElementById("song_json")!,
+//   document.getElementById("song_json")!,
+//   startHackJSON,
+// );

@@ -17,32 +17,43 @@
   <div id="content0">
     <div id="content">
       <center>
-        <h1 id="title">Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
+        <h1 id="title">Dance Hacker v2.0<sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
         <label for="song_input">🎶 Song file:</label>
         <input id="song_input" type="file" />
         <br>
         <br>
-        <button id="clear_beats">🗑️ Clear beats</button>
+        <button id="clear_beats" disabled class="song-enables" style="background: rgba(255, 0, 0, 0.25);">❌ Clear
+          beats</button>
         <br>
-        <audio id="original_audio" controls></audio>
+        <audio id="original_audio" controls style="width: 100%"></audio>
         <br>
-        <button id="rewind_beats">⏪ Rewind 4 beats</button>
-        <button id="add_beat">➕ Add beat</button>
-        <button id="play_from_final_beat">▶️ Play from final beat</button>
+        <button id="add_beat" disabled class="song-enables" style="font-size: 2em">➕ Add beat</button>
+        <br>
+        <button id="rewind_beats" disabled class="song-enables">⏪ Rewind 4 beats</button>
+        <button id="play_from_final_beat" disabled class="song-enables">▶️ Play from final beat</button>
         <br>
         <textarea id="beat_list" cols="100" , rows="10"></textarea>
         <br>
-        <button id="save_beats" disabled>⬇️ Save beats</button><br>
-        <label for="load_beats" storedData>⬆️ Load beats: </label><input id="load_beats" type="file" />
+        <button id="save_beats" disabled class="song-enables">⬇️ Save beats</button> /
+        <label for="load_beats" disabled class="song-enables">⬆️ Load beats: </label><input id="load_beats" type="file"
+          disabled />
 
-        <div id="new_song">Drag and drop a song file here!</div>
-        <textarea id="output_text">[Full analysis will appear here.]</textarea>
+        <br>
+        <br>
+        <hr>
+        <br>
+        Beat pattern: <input type="text" id="beat_pattern" value="12[34]"><br>
+        Overlap: <input type="number" id="overlap" min="0" max="100" step="5" value="100">
+        <br>
+        <input id="autoplay_hack" type="checkbox" checked>
+        <label for="autoplay_hack">Start playing immediately</label>
+        <br><br>
+        <button id="hack" disabled class="song-enables" style="font-size: 2em;">&nbsp;🎶🔨&nbsp;Hack&nbsp;</button>
+        <button id="download_button" disabled>Download .wav</button>
+        <br>
+        <audio id="output_audio" controls="controls"></audio>
 
-        <div id="song_json">Drag and drop a JSON file here!</div>
-        <!--input type="file" name="track" id="track" onchange=""><br-->
-
-        <div id="output_bpm">No output yet...</div>
 
         <div id="analysis_info" class="hidden">
           <h2><span id="analysis_title">[Title]</span> (<span id="analysis_time">[Time]</span>)</h2>
@@ -54,20 +65,10 @@
           <hr><br>
         </div>
 
-        <div id="download_button_div" class="hidden">
-          <audio id="output_audio" controls="controls"></audio><br>
-          <br>
-          <button id="download_button">Download .wav</button>
-          <button id="rehack_button">Re-hack</button><br><br>
-        </div>
-
         <input id="beat_type_tatums" type="checkbox" hidden>
         <label for="beat_type_tatums" hidden>Use tatums (divide beats in half)</label>
-        <input id="autoplay_hack" type="checkbox" checked>
-        <label for="autoplay_hack">Start playing immediately</label>
+
         <br>
-        <input type="text" id="beat_pattern" value="12[34]">
-        <input type="number" id="overlap" min="0" max="100" step="5" value="100"><br>
 
       </center>
     </div>
