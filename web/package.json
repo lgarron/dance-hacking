@@ -1,7 +1,6 @@
 {
   "devDependencies": {
-    "barely-a-dev-server": "^0.4.12",
-    "rome": "^12.0.0"
+    "barely-a-dev-server": "^0.4.12"
   },
   "scripts": {
     "lint": "npx rome check ./src",

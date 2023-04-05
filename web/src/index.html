@@ -1,6 +1,7 @@
 <html>
 
 <head>
+  <meta charset="utf8">
   <script src="inc/js/index.js" type="module"></script>
 
   <link href="inc/css/drag-drop-file.css" rel="stylesheet" />
@@ -18,7 +19,23 @@
       <center>
         <h1 id="title">Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
+        Song file:
+        <input id="song_input" type="file" />
+        <br>
+        <br>
+        <button id="clear_beats">🗑️ Clear beats</button>
+        <br>
+        <audio id="original_audio" controls></audio>
+        <br>
+        <button id="rewind_beats">⏪ Rewind 4 beats</button>
+        <button id="add_beat">➕ Add beat</button>
+        <button id="play_from_final_beat">▶️ Play from final beat</button>
+        <br>
+        <textarea id="beat_list" cols="100" , rows="10"></textarea>
+
         <div id="new_song">Drag and drop a song file here!</div>
+        <textarea id="output_text">[Full analysis will appear here.]</textarea>
+
         <div id="song_json">Drag and drop a JSON file here!</div>
         <!--input type="file" name="track" id="track" onchange=""><br-->
 
@@ -48,8 +65,6 @@
         <br>
         <input type="text" id="beat_pattern" value="12[34]">
         <input type="number" id="overlap" min="0" max="100" step="5" value="100"><br>
-
-        <textarea id="output_text">[Full analysis will appear here.]</textarea>
 
       </center>
     </div>

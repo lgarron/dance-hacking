@@ -1,0 +1,18 @@
+<html>
+<head>
+  <script src="spark-md5.js"></script>
+  <script src="jquery-1.8.2.js"></script>
+  <script src="echonest-analysis.js"></script>
+</head>
+<body>
+
+<center>
+<h1>Echonest Upload!</h1>
+
+<input type="file" onchange="echonestAnalysis(this.files[0]).go(function(aa){output.value = JSON.stringify(aa);});">
+<br><br>
+<textarea id="output" style="width: 80%; height: 80%;">[Result will appear here.]</textarea>
+</center>
+
+</body>
+</html>
