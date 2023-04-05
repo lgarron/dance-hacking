@@ -19,7 +19,7 @@
       <center>
         <h1 id="title">Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
-        Song file:
+        <label for="song_input">🎶 Song file:</label>
         <input id="song_input" type="file" />
         <br>
         <br>
@@ -32,6 +32,9 @@
         <button id="play_from_final_beat">▶️ Play from final beat</button>
         <br>
         <textarea id="beat_list" cols="100" , rows="10"></textarea>
+        <br>
+        <button id="save_beats" disabled>⬇️ Save beats</button><br>
+        <label for="load_beats" storedData>⬆️ Load beats: </label><input id="load_beats" type="file" />
 
         <div id="new_song">Drag and drop a song file here!</div>
         <textarea id="output_text">[Full analysis will appear here.]</textarea>

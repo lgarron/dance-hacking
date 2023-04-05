@@ -1,7 +1,7 @@
 type SongBeatData = any[];
 
 interface StoredSongData {
-  name: string;
+  fileName: string;
   beats?: SongBeatData;
 }
 
@@ -18,9 +18,8 @@ class SongData {
     public file: File,
     public localStorageKey: string,
     public displayElem: HTMLTextAreaElement,
-    public beats: SongBeatData,
+    public songData: StoredSongData,
   ) {
-    this.reloadBeats();
     this.updateDisplay();
   }
 
@@ -30,53 +29,53 @@ class SongData {
   ): Promise<SongData> {
     const hash = await hashFile(file);
     const localStorageKey = `song-${hash}`;
-    const beats = JSON.parse(localStorage[localStorageKey] ?? "[]");
-    return new SongData(file, localStorageKey, displayElem, beats);
+    const storedData = localStorage[localStorageKey];
+    const songData: StoredSongData = storedData
+      ? JSON.parse(storedData)
+      : {
+          fileName: file.name,
+          beats: [],
+        };
+    return new SongData(file, localStorageKey, displayElem, songData);
   }
 
   async store(): Promise<void> {
-    const storedData: StoredSongData = {
-      name: this.file.name,
-      beats: this.beats,
-    };
-    localStorage[this.localStorageKey] = JSON.stringify(storedData);
-  }
-
-  // TODO: validate data?
-  reloadBeats() {
-    this.beats =
-      JSON.parse(localStorage[this.localStorageKey] ?? "{}").beats ?? [];
-    this.updateDisplay();
+    localStorage[this.localStorageKey] = JSON.stringify(this.songData);
   }
 
   updateDisplay() {
-    this.displayElem.textContent = JSON.stringify(this.beats);
+    this.displayElem.textContent = JSON.stringify(this.songData.beats);
   }
 
   addBeat(timestamp: Milliseconds) {
-    this.beats.push([timestamp]);
+    this.songData.beats.push([timestamp]);
     this.updateDisplay();
-    this.persistBeats();
+    this.persistData();
   }
 
   clearBeats() {
-    this.beats = [];
-    this.persistBeats();
+    this.songData.beats = [];
+    this.persistData();
   }
 
   // Pass (-1, 1) to delete the last beat.
   deleteBeats(i: number, n: number) {
-    this.beats.splice(i, n);
-    this.persistBeats();
-  }
-
-  persistBeats() {
-    this.updateDisplay();
-    this.store(); // TODO: debounce
+    this.songData.beats.splice(i, n);
+    this.persistData();
   }
 
   lastBeatTimestamp(): Milliseconds {
-    return (this.beats.at(-1) ?? [0])[0];
+    return (this.songData.beats.at(-1) ?? [0])[0];
+  }
+
+  setData(data: StoredSongData): void {
+    this.songData = data;
+    this.persistData();
+  }
+
+  persistData() {
+    this.updateDisplay();
+    this.store(); // TODO: debounce
   }
 }
 
@@ -84,50 +83,72 @@ function button(selector: string): HTMLButtonElement {
   return document.querySelector(selector) as HTMLButtonElement;
 }
 
+function buttonListener(selector: string, listner: () => void): void {
+  button(selector).addEventListener("click", listner);
+}
+
+function fileInputListener(selector: string, callback: (file: File) => void) {
+  const elem = document.querySelector(selector) as HTMLInputElement;
+  elem.addEventListener("change", async () => {
+    const newFile = elem.files?.[0];
+    if (newFile) {
+      callback(newFile);
+    }
+  });
+}
 class App {
   songInputElem = document.querySelector("#song_input") as HTMLInputElement;
   originalAudioElem = document.querySelector(
     "#original_audio",
   ) as HTMLAudioElement;
   beatListElem = document.querySelector("#beat_list") as HTMLTextAreaElement;
-  addBeatInput = button("#add_beat");
-  rewindBeatsElem = button("#rewind_beats");
-  clearBeatsElem = button("#clear_beats");
-  playFromFinalBeatElem = button("#play_from_final_beat");
 
   songData?: SongData;
 
   constructor() {
-    this.songInputElem.addEventListener("change", async () => {
-      const newSongFile = this.songInputElem.files?.[0];
-      if (newSongFile) {
-        this.setSongData(
-          await SongData.fromFile(newSongFile, this.beatListElem),
-        );
-      }
+    fileInputListener("#song_input", async (file: File) => {
+      this.setSongData(await SongData.fromFile(file, this.beatListElem));
     });
 
-    this.addBeatInput.addEventListener("click", () =>
+    buttonListener("#add_beat", () =>
       this.songData.addBeat(this.originalAudioElem.currentTime),
     );
 
-    this.rewindBeatsElem.addEventListener("click", () => {
+    buttonListener("#rewind_beats", () => {
       this.songData.deleteBeats(-4, 4);
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
     });
 
-    this.clearBeatsElem.addEventListener("click", () =>
-      this.songData.clearBeats(),
-    );
-    this.playFromFinalBeatElem.addEventListener("click", () => {
+    buttonListener("#clear_beats", () => this.songData.clearBeats());
+    buttonListener("#play_from_final_beat", () => {
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
       this.originalAudioElem.play();
+    });
+
+    buttonListener("#save_beats", () => {
+      const songData = this.songData.songData!;
+      console.log({ songData });
+      const buffer = new TextEncoder().encode(JSON.stringify(songData));
+      const url = URL.createObjectURL(
+        new Blob([buffer], { type: "text/plain" }),
+      );
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${songData.fileName} (${songData.beats.length} beats).json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    fileInputListener("#load_beats", async (file: File) => {
+      this.songData!.setData(JSON.parse(await file.text()));
     });
   }
 
   async setSongData(songData: SongData) {
     this.songData = songData;
     this.originalAudioElem.src = URL.createObjectURL(songData.file);
+    button("#save_beats").disabled = false;
+    button("#load_beats").disabled = false;
   }
 }
 
