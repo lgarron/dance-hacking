@@ -1,3 +1,4 @@
+import { FileAPIReader, getAllTags, loadTags } from "../lib/id3.js";
 import { hackData } from "./beatcaster.js";
 import { current_hack } from "./current_hack.js";
 import { registerFileDragDrop } from "./drag-drop-file.js";
@@ -109,11 +110,11 @@ function setBackground(file) {
   console.log("Loading ID3 tags.");
   var url = file.urn || file.name;
   var reader = new FileAPIReader(file);
-  ID3.loadTags(
+  loadTags(
     url,
     function () {
       console.log("Loaded ID3 tags.");
-      var tags = ID3.getAllTags(url);
+      var tags = getAllTags(url);
       var image = tags.picture;
       if (typeof image !== "undefined") {
         document.body.background =
