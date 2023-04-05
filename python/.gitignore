@@ -1,0 +1,10 @@
+# Symlinks
+symlinks/*
+*.pyc
+dl/*
+
+/.venv
+
+lib/en-ffmpeg
+lib/ffmpeg.exe
+lib/pthreadGC2.dll

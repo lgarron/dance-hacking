@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "devDependencies": {
+    "barely-a-dev-server": "^0.4.12"
+  },
+  "scripts": {
+    "lint": "npx rome check ./src",
+    "format": "npx rome format ./src"
+  }
+}
