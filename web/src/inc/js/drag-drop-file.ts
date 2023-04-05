@@ -1,11 +1,11 @@
 export function registerFileDragDrop(domElement, feedbackElement, callback) {
-  var css_classes = {
+  const css_classes = {
     over: "drag_drop_over",
     out: "drag_drop_out",
     done: "drag_drop_done",
   };
 
-  var feedback_text = {
+  const feedback_text = {
     over: "Let Go!",
     out: "Come back! :-(",
     done: "Got it!",
@@ -13,7 +13,7 @@ export function registerFileDragDrop(domElement, feedbackElement, callback) {
 
   function setDragDropVisualFeedback(type) {
     feedbackElement.innerHTML = feedback_text[type];
-    var cL = feedbackElement.classList;
+    const cL = feedbackElement.classList;
     for (const i in css_classes) {
       cL.remove(css_classes[i]);
     }
@@ -41,7 +41,7 @@ export function registerFileDragDrop(domElement, feedbackElement, callback) {
     event.stopPropagation(); // Stops some browsers from redirecting.
     event.preventDefault();
     setDragDropVisualFeedback("done");
-    var src = event.dataTransfer.files[0];
+    const src = event.dataTransfer.files[0];
     callback(src);
     return false;
   }
