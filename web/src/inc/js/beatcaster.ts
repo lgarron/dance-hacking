@@ -1,28 +1,28 @@
 import { current_hack } from "./current_hack.js";
 
 function log(str) {
-  console.log("[Beatcaster] " + str);
+  console.log(`[Beatcaster] ${str}`);
 }
 
 function hack(pattern, blend, copy) {
   //log("Hack-b-c");
-  var i = 0;
+  let i = 0;
   while (i < pattern.length) {
     if (isNumber(pattern[i])) {
-      var p = parseFloat(pattern[i]);
+      const p = parseFloat(pattern[i]);
       copy(p);
     } else if (pattern[i] === "[") {
-      var p3 = pattern[i + 3];
+      const p3 = pattern[i + 3];
       if (p3 !== "]") {
-        log("WARNING: Pattern is irregular. No closing ] at position " + i + 3);
+        log(`WARNING: Pattern is irregular. No closing ] at position ${i}${3}`);
       }
-      var p1 = parseFloat(pattern[i + 1]);
-      var p2 = parseFloat(pattern[i + 2]);
+      const p1 = parseFloat(pattern[i + 1]);
+      const p2 = parseFloat(pattern[i + 2]);
       blend(p1, p2);
       i += 3;
     } else {
       log(
-        "WARNING: Pattern is irregular. Unexpected character at position " + i,
+        `WARNING: Pattern is irregular. Unexpected character at position ${i}`,
       );
     }
     i += 1;
@@ -36,7 +36,7 @@ function isNumber(n) {
 }
 
 function beatsPerBar(pattern) {
-  var max_beat_index = 0;
+  let max_beat_index = 0;
 
   function update_max_beat_index(i) {
     if (i > max_beat_index) {
@@ -58,23 +58,41 @@ function beatsPerBar(pattern) {
   return max_beat_index;
 }
 
+type HackDataEntry =
+  | {
+      kind: "copy";
+      segment: {
+        start: number;
+        end: number;
+      };
+    }
+  | {
+      kind: "blend";
+      segment1: {
+        start: number;
+        end: number;
+      };
+      segment2: {
+        start: number;
+        end: number;
+      };
+    };
+
 export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
   // Number of samples in the hacked song.
   let num_samples = 0;
-  const hack_data = [];
+  const hack_data: HackDataEntry[] = [];
   try {
-    current_hack.downloadFileName =
-      current_hack.file.name +
-      " (" +
-      document.getElementById("beat_pattern").value +
-      " pattern, " +
-      document.getElementById("overlap").value +
-      "% overlap)";
+    current_hack.downloadFileName = `${current_hack.file.name} (${
+      (document.getElementById("beat_pattern") as HTMLInputElement).value
+    } pattern, ${
+      (document.getElementById("overlap") as HTMLInputElement).value
+    }% overlap)`;
     //log("Datafying-hack data.");
     const beats_per_bar = beatsPerBar(pattern);
 
-    var beat_type = tatumsQ ? "tatums" : "beats";
-    var beats = audio_analysis;
+    const beat_type = tatumsQ ? "tatums" : "beats";
+    const beats = audio_analysis;
 
     // Returns the j-th beat of the i-th bar (0-indexed).
     function beat_start(i, j) {
@@ -84,8 +102,8 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
     function samplesBetweenTimes(t1, t2) {
       // We must compute these separately, then subtract.
       // Else, we might risk rounding error.
-      var sampleStart = Math.floor(t1 * audioData.sampleRate);
-      var sampleEnd = Math.floor(t2 * audioData.sampleRate);
+      const sampleStart = Math.floor(t1 * audioData.sampleRate);
+      const sampleEnd = Math.floor(t2 * audioData.sampleRate);
       return sampleEnd - sampleStart;
     }
 
@@ -128,9 +146,10 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
     // Everything up to the first beat
     hack_data_copy(0, beat_start(0, 0));
 
-    var num_bars = Math.floor((beats.length - 1) / beats_per_bar);
-    log("Generating hack data for " + num_bars + " bars!");
-    for (var i = 0; i < num_bars; i++) {
+    const num_bars = Math.floor((beats.length - 1) / beats_per_bar);
+    const newLocal = `Generating hack data for ${num_bars} bars!`;
+    log(newLocal);
+    for (let i = 0; i < num_bars; i++) {
       //log("Bar #" + i);
 
       // Curry the bar index.
