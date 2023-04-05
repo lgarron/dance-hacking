@@ -33,11 +33,11 @@ class SongData {
     const storedData = localStorage[localStorageKey];
     const songData: StoredSongData = storedData
       ? JSON.parse(storedData)
-      : {
+      : ({
           fileName: file.name,
           beats: [],
-          formatVersion: 1
-        } satisfies StoredSongData;
+          formatVersion: 1,
+        } satisfies StoredSongData);
     return new SongData(file, localStorageKey, displayElem, songData);
   }
 
@@ -154,21 +154,18 @@ class App {
       button("#add_beat").focus();
     });
 
-    buttonListener("#save_beats", () => {
-      const songData = this.songData.songData!;
-      const buffer = new TextEncoder().encode(JSON.stringify(songData));
-      const url = URL.createObjectURL(
-        new Blob([buffer], { type: "text/plain" }),
-      );
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${songData.fileName} (${songData.beats.length} beats).json`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
+    buttonListener("#save_beats", () => this.downloadSongData());
 
     fileInputListener("#load_beats", async (file: File) => {
-      this.songData!.setData(JSON.parse(await file.text()));
+      let parsed = JSON.parse(await file.text());
+      if (parsed instanceof Array) {
+        parsed = {
+          fileName: this.songData.file.name,
+          beats: parsed,
+          formatVersion: 1,
+        } satisfies StoredSongData;
+      }
+      this.songData!.setData(parsed);
     });
 
     buttonListener("#hack", () => {
@@ -176,6 +173,17 @@ class App {
       current_hack.audio_analysis = this.songData!.songData.beats;
       startHack();
     });
+  }
+
+  downloadSongData() {
+    const songData = this.songData.songData!;
+    const buffer = new TextEncoder().encode(JSON.stringify(songData));
+    const url = URL.createObjectURL(new Blob([buffer], { type: "text/plain" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${songData.fileName} (${songData.beats.length} beats).json`;
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   async setSongData(songData: SongData) {
@@ -196,7 +204,8 @@ function buf2hex(buffer: ArrayBuffer): string {
   ).join("");
 }
 
-(window as any).app = new App();
+const app = new App();
+(window as any).app = app;
 
 /******** old code ********/
 
@@ -221,6 +230,7 @@ function saveFile() {
   }
   const extension = ".wav";
   saveAs(current_hack.blob, fileName + extension);
+  // app.downloadSongData();
 }
 
 function rehack() {
