@@ -6,7 +6,8 @@ import { createWaveFileData } from "./wav.js";
 
 function displayString(str) {
   console.log(str);
-  $("#output_bpm").stop().fadeOut(0).html(str).fadeIn(100);
+  document.querySelector("#output_bpm").textContent = str;
+  // .stop().fadeOut(0).html(str).fadeIn(100); // TODO
 }
 
 function saveFile() {
@@ -24,23 +25,24 @@ function rehack() {
 }
 
 function display_analysis(audio_analysis) {
-  $("#output_text")
-    .attr("value", JSON.stringify(audio_analysis, null, 2))
-    .fadeOut(0)
-    .fadeIn(400);
-  // $("#analysis_title").html(audio_analysis.meta.title);
+  document
+    .querySelector("#output_text")
+    .setAttribute("value", JSON.stringify(audio_analysis, null, 2))
+    // .fadeOut(0)
+    // .fadeIn(400); // TODO
+  // document.querySelector("#analysis_title").html(audio_analysis.meta.title);
   // var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
-  // $("#analysis_time").html(time);
-  // $("#analysis_artist").html(audio_analysis.meta.artist);
-  // $("#analysis_album").html(audio_analysis.meta.album);
-  // $("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
+  // document.querySelector("#analysis_time").html(time);
+  // document.querySelector("#analysis_artist").html(audio_analysis.meta.artist);
+  // document.querySelector("#analysis_album").html(audio_analysis.meta.album);
+  // document.querySelector("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
   // var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  // $("#analysis_key").html(keys[audio_analysis.track.key]);
+  // document.querySelector("#analysis_key").html(keys[audio_analysis.track.key]);
   // var modes = ["Minor", "Major"];
-  // $("#analysis_mode").html(modes[audio_analysis.track.mode]);
-  // $("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
-  // $("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
-  // $("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
+  // document.querySelector("#analysis_mode").html(modes[audio_analysis.track.mode]);
+  // document.querySelector("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
+  // document.querySelector("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
+  // document.querySelector("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
   document.getElementById("analysis_info").classList.remove("hidden");
 }
 
@@ -153,15 +155,15 @@ function startHack() {
   processAnalysis(current_hack.audio_analysis);
 }
 
-$(document).ready(function () {
-  registerFileDragDrop(
-    document.getElementById("new_song"),
-    document.getElementById("new_song"),
-    startHackSong,
-  );
-  registerFileDragDrop(
-    document.getElementById("song_json"),
-    document.getElementById("song_json"),
-    startHackJSON,
-  );
-});
+
+registerFileDragDrop(
+  document.getElementById("new_song"),
+  document.getElementById("new_song"),
+  startHackSong,
+);
+registerFileDragDrop(
+  document.getElementById("song_json"),
+  document.getElementById("song_json"),
+  startHackJSON,
+);
+
