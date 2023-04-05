@@ -96,11 +96,18 @@ function fileInputListener(selector: string, callback: (file: File) => void) {
     }
   });
 }
+
+const originalAudioElem = document.querySelector(
+  "#original_audio",
+) as HTMLAudioElement;
+
+const outputAudioElem = document.getElementById(
+  "output_audio",
+)! as HTMLAudioElement;
+
 class App {
   songInputElem = document.querySelector("#song_input") as HTMLInputElement;
-  originalAudioElem = document.querySelector(
-    "#original_audio",
-  ) as HTMLAudioElement;
+  originalAudioElem = originalAudioElem;
   beatListElem = document.querySelector("#beat_list") as HTMLTextAreaElement;
 
   songData?: SongData;
@@ -123,6 +130,7 @@ class App {
     buttonListener("#clear_beats", () => this.songData.clearBeats());
     buttonListener("#play_from_final_beat", () => {
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      outputAudioElem.pause();
       this.originalAudioElem.play();
       button("#add_beat").focus();
     });
@@ -255,13 +263,11 @@ function hackSong(data) {
         .getElementById("download_button")!
         .addEventListener("click", saveFile);
 
-      const outputAudioElem = document.getElementById(
-        "output_audio",
-      )! as HTMLAudioElement;
       outputAudioElem.src = hackedSongBlobURL;
       if (
         (document.getElementById("autoplay_hack")! as HTMLInputElement).checked
       ) {
+        originalAudioElem.pause();
         outputAudioElem.play();
       }
       //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");

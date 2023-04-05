@@ -49,7 +49,7 @@ body {
   height: 40%;
 }
 
-#output_audio {
+audio {
   width: 75%;
 }
 
