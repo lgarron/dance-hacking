@@ -44,7 +44,18 @@ class SongData {
   }
 
   updateDisplay() {
-    this.displayElem.textContent = JSON.stringify(this.songData.beats);
+    const beats = this.songData.beats;
+    const avg_bpm =
+      beats.length > 2
+        ? ` (${
+            Math.round(
+              (((beats.length - 2) * 60) / (beats.at(-1)[0] - beats.at(0)[0])) *
+                10,
+            ) / 10
+          } average bpm)`
+        : "";
+    this.displayElem.textContent = `${beats.length} beats${avg_bpm}
+${JSON.stringify(beats)}`;
   }
 
   addBeat(timestamp: Milliseconds) {
