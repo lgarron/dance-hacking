@@ -1,5 +1,6 @@
 import { hackData } from "./beatcaster.js";
 import { current_hack } from "./current_hack.js";
+import { registerFileDragDrop } from "./drag-drop-file.js";
 import { createWaveFileData } from "./wav.js";
 
 function displayString(str) {
