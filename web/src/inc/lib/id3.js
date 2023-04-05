@@ -1270,7 +1270,7 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
     "\u00a9grp": ["grouping"],
     keyw: ["keyword"],
     "\u00a9lyr": ["lyrics"],
-    "\u00a9gen": ["genre"],
+    // "\u00a9gen": ["genre"],
   };
   ID4.loadData = function (data, callback) {
     data.loadRange([0, 7], function () {

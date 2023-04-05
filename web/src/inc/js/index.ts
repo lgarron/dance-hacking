@@ -28,9 +28,9 @@ function rehack() {
 function display_analysis(audio_analysis) {
   document
     .querySelector("#output_text")
-    .setAttribute("value", JSON.stringify(audio_analysis, null, 2))
-    // .fadeOut(0)
-    // .fadeIn(400); // TODO
+    .setAttribute("value", JSON.stringify(audio_analysis, null, 2));
+  // .fadeOut(0)
+  // .fadeIn(400); // TODO
   // document.querySelector("#analysis_title").html(audio_analysis.meta.title);
   // var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
   // document.querySelector("#analysis_time").html(time);
@@ -156,7 +156,6 @@ function startHack() {
   processAnalysis(current_hack.audio_analysis);
 }
 
-
 registerFileDragDrop(
   document.getElementById("new_song"),
   document.getElementById("new_song"),
@@ -167,4 +166,3 @@ registerFileDragDrop(
   document.getElementById("song_json"),
   startHackJSON,
 );
-

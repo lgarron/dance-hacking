@@ -1,3 +1,7 @@
+.PHONY: dev
+dev:
+	bun script/dev.ts
+
 
 SFTP_PATH = "towns.dreamhost.com:~/garron.net/app/old-dancehack.com/"
 URL       = "https://garron.net/app/old-dancehack.com/"
