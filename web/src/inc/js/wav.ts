@@ -3,19 +3,19 @@
 // Based on audiojedit.js
 
 export const createWaveFileData = (function () {
-  var writeString = function (s, a, offset) {
-    for (var i = 0; i < s.length; ++i) {
+  const writeString = function (s, a, offset) {
+    for (let i = 0; i < s.length; ++i) {
       a[offset + i] = s.charCodeAt(i);
     }
   };
 
-  var writeInt16 = function (n, a, offset) {
+  const writeInt16 = function (n, a, offset) {
     n = n | 0;
     a[offset + 0] = n & 255;
     a[offset + 1] = (n >> 8) & 255;
   };
 
-  var writeInt32 = function (n, a, offset) {
+  const writeInt32 = function (n, a, offset) {
     n = n | 0;
     a[offset + 0] = n & 255;
     a[offset + 1] = (n >> 8) & 255;
@@ -23,14 +23,14 @@ export const createWaveFileData = (function () {
     a[offset + 3] = (n >> 24) & 255;
   };
 
-  var writeAudioBuffer = function (audioBuffer, a, offset) {
-    var n = audioBuffer.length,
-      bufferL = audioBuffer.getChannelData(0),
-      sampleL,
-      bufferR = audioBuffer.getChannelData(1),
-      sampleR;
+  const writeAudioBuffer = function (audioBuffer, a, offset) {
+    const n = audioBuffer.length;
+    const bufferL = audioBuffer.getChannelData(0);
+    let sampleL;
+    const bufferR = audioBuffer.getChannelData(1);
+    let sampleR;
 
-    for (var i = 0; i < n; ++i) {
+    for (let i = 0; i < n; ++i) {
       sampleL = bufferL[i] * 32768.0;
       sampleR = bufferR[i] * 32768.0;
 
@@ -55,24 +55,26 @@ export const createWaveFileData = (function () {
     }
   };
 
-  var handle = {};
+  const handle = {};
   handle["copy"] = function (audioBuffer, a, offset, beat, overlap) {
-    var n = audioBuffer.length,
-      bufferL = audioBuffer.getChannelData(0),
-      sampleL,
-      bufferR = audioBuffer.getChannelData(1),
-      sampleR;
+    const n = audioBuffer.length;
+    const bufferL = audioBuffer.getChannelData(0);
+    let sampleL;
+    const bufferR = audioBuffer.getChannelData(1);
+    let sampleR;
 
     // console.log(beat);
-    var startSample = Math.floor(
+    const startSample = Math.floor(
       audioBuffer.sampleRate * beat["segment"]["start"],
     );
     // console.log(audioBuffer.sampleRate);
     // console.log(beat["segment"]["start"]);
-    var endSample = Math.floor(audioBuffer.sampleRate * beat["segment"]["end"]);
+    const endSample = Math.floor(
+      audioBuffer.sampleRate * beat["segment"]["end"],
+    );
     //console.log(startSample);
     // console.log(endSample);
-    for (var i = startSample; i < endSample; ++i) {
+    for (let i = startSample; i < endSample; ++i) {
       sampleL = bufferL[i] * 32768.0;
       sampleR = bufferR[i] * 32768.0;
 
@@ -99,13 +101,13 @@ export const createWaveFileData = (function () {
   };
 
   handle["blend"] = function (audioBuffer, a, offset, beat, overlap) {
-    var n = audioBuffer.length,
-      bufferL = audioBuffer.getChannelData(0),
-      sampleL,
-      bufferR = audioBuffer.getChannelData(1),
-      sampleR;
+    const n = audioBuffer.length;
+    const bufferL = audioBuffer.getChannelData(0);
+    let sampleL;
+    const bufferR = audioBuffer.getChannelData(1);
+    let sampleR;
 
-    var num_overlap_samples = Math.floor(
+    const num_overlap_samples = Math.floor(
       audioBuffer.sampleRate *
         overlap *
         Math.min(
@@ -131,26 +133,26 @@ export const createWaveFileData = (function () {
     );
 
     //console.log(num_overlap_samples);
-    for (var i = 0; i < num_overlap_samples; ++i) {
-      var sample1L =
+    for (let i = 0; i < num_overlap_samples; ++i) {
+      const sample1L =
         bufferL[
           Math.floor(audioBuffer.sampleRate * beat["segment1"]["end"]) -
             num_overlap_samples +
             i
         ] * 32768.0;
-      var sample1R =
+      const sample1R =
         bufferR[
           Math.floor(audioBuffer.sampleRate * beat["segment1"]["end"]) -
             num_overlap_samples +
             i
         ] * 32768.0;
-      var sample2L =
+      const sample2L =
         bufferL[
           Math.floor(audioBuffer.sampleRate * beat["segment2"]["end"]) -
             num_overlap_samples +
             i
         ] * 32768.0;
-      var sample2R =
+      const sample2R =
         bufferR[
           Math.floor(audioBuffer.sampleRate * beat["segment2"]["end"]) -
             num_overlap_samples +
@@ -158,10 +160,10 @@ export const createWaveFileData = (function () {
         ] * 32768.0;
 
       //console.log(sample1L);
-      var s2_weight = i / num_overlap_samples;
+      const s2_weight = i / num_overlap_samples;
 
-      var s1_scale = Math.pow(1 - s2_weight, 0.5);
-      var s2_scale = Math.pow(s2_weight, 0.5);
+      const s1_scale = Math.pow(1 - s2_weight, 0.5);
+      const s2_scale = Math.pow(s2_weight, 0.5);
 
       sampleL = sample1L * s1_scale + sample2L * s2_scale;
       sampleR = sample1R * s1_scale + sample2R * s2_scale;
@@ -188,25 +190,25 @@ export const createWaveFileData = (function () {
     return offset;
   };
 
-  return function (audioBuffer, hackData, progressCallback) {
-    var inputFrameLength = audioBuffer.length,
-      outputFrameLength = hackData["num_samples"],
-      numberOfChannels = audioBuffer.numberOfChannels,
-      sampleRate = audioBuffer.sampleRate,
-      bitsPerSample = 16,
-      byteRate = (sampleRate * numberOfChannels * bitsPerSample) / 8,
-      blockAlign = (numberOfChannels * bitsPerSample) / 8,
-      wavDataByteLength = outputFrameLength * numberOfChannels * 2,
-      // 16-bit audio
-      headerByteLength = 44,
-      totalLength = headerByteLength + wavDataByteLength,
-      waveFileData = new Uint8Array(totalLength),
-      subChunk1Size = 16,
-      // for linear PCM
-      subChunk2Size = wavDataByteLength,
-      chunkSize = 4 + (8 + subChunk1Size) + (8 + subChunk2Size);
+  return function (audioBuffer, hackData) {
+    const inputFrameLength = audioBuffer.length;
+    const outputFrameLength = hackData["num_samples"];
+    const numberOfChannels = audioBuffer.numberOfChannels;
+    const sampleRate = audioBuffer.sampleRate;
+    const bitsPerSample = 16;
+    const byteRate = (sampleRate * numberOfChannels * bitsPerSample) / 8;
+    const blockAlign = (numberOfChannels * bitsPerSample) / 8;
+    const wavDataByteLength = outputFrameLength * numberOfChannels * 2;
+    // 16-bit audio
+    const headerByteLength = 44;
+    const totalLength = headerByteLength + wavDataByteLength;
+    const waveFileData = new Uint8Array(totalLength);
+    const subChunk1Size = 16;
+    // for linear PCM
+    const subChunk2Size = wavDataByteLength;
+    const chunkSize = 4 + (8 + subChunk1Size) + (8 + subChunk2Size);
 
-    var overlap = hackData["overlap"];
+    const overlap = hackData["overlap"];
     //console.log(overlap);
 
     writeString("RIFF", waveFileData, 0);
@@ -225,11 +227,11 @@ export const createWaveFileData = (function () {
     writeInt32(subChunk2Size, waveFileData, 40); // SubChunk2Size (4)
 
     // Write actual audio data starting at offset 44.
-    var segments = hackData["segments"];
-    var offset = 44;
-    for (var i = 0; i < segments.length; i++) {
+    const segments = hackData["segments"];
+    let offset = 44;
+    for (let i = 0; i < segments.length; i++) {
       //console.log("Loop #" + i);
-      var fn = handle[segments[i]["kind"]];
+      const fn = handle[segments[i]["kind"]];
       offset = fn(audioBuffer, waveFileData, offset, segments[i], overlap);
     }
 

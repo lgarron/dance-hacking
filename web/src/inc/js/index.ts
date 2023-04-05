@@ -3,7 +3,7 @@ import { FileAPIReader, getAllTags, loadTags, Base64 } from "../lib/id3.js";
 import { hackData } from "./beatcaster.js";
 import { current_hack } from "./current_hack";
 import { registerFileDragDrop } from "./drag-drop-file";
-import { createWaveFileData } from "./wav.js";
+import { createWaveFileData } from "./wav";
 
 function displayString(str) {
   console.log(str);
