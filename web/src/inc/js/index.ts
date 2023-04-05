@@ -3,6 +3,7 @@ type SongBeatData = any[];
 interface StoredSongData {
   fileName: string;
   beats?: SongBeatData;
+  formatVersion: number;
 }
 
 type Milliseconds = number;
@@ -35,7 +36,8 @@ class SongData {
       : {
           fileName: file.name,
           beats: [],
-        };
+          formatVersion: 1
+        } satisfies StoredSongData;
     return new SongData(file, localStorageKey, displayElem, songData);
   }
 
@@ -154,7 +156,6 @@ class App {
 
     buttonListener("#save_beats", () => {
       const songData = this.songData.songData!;
-      console.log({ songData });
       const buffer = new TextEncoder().encode(JSON.stringify(songData));
       const url = URL.createObjectURL(
         new Blob([buffer], { type: "text/plain" }),
