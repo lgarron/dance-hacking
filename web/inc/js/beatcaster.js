@@ -59,20 +59,21 @@ var beatcaster = (function() {
 
   function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
     try {
+      current_hack.downloadFileName = current_hack.file.name + " (" + document.getElementById("beat_pattern").value + " pattern, " + document.getElementById("overlap").value + "% overlap)";
       //log("Datafying-hack data.");
       beats_per_bar = beatsPerBar(pattern);
 
       var hack_data = [];
 
       var beat_type = (tatumsQ ? "tatums" : "beats");
-      var beats = audio_analysis[beat_type];
+      var beats = audio_analysis;
 
       // Number of samples in the hacked song.
       var num_samples = 0;
 
       // Returns the j-th beat of the i-th bar (0-indexed).
       function beat_start(i, j) {
-        return beats[i * beats_per_bar + j]["start"];
+        return beats[i * beats_per_bar + j][0];
       }
 
       function samplesBetweenTimes(t1, t2) {

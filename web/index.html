@@ -23,7 +23,8 @@
 <center>
 <h1 id="title">Waltzify! <sup style="font-size: 50%; font-variant: small-caps;">Very Beta</sup></h1>
 
-<div id="new_song">Drag and drop a song here!</div>
+<div id="new_song">Drag and drop a song file here!</div>
+<div id="song_json">Drag and drop a JSON file here!</div>
 <!--input type="file" name="track" id="track" onchange=""><br-->
 
 <div id="output_bpm">No output yet...</div>
@@ -43,8 +44,8 @@
   <button id="rehack_button">Re-hack</button><br><br>
 </div>
 
-<input id="beat_type_tatums" type="checkbox">
-<label for="beat_type_tatums">Use tatums (divide beats in half)</label>
+<input id="beat_type_tatums" type="checkbox" hidden>
+<label for="beat_type_tatums" hidden>Use tatums (divide beats in half)</label>
 <input id="autoplay_hack" type="checkbox">
 <label for="autoplay_hack">Start playing immediately</label>
 <br>
@@ -53,9 +54,6 @@
 
 <textarea id="output_text">[Full analysis will appear here.]</textarea>
 
-<br>
-Thanks to the <a href="http://the.echonest.com/">Echonest</a> <a href="http://developer.echonest.com/docs/v4/track.html">Track API</a>.<br>
-Only tested in Google Chrome.<br>
 </center>
 </div></div>
 

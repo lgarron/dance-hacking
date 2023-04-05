@@ -13,7 +13,8 @@ function displayString(str) {
 }
 
 function saveFile() {
-  var fileName = current_hack.audio_analysis.meta.title;
+  console.log(current_hack.file)
+  var fileName = current_hack.downloadFileName;
   if(fileName === "") {
     fileName = "Song";
   }
@@ -27,26 +28,26 @@ function rehack() {
 
 function display_analysis (audio_analysis) {
   $("#output_text").attr("value", JSON.stringify(audio_analysis, null, 2)).fadeOut(0).fadeIn(400);
-  $("#analysis_title").html(audio_analysis.meta.title);
-  var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
-  $("#analysis_time").html(time);
-  $("#analysis_artist").html(audio_analysis.meta.artist);
-  $("#analysis_album").html(audio_analysis.meta.album);
-  $("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
-  var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  $("#analysis_key").html(keys[audio_analysis.track.key]);
-  var modes = ["Minor", "Major"];
-  $("#analysis_mode").html(modes[audio_analysis.track.mode]);
-  $("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
-  $("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
-  $("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
+  // $("#analysis_title").html(audio_analysis.meta.title);
+  // var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
+  // $("#analysis_time").html(time);
+  // $("#analysis_artist").html(audio_analysis.meta.artist);
+  // $("#analysis_album").html(audio_analysis.meta.album);
+  // $("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
+  // var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+  // $("#analysis_key").html(keys[audio_analysis.track.key]);
+  // var modes = ["Minor", "Major"];
+  // $("#analysis_mode").html(modes[audio_analysis.track.mode]);
+  // $("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
+  // $("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
+  // $("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
   document.getElementById("analysis_info").classList.remove("hidden");
 
 }
 
 function hackSong(data) {
 
-  var context = new webkitAudioContext();
+  var context = new AudioContext();
   context.decodeAudioData(data, function(buffer) {
 
     current_hack.hack_data = beatcaster.hackData(
@@ -72,6 +73,7 @@ function hackSong(data) {
     }
     //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
     document.getElementById("new_song").classList.add("hidden");
+    document.getElementById("song_json").classList.add("hidden");
     document.getElementById("output_bpm").classList.add("hidden");
     
     document.getElementById("rehack_button").addEventListener("click", rehack);
@@ -87,7 +89,7 @@ function processAnalysis(audio_analysis) {
 
   current_hack.audio_analysis = audio_analysis;
   display_analysis(audio_analysis);
-  displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
+  // displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
 
   var reader = new FileReader();
@@ -123,21 +125,27 @@ function setBackground(file) {
   });
 }
 
-function startHack(file) {
-  current_hack.file = file;
+function startHackSong(file) {
+  current_hack.file = file
+  startHack()
+}
+async function startHackJSON(file) {
+  current_hack.audio_analysis = JSON.parse(await file.text())
+  startHack()
+}
+
+function startHack() {
+  if (!(current_hack.file && current_hack.audio_analysis)) {
+    return;
+  }
 
   try {setBackground(current_hack.file); }
   catch (e) {console.log(e); }
 
-  try {
-    var echonest = echonestAnalysis(file);
-    echonest.setProgressCallback(displayString);
-    echonest.go(processAnalysis);
-  } catch(e) {
-    console.log(e);
-  }
+  processAnalysis(current_hack.audio_analysis)
 }
 
 $(document).ready(function() {
-  registerFileDragDrop(document.body, document.getElementById("new_song"), startHack);
+  registerFileDragDrop(document.getElementById("new_song"), document.getElementById("new_song"), startHackSong);
+  registerFileDragDrop(document.getElementById("song_json"), document.getElementById("song_json"), startHackJSON);
 });

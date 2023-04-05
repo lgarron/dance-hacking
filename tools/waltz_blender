@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # Usage ./waltz_blender.py file.wav beats.json
 # Usage ./waltz_blender.py file.wav beats.json "12[34]" 100 0 4
@@ -29,8 +29,8 @@ import wave, binascii, json, sys, struct, math
 in_file_name = sys.argv[1]
 beats_file_name = sys.argv[2]
 
-print "in_file_name:", in_file_name
-print "beats_file_name:", beats_file_name
+print ("in_file_name:", in_file_name)
+print ("beats_file_name:", beats_file_name)
 
 overlap_ratio = DEFAULT_OVERLAP_RATIO
 pattern = DEFAULT_PATTERN
@@ -67,13 +67,13 @@ def hack(b, c):
 		elif pattern[i] == "[":
 			p3 = pattern[i+3]
 			if p3 != "]":
-				print "WARNING: Pattern is irregular. No closing ] at position " + str(i+3)
+				print ("WARNING: Pattern is irregular. No closing ] at position " + str(i+3))
 			p1 = int(pattern[i+1])
 			p2 = int(pattern[i+2])
 			b(p1, p2)
 			i += 3
 		else:
-			print "WARNING: Pattern is irregular at position " + str(i)
+			print ("WARNING: Pattern is irregular at position " + str(i))
 		i += 1
 
 
@@ -99,10 +99,10 @@ if not(beats_per_bar_was_specified):
 
 
 
-print "Pattern:", pattern
-print "Beats per bar:", beats_per_bar
-print "Overlap Ratio:", overlap_ratio
-print "Beats Shifted:", beats_shift
+print ("Pattern:", pattern)
+print ("Beats per bar:", beats_per_bar)
+print ("Overlap Ratio:", overlap_ratio)
+print ("Beats Shifted:", beats_shift)
 
 
 out_file_name = in_file_name
@@ -133,7 +133,7 @@ elif type(analysis_data) == dict:
 	for i in range(len(b)):
 		beats.append([b[i]["start"]])
 else:
-	print "WARNING: Unknown beat data format."
+	print ("WARNING: Unknown beat data format.")
 
 beats_in.close()
 
@@ -145,10 +145,10 @@ print(file_in.getparams())
 
 # Make sure the file is okay.
 if (file_in.getnchannels() != 2):
-	print "WARNING: Input file has", file_in.getnchannels(), "channels. Support is only for 2 channels right now."
+	print ("WARNING: Input file has", file_in.getnchannels(), "channels. Support is only for 2 channels right now.")
 
 if (file_in.getsampwidth() != 2):
-	print "WARNING: Input file has", file_in.getsampwidth(), "bytes per sample. Only 16-bit (2 bytes) supported is supported right now."
+	print ("WARNING: Input file has", file_in.getsampwidth(), "bytes per sample. Only 16-bit (2 bytes) supported is supported right now.")
 
 
 # Frames of audio data per second.
@@ -203,7 +203,7 @@ hack_data.append({
 
 
 
-num_bars = len(beats)/beats_per_bar - 1
+num_bars = len(beats)//beats_per_bar - 1
 for i in range(num_bars):
 
 	def b(j, k): blend_beats(i, j, k)
@@ -264,7 +264,7 @@ def _blend(seg):
 	file_in.setpos(seg["segment2"]["end"] - num_overlap_samples)
 	frames2 = file_in.readframes(num_overlap_samples)
 	
-	out_blend = ""
+	out_blend = b""
 
 	def clip(i):
 		return max(-32768, min(32767, math.trunc(i)))
@@ -314,4 +314,4 @@ for seg in hack_data:
 file_in.close()
 file_out.close()
 
-print "Done with " + out_file_name + "."
+print ("Done with " + out_file_name + ".")

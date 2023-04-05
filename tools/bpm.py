@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 import os, argparse, math, json
 
@@ -11,14 +11,14 @@ args = parser.parse_args()
 def mean(type, v):
   total = 0.0
   for i in range(1, len(v)-1):
-    total += v[i+1][0]- v[i][0];
+    total += v[i+1][0]- v[i][0]
     if args.v:
-      print v[i+1][0], 60/(v[i+1][0]- v[i][0])
+      print (v[i+1][0], 60/(v[i+1][0]- v[i][0]))
 
   meanBeatLength = total / (len(v) - 2)
   meanBeatTempo = 60. / meanBeatLength
 
-  print "manual BPM", round(meanBeatTempo, 1)
+  print( "manual BPM", round(meanBeatTempo, 1))
 
 try:
   
@@ -27,8 +27,8 @@ try:
   if type(analysis) == dict and type(analysis["track"]) == dict:
     confidence = analysis["track"]["tempo_confidence"]
     bpm = round(analysis["track"]["tempo"], 1)
-    print "with confidence", confidence, ", BPM", bpm
+    print( "with confidence", confidence, ", BPM", bpm)
   else:
     mean("beats", analysis)
 except:
-  print "BPM could not be determined."
+  print ("BPM could not be determined.")
