@@ -1,33 +1,33 @@
 import { saveAs } from "../lib/FileSaver.js";
-import { FileAPIReader, getAllTags, loadTags } from "../lib/id3.js";
+import { FileAPIReader, getAllTags, loadTags, Base64 } from "../lib/id3.js";
 import { hackData } from "./beatcaster.js";
-import { current_hack } from "./current_hack.js";
+import { current_hack } from "./current_hack";
 import { registerFileDragDrop } from "./drag-drop-file.js";
 import { createWaveFileData } from "./wav.js";
 
 function displayString(str) {
   console.log(str);
-  document.querySelector("#output_bpm").textContent = str;
+  document.querySelector("#output_bpm")!.textContent = str;
   // .stop().fadeOut(0).html(str).fadeIn(100); // TODO
 }
 
 function saveFile() {
   console.log(current_hack.file);
-  var fileName = current_hack.downloadFileName;
+  let fileName = current_hack.downloadFileName;
   if (fileName === "") {
     fileName = "Song";
   }
-  var extension = ".wav";
+  const extension = ".wav";
   saveAs(current_hack.blob, fileName + extension);
 }
 
 function rehack() {
-  current_hack.file && startHack(current_hack.file);
+  current_hack.file && startHack();
 }
 
 function display_analysis(audio_analysis) {
   document
-    .querySelector("#output_text")
+    .querySelector("#output_text")!
     .setAttribute("value", JSON.stringify(audio_analysis, null, 2));
   // .fadeOut(0)
   // .fadeIn(400); // TODO
@@ -44,44 +44,54 @@ function display_analysis(audio_analysis) {
   // document.querySelector("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
   // document.querySelector("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
   // document.querySelector("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
-  document.getElementById("analysis_info").classList.remove("hidden");
+  document.getElementById("analysis_info")!.classList.remove("hidden");
 }
 
 function hackSong(data) {
-  var context = new AudioContext();
+  const context = new AudioContext();
   context.decodeAudioData(
     data,
     function (buffer) {
       current_hack.hack_data = hackData(
         buffer,
         current_hack.audio_analysis,
-        document.getElementById("beat_pattern").value,
-        document.getElementById("overlap").value / 100,
-        document.getElementById("beat_type_tatums").checked,
+        (document.getElementById("beat_pattern")! as HTMLInputElement).value,
+        parseInt(
+          (document.getElementById("overlap")! as HTMLInputElement).value,
+        ) / 100,
+        (document.getElementById("beat_type_tatums")! as HTMLInputElement)
+          .checked,
       );
 
-      var w = createWaveFileData(buffer, current_hack.hack_data);
+      const w = createWaveFileData(buffer, current_hack.hack_data);
       current_hack.blob = new Blob([w]);
-      var hackedSongBlobURL = webkitURL.createObjectURL(current_hack.blob);
+      const hackedSongBlobURL = webkitURL.createObjectURL(current_hack.blob);
 
       // Update UI
 
-      document.getElementById("download_button_div").classList.remove("hidden");
       document
-        .getElementById("download_button")
+        .getElementById("download_button_div")!
+        .classList.remove("hidden");
+      document
+        .getElementById("download_button")!
         .addEventListener("click", saveFile);
 
-      document.getElementById("output_audio").src = hackedSongBlobURL;
-      if (document.getElementById("autoplay_hack").checked) {
-        document.getElementById("output_audio").play();
+      const outputAudioElem = document.getElementById(
+        "output_audio",
+      )! as HTMLAudioElement;
+      outputAudioElem.src = hackedSongBlobURL;
+      if (
+        (document.getElementById("autoplay_hack")! as HTMLInputElement).checked
+      ) {
+        outputAudioElem.play();
       }
       //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
-      document.getElementById("new_song").classList.add("hidden");
-      document.getElementById("song_json").classList.add("hidden");
-      document.getElementById("output_bpm").classList.add("hidden");
+      document.getElementById("new_song")!.classList.add("hidden");
+      document.getElementById("song_json")!.classList.add("hidden");
+      document.getElementById("output_bpm")!.classList.add("hidden");
 
       document
-        .getElementById("rehack_button")
+        .getElementById("rehack_button")!
         .addEventListener("click", rehack);
     },
     function (e) {
@@ -97,10 +107,10 @@ function processAnalysis(audio_analysis) {
   // displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
 
-  var reader = new FileReader();
+  const reader = new FileReader();
 
   reader.onload = function (fileEvent) {
-    hackSong(fileEvent.target.result);
+    hackSong(fileEvent.target!.result);
   };
 
   reader.readAsArrayBuffer(current_hack.file);
@@ -111,17 +121,18 @@ function processAnalysis(audio_analysis) {
 // See original demo at https://github.com/aadsm/JavaScript-ID3-Reader/issues/3
 function setBackground(file) {
   console.log("Loading ID3 tags.");
-  var url = file.urn || file.name;
-  var reader = new FileAPIReader(file);
+  const url = file.urn || file.name;
+  const reader = new FileAPIReader(file);
   loadTags(
     url,
     function () {
       console.log("Loaded ID3 tags.");
-      var tags = getAllTags(url);
-      var image = tags.picture;
+      const tags = getAllTags(url);
+      const image = tags.picture;
       if (typeof image !== "undefined") {
-        document.body.background =
-          "data:" + image.format + ";base64," + Base64.encodeBytes(image.data);
+        document.body.style.background = `data:${
+          image.format
+        };base64,${Base64.encodeBytes(image.data)}`;
       } else {
         console.log("No image.");
       }
@@ -157,12 +168,12 @@ function startHack() {
 }
 
 registerFileDragDrop(
-  document.getElementById("new_song"),
-  document.getElementById("new_song"),
+  document.getElementById("new_song")!,
+  document.getElementById("new_song")!,
   startHackSong,
 );
 registerFileDragDrop(
-  document.getElementById("song_json"),
-  document.getElementById("song_json"),
+  document.getElementById("song_json")!,
+  document.getElementById("song_json")!,
   startHackJSON,
 );

@@ -1361,3 +1361,4 @@ function BinaryFile(strData, iDataOffset, iDataLength) {
 export const getAllTags = ID3.getAllTags;
 export const loadTags = ID3.loadTags;
 export const FileAPIReader = ns.FileAPIReader;
+export const Base64 = ns.Base64;
