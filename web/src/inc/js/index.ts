@@ -121,8 +121,14 @@ class App {
       this.songData.addBeat(this.originalAudioElem.currentTime),
     );
 
-    buttonListener("#rewind_beats", () => {
+    buttonListener("#rewind_4_beats", () => {
       this.songData.deleteBeats(-4, 4);
+      this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      button("#add_beat").focus();
+    });
+
+    buttonListener("#rewind_1_beat", () => {
+      this.songData.deleteBeats(-1, 1);
       this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
       button("#add_beat").focus();
     });
