@@ -1,10 +1,12 @@
 {
   "type": "module",
   "devDependencies": {
-    "barely-a-dev-server": "^0.4.12"
+    "@biomejs/biome": "^1.9.4",
+    "@cubing/deploy": "^0.1.4",
+    "barely-a-dev-server": "^0.7.1",
+    "esbuild": "^0.25.0"
   },
-  "scripts": {
-    "lint": "npx rome check ./src",
-    "format": "npx rome format ./src"
+  "@cubing/deploy": {
+    "https://garron.net/app/dance-hacker/": {}
   }
 }

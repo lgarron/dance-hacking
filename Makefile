@@ -6,19 +6,22 @@ dev:
 build:
 	node script/build.js
 
-DEPLOY_SITE_PATH   = garron.net/app/dance-hacker/
-DEPLOY_SOURCE_PATH = "./dist/${DEPLOY_SITE_PATH}"
-DEPLOY_SFTP_PATH   = "towns.dreamhost.com:~/${DEPLOY_SITE_PATH}"
-
-.PHONY: deploy
+.PHOHY: deploy
 deploy: build
-	rsync -avz \
-		--exclude .DS_Store \
-		--exclude .git \
-		${DEPLOY_SOURCE_PATH} \
-		${DEPLOY_SFTP_PATH}
-	echo "\nDone deploying. Go to https://${DEPLOY_SITE_PATH}\n"
+	bun x @cubing/deploy
 
 .PHONY: clean
 clean:
 	rm -rf ./dist
+
+.PHONY: setup
+setup:
+	bun install
+
+.PHONY: lint
+lint:
+	bun x @biomejs/biome check ./script ./src
+	
+.PHONY: format
+format:
+	npx @biomejs/biome format --write ./script ./src
