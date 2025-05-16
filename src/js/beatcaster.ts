@@ -8,16 +8,21 @@ function hack(pattern, blend, copy) {
   //log("Hack-b-c");
   let i = 0;
   while (i < pattern.length) {
-    if (isNumber(pattern[i])) {
-      const p = parseFloat(pattern[i]);
+    if (
+      isNumber(pattern[i]) ||
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".includes(
+        pattern[i],
+      )
+    ) {
+      const p = parseInt(pattern[i]) || parseInt(pattern[i], 26) - 9;
       copy(p);
     } else if (pattern[i] === "[") {
       const p3 = pattern[i + 3];
       if (p3 !== "]") {
         log(`WARNING: Pattern is irregular. No closing ] at position ${i}${3}`);
       }
-      const p1 = parseFloat(pattern[i + 1]);
-      const p2 = parseFloat(pattern[i + 2]);
+      const p1 = parseInt(pattern[i + 1]) || parseInt(pattern[i + 1], 26) - 9;
+      const p2 = parseInt(pattern[i + 2]) || parseInt(pattern[i + 2], 26) - 9;
       blend(p1, p2);
       i += 3;
     } else {
@@ -32,7 +37,7 @@ function hack(pattern, blend, copy) {
 // From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
 
 function isNumber(n) {
-  return !isNaN(parseFloat(n)) && isFinite(n);
+  return !isNaN(parseInt(n)) && isFinite(n);
 }
 
 function beatsPerBar(pattern) {
@@ -79,6 +84,7 @@ type HackDataEntry =
     };
 
 export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
+  console.log({ pattern });
   // Number of samples in the hacked song.
   let num_samples = 0;
   const hack_data: HackDataEntry[] = [];
