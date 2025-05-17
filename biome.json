@@ -2,7 +2,13 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["./node_modules/@cubing/dev-config/biome/biome.json"],
   "files": {
-    "includes": ["**", "!dist", "!package.json"]
+    "includes": [
+      "**",
+      "!dist",
+      "!package.json",
+      "!src/vendor/FileSaver.ts",
+      "!src/vendor/id3.ts"
+    ]
   },
   "linter": {
     "rules": {
@@ -15,9 +21,12 @@
         "useConst": "error",
         "useSingleVarDeclarator": "error",
         "noUnusedTemplateLiteral": "error",
-        "useNumberNamespace": "error",
         "noInferrableTypes": "error",
-        "noUselessElse": "error"
+        "noUselessElse": "error",
+        "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "useArrowFunction": "off"
       }
     }
   }

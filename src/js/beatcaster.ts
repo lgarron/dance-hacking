@@ -1,16 +1,26 @@
 import { current_hack } from "./current_hack.js";
+import type {
+  HackData,
+  HackPatternString,
+  HackSpecBeat,
+  Milliseconds,
+  SongBeatData,
+} from "./types.js";
 
-function log(str) {
+function log(str: string) {
   console.log(`[Beatcaster] ${str}`);
 }
 
-function hack(pattern, blend, copy) {
+function hack(
+  pattern: HackPatternString,
+  blend: (p1: number, p2: number) => void,
+  copy: (p: number) => void,
+) {
   //log("Hack-b-c");
   let i = 0;
   while (i < pattern.length) {
     if (
-      isNumber(pattern[i]) ||
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".includes(
+      "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".includes(
         pattern[i],
       )
     ) {
@@ -34,27 +44,21 @@ function hack(pattern, blend, copy) {
   }
 }
 
-// From http://stackoverflow.com/questions/18082/validate-numbers-in-javascript-isnumeric
-
-function isNumber(n) {
-  return !isNaN(parseInt(n)) && isFinite(n);
-}
-
-function beatsPerBar(pattern) {
+function beatsPerBar(pattern: HackPatternString) {
   let max_beat_index = 0;
 
-  function update_max_beat_index(i) {
+  function update_max_beat_index(i: number) {
     if (i > max_beat_index) {
       max_beat_index = i;
     }
   }
 
-  function update_max_beat_index_b(j, k) {
+  function update_max_beat_index_b(j: number, k: number) {
     update_max_beat_index(j);
     update_max_beat_index(k);
   }
 
-  function update_max_beat_index_c(j) {
+  function update_max_beat_index_c(j: number) {
     update_max_beat_index(j);
   }
 
@@ -63,33 +67,18 @@ function beatsPerBar(pattern) {
   return max_beat_index;
 }
 
-type HackDataEntry =
-  | {
-      kind: "copy";
-      segment: {
-        start: number;
-        end: number;
-      };
-    }
-  | {
-      kind: "blend";
-      segment1: {
-        start: number;
-        end: number;
-      };
-      segment2: {
-        start: number;
-        end: number;
-      };
-    };
-
-export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
+export function hackData(
+  audioData: AudioBuffer,
+  audio_analysis: SongBeatData,
+  pattern: HackPatternString,
+  overlap: number,
+): HackData {
   console.log({ pattern });
   // Number of samples in the hacked song.
   let num_samples = 0;
-  const hack_data: HackDataEntry[] = [];
+  const hack_data: HackSpecBeat[] = [];
   try {
-    current_hack.downloadFileName = `${current_hack.file.name} (${
+    current_hack.downloadFileName = `${current_hack.file!.name} (${
       (document.getElementById("beat_pattern") as HTMLInputElement).value
     } pattern, ${
       (document.getElementById("overlap") as HTMLInputElement).value
@@ -97,15 +86,14 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
     //log("Datafying-hack data.");
     const beats_per_bar = beatsPerBar(pattern);
 
-    const beat_type = tatumsQ ? "tatums" : "beats";
     const beats = audio_analysis;
 
     // Returns the j-th beat of the i-th bar (0-indexed).
-    function beat_start(i, j) {
+    function beat_start(i: number, j: number) {
       return beats[i * beats_per_bar + j][0];
     }
 
-    function samplesBetweenTimes(t1, t2) {
+    function samplesBetweenTimes(t1: number, t2: number) {
       // We must compute these separately, then subtract.
       // Else, we might risk rounding error.
       const sampleStart = Math.floor(t1 * audioData.sampleRate);
@@ -113,7 +101,7 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
       return sampleEnd - sampleStart;
     }
 
-    function hack_data_copy(timeStart, timeEnd) {
+    function hack_data_copy(timeStart: Milliseconds, timeEnd: Milliseconds) {
       hack_data.push({
         kind: "copy",
         segment: {
@@ -125,12 +113,12 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
       num_samples += samplesBetweenTimes(timeStart, timeEnd);
     }
 
-    function copy_beat(i, j) {
+    function copy_beat(i: number, j: number) {
       //log("copy_beat");
       hack_data_copy(beat_start(i, j - 1), beat_start(i, j));
     }
 
-    function blend_beats(i, j, k) {
+    function blend_beats(i: number, j: number, k: number) {
       //log("blend_beats");
       hack_data.push({
         kind: "blend",
@@ -159,11 +147,11 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
       //log("Bar #" + i);
 
       // Curry the bar index.
-      function blend(j, k) {
+      function blend(j: number, k: number) {
         return blend_beats(i, j, k);
       }
 
-      function copy(j) {
+      function copy(j: number) {
         return copy_beat(i, j);
       }
       hack(pattern, blend, copy);
@@ -174,7 +162,8 @@ export function hackData(audioData, audio_analysis, pattern, overlap, tatumsQ) {
 
     log("Done generating hack data!");
   } catch (e) {
-    log(e);
+    // biome-ignore lint/suspicious/noExplicitAny: TypeScript makes it a bit gnarly
+    log(e as any);
   }
 
   return {

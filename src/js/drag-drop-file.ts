@@ -1,4 +1,8 @@
-export function registerFileDragDrop(domElement, feedbackElement, callback) {
+export function registerFileDragDrop(
+  domElement: HTMLElement,
+  feedbackElement: HTMLElement,
+  callback: (file: File) => void,
+) {
   const css_classes = {
     over: "drag_drop_over",
     out: "drag_drop_out",
@@ -11,37 +15,37 @@ export function registerFileDragDrop(domElement, feedbackElement, callback) {
     done: "Got it!",
   };
 
-  function setDragDropVisualFeedback(type) {
+  function setDragDropVisualFeedback(type: "over" | "out" | "done") {
     feedbackElement.innerHTML = feedback_text[type];
     const cL = feedbackElement.classList;
-    for (const i in css_classes) {
-      cL.remove(css_classes[i]);
+    for (const className of Object.values(css_classes)) {
+      cL.remove(className);
     }
     feedbackElement.classList.add(css_classes[type]);
   }
 
-  function dragEnter(event) {
+  function dragEnter(event: DragEvent) {
     event.preventDefault();
     return true;
   }
 
-  function dragOver(event) {
+  function dragOver(event: DragEvent) {
     event.preventDefault();
     setDragDropVisualFeedback("over");
     return false;
   }
 
-  function dragLeave(event) {
+  function dragLeave(event: DragEvent) {
     event.preventDefault();
     setDragDropVisualFeedback("out");
     return false;
   }
 
-  function dragDrop(event) {
+  function dragDrop(event: DragEvent) {
     event.stopPropagation(); // Stops some browsers from redirecting.
     event.preventDefault();
     setDragDropVisualFeedback("done");
-    const src = event.dataTransfer.files[0];
+    const src = event.dataTransfer!.files[0];
     callback(src);
     return false;
   }

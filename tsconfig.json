@@ -1,8 +1,5 @@
+// tsconfig.json
 {
-  "compilerOptions": {
-    "lib": [
-      "dom",
-      "es2022"
-    ]
-  }
+  "extends": "./node_modules/@cubing/dev-config/ts/es2022-types/tsconfig.json",
+  "include": ["./src/"]
 }

@@ -21,7 +21,10 @@ export const saveAs = (function (view) {
     return view.URL || view.webkitURL || view;
   };
   const URL = view.URL || view.webkitURL || view;
-  const save_link = doc.createElementNS("http://www.w3.org/1999/xhtml", "a") as HTMLAnchorElement;
+  const save_link = doc.createElementNS(
+    "http://www.w3.org/1999/xhtml",
+    "a",
+  ) as HTMLAnchorElement;
   const can_use_save_link = "download" in save_link;
   const click = function (node) {
     const event = doc.createEvent("MouseEvents");
@@ -57,7 +60,7 @@ export const saveAs = (function (view) {
   };
   const force_saveable_type = "application/octet-stream";
   let fs_min_size = 0;
-  const deletion_queue: (string | {remove: () => void})[] = [];
+  const deletion_queue: (string | { remove: () => void })[] = [];
   const process_deletion_queue = function () {
     let i = deletion_queue.length;
     while (i--) {

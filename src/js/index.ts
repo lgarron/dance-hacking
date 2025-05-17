@@ -1,13 +1,3 @@
-type SongBeatData = any[];
-
-interface StoredSongData {
-  fileName: string;
-  beats?: SongBeatData;
-  formatVersion: number;
-}
-
-type Milliseconds = number;
-
 async function hashFile(file: File): Promise<string> {
   return buf2hex(
     await crypto.subtle.digest("SHA-256", await file.arrayBuffer()),
@@ -51,7 +41,8 @@ class SongData {
       beats.length > 2
         ? ` (${
             Math.round(
-              (((beats.length - 2) * 60) / (beats.at(-1)[0] - beats.at(0)[0])) *
+              (((beats.length - 2) * 60) /
+                (beats.at(-1)![0] - beats.at(0)![0])) *
                 10,
             ) / 10
           } average bpm)`
@@ -130,25 +121,37 @@ class App {
       this.setSongData(await SongData.fromFile(file, this.beatListElem));
     });
 
-    buttonListener("#add_beat", () =>
-      this.songData.addBeat(this.originalAudioElem.currentTime),
-    );
+    buttonListener("#add_beat", () => {
+      if (this.songData) {
+        this.songData.addBeat(this.originalAudioElem.currentTime);
+      }
+    });
 
     buttonListener("#rewind_4_beats", () => {
-      this.songData.deleteBeats(-4, 4);
-      this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      if (this.songData) {
+        this.songData.deleteBeats(-4, 4);
+        this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      }
       button("#add_beat").focus();
     });
 
     buttonListener("#rewind_1_beat", () => {
-      this.songData.deleteBeats(-1, 1);
-      this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      if (this.songData) {
+        this.songData.deleteBeats(-1, 1);
+        this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      }
       button("#add_beat").focus();
     });
 
-    buttonListener("#clear_beats", () => this.songData.clearBeats());
+    buttonListener("#clear_beats", () => {
+      if (this.songData) {
+        this.songData.clearBeats();
+      }
+    });
     buttonListener("#play_from_final_beat", () => {
-      this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      if (this.songData) {
+        this.originalAudioElem.currentTime = this.songData.lastBeatTimestamp();
+      }
       outputAudioElem.pause();
       this.originalAudioElem.play();
       button("#add_beat").focus();
@@ -157,15 +160,17 @@ class App {
     buttonListener("#save_beats", () => this.downloadSongData());
 
     fileInputListener("#load_beats", async (file: File) => {
-      let parsed = JSON.parse(await file.text());
-      if (parsed instanceof Array) {
-        parsed = {
-          fileName: this.songData.file.name,
-          beats: parsed,
-          formatVersion: 1,
-        } satisfies StoredSongData;
+      if (this.songData) {
+        let parsed = JSON.parse(await file.text());
+        if (Array.isArray(parsed)) {
+          parsed = {
+            fileName: this.songData.file.name,
+            beats: parsed,
+            formatVersion: 1,
+          } satisfies StoredSongData;
+        }
+        this.songData.setData(parsed);
       }
-      this.songData!.setData(parsed);
     });
 
     buttonListener("#hack", () => {
@@ -176,22 +181,28 @@ class App {
   }
 
   downloadSongData() {
-    const songData = this.songData.songData!;
-    const buffer = new TextEncoder().encode(JSON.stringify(songData));
-    const url = URL.createObjectURL(new Blob([buffer], { type: "text/plain" }));
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${songData.fileName} (${songData.beats.length} beats).json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    if (this.songData) {
+      const songData = this.songData.songData!;
+      const buffer = new TextEncoder().encode(JSON.stringify(songData));
+      const url = URL.createObjectURL(
+        new Blob([buffer], { type: "text/plain" }),
+      );
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${songData.fileName} (${songData.beats.length} beats).json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
   }
 
   async setSongData(songData: SongData) {
     this.songData = songData;
     this.originalAudioElem.src = URL.createObjectURL(songData.file);
     document
-      .querySelectorAll(".song-enables")
-      .forEach((elem: HTMLInputElement) => (elem.disabled = false));
+      .querySelectorAll<HTMLInputElement>(".song-enables")
+      .forEach((elem: HTMLInputElement) => {
+        elem.disabled = false;
+      });
   }
 }
 
@@ -205,18 +216,19 @@ function buf2hex(buffer: ArrayBuffer): string {
 }
 
 const app = new App();
+// biome-ignore lint/suspicious/noExplicitAny: This is for debuggin'
 (window as any).app = app;
 
 /******** old code ********/
 
-import { saveAs } from "../lib/FileSaver.js";
-import { FileAPIReader, getAllTags, loadTags, Base64 } from "../lib/id3.js";
+import { saveAs } from "../vendor/FileSaver";
+import { Base64, FileAPIReader, getAllTags, loadTags } from "../vendor/id3";
 import { hackData } from "./beatcaster";
 import { current_hack } from "./current_hack";
-import { registerFileDragDrop } from "./drag-drop-file";
+import type { Milliseconds, SongBeatData, StoredSongData } from "./types";
 import { createWaveFileData } from "./wav";
 
-function displayString(str) {
+function displayString(str: string) {
   console.log(str);
   // document.querySelector("#output_bpm")!.textContent = str;
   // .stop().fadeOut(0).html(str).fadeIn(100); // TODO
@@ -233,46 +245,18 @@ function saveFile() {
   // app.downloadSongData();
 }
 
-function rehack() {
-  current_hack.file && startHack();
-}
-
-function display_analysis(audio_analysis) {
-  document
-    .querySelector("#output_text")!
-    .setAttribute("value", JSON.stringify(audio_analysis, null, 2));
-  // .fadeOut(0)
-  // .fadeIn(400); // TODO
-  // document.querySelector("#analysis_title").html(audio_analysis.meta.title);
-  // var time = "" + Math.floor(audio_analysis.meta.seconds/60) + ":" + Math.floor((audio_analysis.meta.seconds % 60)/10) + Math.floor(audio_analysis.meta.seconds % 10);
-  // document.querySelector("#analysis_time").html(time);
-  // document.querySelector("#analysis_artist").html(audio_analysis.meta.artist);
-  // document.querySelector("#analysis_album").html(audio_analysis.meta.album);
-  // document.querySelector("#analysis_bpm").html(Math.round(audio_analysis.track.tempo)) ;
-  // var keys = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
-  // document.querySelector("#analysis_key").html(keys[audio_analysis.track.key]);
-  // var modes = ["Minor", "Major"];
-  // document.querySelector("#analysis_mode").html(modes[audio_analysis.track.mode]);
-  // document.querySelector("#analysis_bpm_confidence").html(Math.round(audio_analysis.track.tempo_confidence * 100));
-  // document.querySelector("#analysis_key_confidence").html(Math.round(audio_analysis.track.key_confidence * 100));
-  // document.querySelector("#analysis_mode_confidence").html(Math.round(audio_analysis.track.mode_confidence * 100));
-  document.getElementById("analysis_info")!.classList.remove("hidden");
-}
-
-function hackSong(data) {
+function hackSong(data: ArrayBuffer) {
   const context = new AudioContext();
   context.decodeAudioData(
     data,
-    function (buffer) {
+    (buffer) => {
       current_hack.hack_data = hackData(
         buffer,
-        current_hack.audio_analysis,
+        current_hack.audio_analysis!,
         (document.getElementById("beat_pattern")! as HTMLInputElement).value,
         parseInt(
           (document.getElementById("overlap")! as HTMLInputElement).value,
         ) / 100,
-        (document.getElementById("beat_type_tatums")! as HTMLInputElement)
-          .checked,
       );
 
       const w = createWaveFileData(buffer, current_hack.hack_data);
@@ -314,7 +298,7 @@ function hackSong(data) {
   );
 }
 
-function processAnalysis(audio_analysis) {
+function processAnalysis(audio_analysis: SongBeatData) {
   current_hack.audio_analysis = audio_analysis;
   // display_analysis(audio_analysis);
   // displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
@@ -323,18 +307,18 @@ function processAnalysis(audio_analysis) {
   const reader = new FileReader();
 
   reader.onload = function (fileEvent) {
-    hackSong(fileEvent.target!.result);
+    hackSong(fileEvent.target!.result as ArrayBuffer);
   };
 
-  reader.readAsArrayBuffer(current_hack.file);
+  reader.readAsArrayBuffer(current_hack.file!);
 }
 
 // From http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/index.js
 // Used at http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/
 // See original demo at https://github.com/aadsm/JavaScript-ID3-Reader/issues/3
-function setBackground(file) {
+function setBackground(file: File) {
   console.log("Loading ID3 tags.");
-  const url = file.urn || file.name;
+  const url = file.name;
   const reader = new FileAPIReader(file);
   loadTags(
     url,
@@ -355,15 +339,6 @@ function setBackground(file) {
       dataReader: reader,
     },
   );
-}
-
-function startHackSong(file) {
-  current_hack.file = file;
-  startHack();
-}
-async function startHackJSON(file) {
-  current_hack.audio_analysis = JSON.parse(await file.text());
-  startHack();
 }
 
 function startHack() {
