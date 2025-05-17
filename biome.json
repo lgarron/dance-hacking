@@ -1,13 +1,24 @@
 {
-  "formatter": {
-    "indentStyle": "space",
-    "indentWidth": 2
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["./node_modules/@cubing/dev-config/biome/biome.json"],
+  "files": {
+    "includes": ["**", "!dist", "!package.json"]
   },
   "linter": {
-    "enabled": true,
     "rules": {
-      "recommended": true
+      "style": {
+        "noParameterAssign": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useSelfClosingElements": "error",
+        "useConst": "error",
+        "useSingleVarDeclarator": "error",
+        "noUnusedTemplateLiteral": "error",
+        "useNumberNamespace": "error",
+        "noInferrableTypes": "error",
+        "noUselessElse": "error"
+      }
     }
   }
 }
-
