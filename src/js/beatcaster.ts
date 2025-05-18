@@ -1,10 +1,9 @@
-import { current_hack } from "./current_hack.js";
+import type { CurrentHack } from "./index.js";
 import type {
   HackData,
   HackPatternString,
   HackSpecBeat,
   Milliseconds,
-  SongBeatData,
 } from "./types.js";
 
 function log(str: string) {
@@ -68,8 +67,8 @@ function beatsPerBar(pattern: HackPatternString) {
 }
 
 export function hackData(
+  currentHack: CurrentHack,
   audioData: AudioBuffer,
-  audio_analysis: SongBeatData,
   pattern: HackPatternString,
   overlap: number,
 ): HackData {
@@ -78,7 +77,7 @@ export function hackData(
   let num_samples = 0;
   const hack_data: HackSpecBeat[] = [];
   try {
-    current_hack.downloadFileName = `${current_hack.file!.name} (${
+    currentHack.downloadFileName = `${currentHack.file!.name} (${
       (document.getElementById("beat_pattern") as HTMLInputElement).value
     } pattern, ${
       (document.getElementById("overlap") as HTMLInputElement).value
@@ -86,7 +85,7 @@ export function hackData(
     //log("Datafying-hack data.");
     const beats_per_bar = beatsPerBar(pattern);
 
-    const beats = audio_analysis;
+    const beats = currentHack.audio_analysis!;
 
     // Returns the j-th beat of the i-th bar (0-indexed).
     function beat_start(i: number, j: number) {

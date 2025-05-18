@@ -1,5 +1,4 @@
-// tsconfig.json
 {
   "extends": "./node_modules/@cubing/dev-config/ts/es2022-types/tsconfig.json",
-  "include": ["./src/"]
+  "include": ["./script", "./src/"]
 }
