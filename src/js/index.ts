@@ -221,7 +221,6 @@ const app = new App();
 
 /******** old code ********/
 
-import { saveAs } from "../vendor/FileSaver";
 import { Base64, FileAPIReader, getAllTags, loadTags } from "../vendor/id3";
 import { hackData } from "./beatcaster";
 import { current_hack } from "./current_hack";
@@ -241,8 +240,10 @@ function saveFile() {
     fileName = "Song";
   }
   const extension = ".wav";
-  saveAs(current_hack.blob, fileName + extension);
-  // app.downloadSongData();
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(current_hack.blob!);
+  a.download = fileName + extension;
+  a.click();
 }
 
 function hackSong(data: ArrayBuffer) {
