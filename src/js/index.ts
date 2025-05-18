@@ -191,7 +191,8 @@ class App {
     buttonListener("#hack", () => {
       this.currentHack.file = this.songData!.file;
       this.currentHack.audio_analysis = this.songData!.songData.beats;
-      startHack(this.currentHack);
+
+      processAnalysis(this.currentHack);
     });
   }
 
@@ -342,10 +343,15 @@ function loadImageFromID3(file: File): Promise<ID3ImageData | undefined> {
   return promise;
 }
 
-function startHack(currentHack: CurrentHack) {
-  if (!(currentHack.file && currentHack.audio_analysis)) {
-    return;
+async function setBackground(file: File) {
+  console.log("Loading ID3 tags.");
+  const image = await loadImageFromID3(file);
+  if (typeof image !== "undefined") {
+    const base64 = `data:${
+      image.format
+    };base64,${Base64.encodeBytes(image.data)}`;
+    document.body.style.backgroundImage = `url(${JSON.stringify(base64)})`;
+  } else {
+    console.log("No image.");
   }
-
-  processAnalysis(currentHack);
 }
