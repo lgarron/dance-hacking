@@ -333,13 +333,11 @@ function setBackground(file: File) {
       console.log("Loaded ID3 tags.");
       const tags = getAllTags(url);
       const image = tags.picture;
-      console.log(image);
       if (typeof image !== "undefined") {
         const base64 = `data:${
           image.format
         };base64,${Base64.encodeBytes(image.data)}`;
-        document.style.backgroundImage = `url(${JSON.stringify(base64)})`;
-        console.log(document.body.style.background);
+        document.body.style.backgroundImage = `url(${JSON.stringify(base64)})`;
       } else {
         console.log("No image.");
       }
