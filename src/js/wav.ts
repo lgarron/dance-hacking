@@ -27,45 +27,6 @@ const writeInt32 = function (n: number, a: bufferData, offset: number) {
   a[offset + 3] = (intN >> 24) & 255;
 };
 
-// const writeAudioBuffer = function (
-//   audioBuffer: AudioBuffer,
-//   a: bufferData,
-//   initialOffset: number,
-//   _beat: number,
-//   _overlap: number,
-// ) {
-//   let offset = initialOffset;
-//   const n = audioBuffer.length;
-//   const bufferL = audioBuffer.getChannelData(0);
-//   let sampleL: number;
-//   const bufferR = audioBuffer.getChannelData(1);
-//   let sampleR: number;
-
-//   for (let i = 0; i < n; ++i) {
-//     sampleL = bufferL[i] * 32768.0;
-//     sampleR = bufferR[i] * 32768.0;
-
-//     // Clip left and right samples to the limitations of 16-bit.
-//     // If we don't do this then we'll get nasty wrap-around distortion.
-//     if (sampleL < INT16_MIN) {
-//       sampleL = INT16_MIN;
-//     }
-//     if (sampleL > INT16_MAX) {
-//       sampleL = INT16_MAX;
-//     }
-//     if (sampleR < INT16_MIN) {
-//       sampleR = INT16_MIN;
-//     }
-//     if (sampleR > INT16_MAX) {
-//       sampleR = INT16_MAX;
-//     }
-
-//     writeInt16(sampleL, a, offset);
-//     writeInt16(sampleR, a, offset + 2);
-//     offset += 4;
-//   }
-// };
-
 function copy(
   audioBuffer: AudioBuffer,
   a: bufferData,

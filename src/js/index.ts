@@ -222,7 +222,6 @@ class App {
 }
 
 function buf2hex(buffer: ArrayBuffer): string {
-  // buffer is an ArrayBuffer
   return (
     Array.prototype.map.call(new Uint8Array(buffer), (x: number) =>
       `00${x.toString(16)}`.slice(-2),
@@ -248,8 +247,6 @@ import { createWaveFileData } from "./wav";
 
 function displayString(str: string) {
   console.log(str);
-  // document.querySelector("#output_bpm")!.textContent = str;
-  // .stop().fadeOut(0).html(str).fadeIn(100); // TODO
 }
 
 function saveFile(currentHack: CurrentHack) {
@@ -282,12 +279,6 @@ function hackSong(currentHack: CurrentHack, data: ArrayBuffer) {
       const w = createWaveFileData(buffer, currentHack.hack_data);
       currentHack.blob = new Blob([w], { type: "audio/wav" });
       const hackedSongBlobURL = webkitURL.createObjectURL(currentHack.blob);
-
-      // Update UI
-
-      // document
-      //   .getElementById("download_button_div")!
-      //   .classList.remove("hidden");
       (
         document.getElementById("download_button") as HTMLButtonElement
       ).disabled = false;
@@ -302,14 +293,6 @@ function hackSong(currentHack: CurrentHack, data: ArrayBuffer) {
         originalAudioElem.pause();
         outputAudioElem.play();
       }
-      //displayString("Hacked version of \"" + current_hack.audio_analysis.meta.title + "\" is playing.");
-      // document.getElementById("new_song")!.classList.add("hidden");
-      // document.getElementById("song_json")!.classList.add("hidden");
-      // document.getElementById("output_bpm")!.classList.add("hidden");
-
-      // document
-      //   .getElementById("rehack_button")!
-      //   .addEventListener("click", rehack);
     },
     function (e) {
       displayString("Failed to decode audio file (unknown reason). :-(");
@@ -319,8 +302,6 @@ function hackSong(currentHack: CurrentHack, data: ArrayBuffer) {
 }
 
 function processAnalysis(currentHack: CurrentHack) {
-  // display_analysis(audio_analysis);
-  // displayString("BPM of \"" + audio_analysis.meta.title + "\" is: " + audio_analysis.track.tempo + "<br>(confidence: " + Math.round(100 * audio_analysis.track.tempo_confidence) + "%)");
   displayString("Please wait a moment for waltzification.");
 
   const reader = new FileReader();
@@ -332,9 +313,6 @@ function processAnalysis(currentHack: CurrentHack) {
   reader.readAsArrayBuffer(currentHack.file!);
 }
 
-// From http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/index.js
-// Used at http://web.ist.utl.pt/antonio.afonso/www.aadsm.net/libraries/id3/
-// See original demo at https://github.com/aadsm/JavaScript-ID3-Reader/issues/3
 function setBackground(file: File) {
   console.log("Loading ID3 tags.");
   const url = file.name;
@@ -368,14 +346,3 @@ function startHack(currentHack: CurrentHack) {
 
   processAnalysis(currentHack);
 }
-
-// registerFileDragDrop(
-//   document.getElementById("new_song")!,
-//   document.getElementById("new_song")!,
-//   startHackSong,
-// );
-// registerFileDragDrop(
-//   document.getElementById("song_json")!,
-//   document.getElementById("song_json")!,
-//   startHackJSON,
-// );
