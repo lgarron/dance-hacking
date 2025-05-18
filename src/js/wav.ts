@@ -2,6 +2,9 @@ import type { HackData, HackSpecBeatBlend, HackSpecBeatCopy } from "./types";
 
 type bufferData = Uint8Array<ArrayBuffer>;
 
+const INT16_MIN = -(1 << 15);
+const INT16_MAX = (1 << 15) - 1;
+
 // Based on audiojedit.js
 
 const writeString = function (s: string, a: bufferData, offset: number) {
@@ -44,17 +47,17 @@ const writeInt32 = function (n: number, a: bufferData, offset: number) {
 
 //     // Clip left and right samples to the limitations of 16-bit.
 //     // If we don't do this then we'll get nasty wrap-around distortion.
-//     if (sampleL < -32768) {
-//       sampleL = -32768;
+//     if (sampleL < INT16_MIN) {
+//       sampleL = INT16_MIN;
 //     }
-//     if (sampleL > 32767) {
-//       sampleL = 32767;
+//     if (sampleL > INT16_MAX) {
+//       sampleL = INT16_MAX;
 //     }
-//     if (sampleR < -32768) {
-//       sampleR = -32768;
+//     if (sampleR < INT16_MIN) {
+//       sampleR = INT16_MIN;
 //     }
-//     if (sampleR > 32767) {
-//       sampleR = 32767;
+//     if (sampleR > INT16_MAX) {
+//       sampleR = INT16_MAX;
 //     }
 
 //     writeInt16(sampleL, a, offset);
@@ -89,17 +92,17 @@ function copy(
 
     // Clip left and right samples to the limitations of 16-bit.
     // If we don't do this then we'll get nasty wrap-around distortion.
-    if (sampleL < -32768) {
-      sampleL = -32768;
+    if (sampleL < INT16_MIN) {
+      sampleL = INT16_MIN;
     }
-    if (sampleL > 32767) {
-      sampleL = 32767;
+    if (sampleL > INT16_MAX) {
+      sampleL = INT16_MAX;
     }
-    if (sampleR < -32768) {
-      sampleR = -32768;
+    if (sampleR < INT16_MIN) {
+      sampleR = INT16_MIN;
     }
-    if (sampleR > 32767) {
-      sampleR = 32767;
+    if (sampleR > INT16_MAX) {
+      sampleR = INT16_MAX;
     }
 
     writeInt16(sampleL, a, offset);
@@ -183,17 +186,17 @@ function blend(
 
     // Clip left and right samples to the limitations of 16-bit.
     // If we don't do this then we'll get nasty wrap-around distortion.
-    if (sampleL < -32768) {
-      sampleL = -32768;
+    if (sampleL < INT16_MIN) {
+      sampleL = INT16_MIN;
     }
-    if (sampleL > 32767) {
-      sampleL = 32767;
+    if (sampleL > INT16_MAX) {
+      sampleL = INT16_MAX;
     }
-    if (sampleR < -32768) {
-      sampleR = -32768;
+    if (sampleR < INT16_MIN) {
+      sampleR = INT16_MIN;
     }
-    if (sampleR > 32767) {
-      sampleR = 32767;
+    if (sampleR > INT16_MAX) {
+      sampleR = INT16_MAX;
     }
 
     writeInt16(sampleL, a, offset);
