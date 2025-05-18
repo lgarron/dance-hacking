@@ -119,6 +119,12 @@ class App {
   constructor() {
     fileInputListener("#song_input", async (file: File) => {
       this.setSongData(await SongData.fromFile(file, this.beatListElem));
+
+      try {
+        setBackground(file);
+      } catch (e) {
+        console.log(e);
+      }
     });
 
     buttonListener("#add_beat", () => {
@@ -327,10 +333,13 @@ function setBackground(file: File) {
       console.log("Loaded ID3 tags.");
       const tags = getAllTags(url);
       const image = tags.picture;
+      console.log(image);
       if (typeof image !== "undefined") {
-        document.body.style.background = `data:${
+        const base64 = `data:${
           image.format
         };base64,${Base64.encodeBytes(image.data)}`;
+        document.style.backgroundImage = `url(${JSON.stringify(base64)})`;
+        console.log(document.body.style.background);
       } else {
         console.log("No image.");
       }
@@ -345,12 +354,6 @@ function setBackground(file: File) {
 function startHack() {
   if (!(current_hack.file && current_hack.audio_analysis)) {
     return;
-  }
-
-  try {
-    setBackground(current_hack.file);
-  } catch (e) {
-    console.log(e);
   }
 
   processAnalysis(current_hack.audio_analysis);
