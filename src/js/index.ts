@@ -126,7 +126,7 @@ class App {
   currentHack: CurrentHack = {};
 
   constructor() {
-    fileInputListener("#song_input", async (file: File) => {
+    const onFileCallback = async (file: File) => {
       this.setSongData(await SongData.fromFile(file, this.beatListElem));
 
       try {
@@ -134,7 +134,16 @@ class App {
       } catch (e) {
         console.log(e);
       }
-    });
+    };
+    fileInputListener("#song_input", onFileCallback);
+    registerFileDragDrop(document.body, (file: File) => {
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      const fileList = dataTransfer.files;
+
+      document.querySelector<HTMLInputElement>("#song_input")!.files = fileList;
+      onFileCallback(file);
+    }, document.querySelector<HTMLSpanElement>("#drag_drop_feedback")!);
 
     buttonListener("#add_beat", () => {
       if (this.songData) {
@@ -238,6 +247,7 @@ const app = new App();
 
 import { Base64, FileAPIReader, getAllTags, loadTags } from "../vendor/id3";
 import { hackData } from "./beatcaster";
+import { registerFileDragDrop } from "./drag-drop-file";
 import type {
   HackData,
   Milliseconds,

@@ -1,7 +1,7 @@
 export function registerFileDragDrop(
   domElement: HTMLElement,
-  feedbackElement: HTMLElement,
   callback: (file: File) => void,
+  textFeedbackElement: HTMLElement
 ) {
   const css_classes = {
     over: "drag_drop_over",
@@ -16,12 +16,14 @@ export function registerFileDragDrop(
   };
 
   function setDragDropVisualFeedback(type: "over" | "out" | "done") {
-    feedbackElement.innerHTML = feedback_text[type];
-    const cL = feedbackElement.classList;
-    for (const className of Object.values(css_classes)) {
-      cL.remove(className);
-    }
-    feedbackElement.classList.add(css_classes[type]);
+      textFeedbackElement.innerHTML = feedback_text[type];
+
+      for (const className of Object.values(css_classes)) {
+        domElement.classList.remove(className);
+        textFeedbackElement.classList.remove(className);
+      }
+      domElement.classList.add(css_classes[type]);
+      textFeedbackElement.classList.add(css_classes[type]);
   }
 
   function dragEnter(event: DragEvent) {
