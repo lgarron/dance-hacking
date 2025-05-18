@@ -261,6 +261,7 @@ function saveFile(currentHack: CurrentHack) {
   a.href = URL.createObjectURL(currentHack.blob!);
   a.download = fileName + extension;
   a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 function hackSong(currentHack: CurrentHack, data: ArrayBuffer) {
