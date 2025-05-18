@@ -1,4 +1,8 @@
 {
   "extends": "./node_modules/@cubing/dev-config/ts/es2022-types/tsconfig.json",
+  "compilerOptions": {
+    "lib": ["es2024", "DOM", "DOM.Iterable"],
+    "target": "es2024"
+  },
   "include": ["./script", "./src/"]
 }

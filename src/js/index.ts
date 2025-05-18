@@ -313,30 +313,33 @@ function processAnalysis(currentHack: CurrentHack) {
   reader.readAsArrayBuffer(currentHack.file!);
 }
 
-function setBackground(file: File) {
-  console.log("Loading ID3 tags.");
-  const url = file.name;
+interface ID3ImageData {
+  format: string;
+  data: Array<number>;
+}
+
+function loadImageFromID3(file: File): Promise<ID3ImageData | undefined> {
+  // TODO: how can we catch errors?
+  const {
+    promise,
+    resolve,
+    reject: _,
+  } = Promise.withResolvers<ID3ImageData | undefined>();
   const reader = new FileAPIReader(file);
+  const url = file.name;
   loadTags(
     url,
     function () {
       console.log("Loaded ID3 tags.");
       const tags = getAllTags(url);
-      const image = tags.picture;
-      if (typeof image !== "undefined") {
-        const base64 = `data:${
-          image.format
-        };base64,${Base64.encodeBytes(image.data)}`;
-        document.body.style.backgroundImage = `url(${JSON.stringify(base64)})`;
-      } else {
-        console.log("No image.");
-      }
+      resolve(tags.picture);
     },
     {
       tags: ["picture"],
       dataReader: reader,
     },
   );
+  return promise;
 }
 
 function startHack(currentHack: CurrentHack) {
