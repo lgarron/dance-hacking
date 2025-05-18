@@ -18,10 +18,6 @@ deploy: build
 clean:
 	rm -rf ./dist
 
-.PHONY: setup
-setup:
-	bun install
-
 .PHONY: lint
 lint: setup
 	bun x @biomejs/biome check ./script ./src
